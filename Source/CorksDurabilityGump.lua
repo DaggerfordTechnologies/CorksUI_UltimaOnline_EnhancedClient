@@ -9,6 +9,8 @@ CorksDurabilityGump.REFRESH_INTERVAL = 10
 CorksDurabilityGump.RefreshTimer = 0
 CorksDurabilityGump.RowCount = 0
 
+CorksDurabilityGump.NeedsInitialUpdate = false
+
 CorksDurabilityGump.SlotNames = {
 	[1]  = "Head",
 	[2]  = "Neck",
@@ -46,7 +48,7 @@ function CorksDurabilityGump.Initialize()
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
 
 	WindowUtils.RestoreWindowPosition("CorksDurabilityGump")
-	CorksDurabilityGump.Update()
+	CorksDurabilityGump.NeedsInitialUpdate = true
 end
 
 function CorksDurabilityGump.Shutdown()
@@ -60,6 +62,11 @@ function CorksDurabilityGump.OnPaperdollEvent()
 end
 
 function CorksDurabilityGump.OnUpdate(timePassed)
+	if CorksDurabilityGump.NeedsInitialUpdate then
+		CorksDurabilityGump.NeedsInitialUpdate = false
+		CorksDurabilityGump.Update()
+		return
+	end
 	CorksDurabilityGump.RefreshTimer = CorksDurabilityGump.RefreshTimer + timePassed
 	if CorksDurabilityGump.RefreshTimer >= CorksDurabilityGump.REFRESH_INTERVAL then
 		CorksDurabilityGump.RefreshTimer = 0
