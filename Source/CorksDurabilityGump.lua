@@ -42,6 +42,9 @@ function CorksDurabilityGump.Initialize()
 	WindowUtils.SetWindowTitle("CorksDurabilityGump", L"Corks Gear Watcher")
 
 	LabelSetText("CorksDurabilityGumpHeaderItem", L"Item")
+	-- Restore header dur to its XML right-anchor in case a previous session repositioned it
+	WindowClearAnchors("CorksDurabilityGumpHeaderDur")
+	WindowAddAnchor("CorksDurabilityGumpHeaderDur", "topright", "CorksDurabilityGump", "topright", -18, 38)
 	LabelSetText("CorksDurabilityGumpHeaderDur", L"Durability")
 
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
@@ -179,8 +182,9 @@ function CorksDurabilityGump.Update()
 	CorksDurabilityGump.NeedsResize = true
 end
 
--- Phase 2: measure label text and size the window to fit. Runs the frame
--- after Update() so the layout engine has processed the new labels.
+-- Phase 2: size the scroll child to match row count, and set row widths to
+-- fill the list. Durability stays right-aligned via its XML template anchor.
+-- The main window dimensions are never touched here so user scaling is preserved.
 function CorksDurabilityGump.Resize()
 	local windowName = "CorksDurabilityGump"
 	local scrollChild = windowName .. "ListScrollChild"
@@ -190,85 +194,19 @@ function CorksDurabilityGump.Resize()
 		return
 	end
 
-	local maxItemWidth = 0
-	local maxDurWidth = 0
+	local listW, _ = WindowGetDimensions(windowName .. "List")
+	-- Scrollbar is 20px, leave 20px for inner margin
+	local rowW = listW - 20
+
+	WindowSetDimensions(scrollChild, rowW, rowCount * 22)
 
 	for i = 1, rowCount do
 		local rowName = scrollChild .. "Row" .. i
 		if DoesWindowNameExist(rowName) then
-			local itemW, _ = LabelGetTextDimensions(rowName .. "ItemName")
-			if itemW and itemW > maxItemWidth then
-				maxItemWidth = itemW
-			end
-			local durW, _ = LabelGetTextDimensions(rowName .. "Durability")
-			if durW and durW > maxDurWidth then
-				maxDurWidth = durW
-			end
+			WindowSetDimensions(rowName, rowW, 22)
+			-- Item label fills row width minus space for durability at the right.
+			-- Durability label keeps its template right-anchor so no repositioning needed.
+			WindowSetDimensions(rowName .. "ItemName", rowW - 100, 20)
 		end
 	end
-
-	-- If all measurements are zero the layout engine hasn't processed the labels yet.
-	-- Defer to the next frame and try again.
-	if maxItemWidth == 0 and maxDurWidth == 0 then
-		CorksDurabilityGump.NeedsResize = true
-		return
-	end
-
-	-- Also account for the header label widths
-	local headerItemW, _ = LabelGetTextDimensions(windowName .. "HeaderItem")
-	if headerItemW and headerItemW > maxItemWidth then
-		maxItemWidth = headerItemW
-	end
-	local headerDurW, _ = LabelGetTextDimensions(windowName .. "HeaderDur")
-	if headerDurW and headerDurW > maxDurWidth then
-		maxDurWidth = headerDurW
-	end
-
-	-- Layout constants
-	-- Row layout: leftMargin | itemLabel | gap | durLabel | rightPad
-	-- scrollPad = list x-offset(10) + scrollbar width(20) + right margin(10)
-	local leftMargin = 8
-	local gap        = 20
-	local rightPad   = 16
-	local scrollPad  = 40
-	local minWidth   = 250
-
-	local durLabelWidth = maxDurWidth + 16
-	if durLabelWidth < 80 then
-		durLabelWidth = 80
-	end
-
-	local contentWidth = scrollPad + leftMargin + maxItemWidth + gap + durLabelWidth + rightPad
-	if contentWidth < minWidth then
-		contentWidth = minWidth
-	end
-
-	local itemLabelWidth = contentWidth - scrollPad - leftMargin - gap - durLabelWidth - rightPad
-
-	-- Durability header x relative to window topleft (list starts at x=10)
-	local durColumnX = 10 + leftMargin + itemLabelWidth + gap
-
-	-- Preserve the user-applied scale (set via mouse wheel) when resizing.
-	-- Without this, calling WindowSetDimensions resets the visual scale.
-	local currentScale = WindowGetScale(windowName)
-	WindowSetDimensions(windowName, contentWidth, 400)
-	WindowSetScale(windowName, currentScale)
-	WindowSetDimensions(windowName .. "List", contentWidth - 20, 320)
-	WindowSetDimensions(scrollChild, contentWidth - 40, rowCount * 22)
-
-	for i = 1, rowCount do
-		local rowName = scrollChild .. "Row" .. i
-		if DoesWindowNameExist(rowName) then
-			WindowSetDimensions(rowName, contentWidth - 40, 22)
-			WindowSetDimensions(rowName .. "ItemName", itemLabelWidth, 20)
-			WindowSetDimensions(rowName .. "Durability", durLabelWidth, 20)
-			WindowClearAnchors(rowName .. "Durability")
-			WindowAddAnchor(rowName .. "Durability", "left", rowName, "left", leftMargin + itemLabelWidth + gap, 0)
-		end
-	end
-
-	WindowSetDimensions(windowName .. "HeaderItem", itemLabelWidth, 20)
-	WindowSetDimensions(windowName .. "HeaderDur", durLabelWidth, 20)
-	WindowClearAnchors(windowName .. "HeaderDur")
-	WindowAddAnchor(windowName .. "HeaderDur", "topleft", windowName, "topleft", durColumnX, 38)
 end
