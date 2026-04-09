@@ -42,9 +42,6 @@ function CorksDurabilityGump.Initialize()
 	WindowUtils.SetWindowTitle("CorksDurabilityGump", L"Corks Gear Watcher")
 
 	LabelSetText("CorksDurabilityGumpHeaderItem", L"Item")
-	-- Restore header dur to its XML right-anchor in case a previous session repositioned it
-	WindowClearAnchors("CorksDurabilityGumpHeaderDur")
-	WindowAddAnchor("CorksDurabilityGumpHeaderDur", "topright", "CorksDurabilityGump", "topright", -18, 38)
 	LabelSetText("CorksDurabilityGumpHeaderDur", L"Durability")
 
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
@@ -182,9 +179,9 @@ function CorksDurabilityGump.Update()
 	CorksDurabilityGump.NeedsResize = true
 end
 
--- Phase 2: size the scroll child to match row count, and set row widths to
--- fill the list. Durability stays right-aligned via its XML template anchor.
--- The main window dimensions are never touched here so user scaling is preserved.
+-- Phase 2: update the scroll child height to match the number of rows.
+-- All widths stay at XML template values — never touch them dynamically
+-- to avoid feedback loops with WindowGetDimensions under scaling.
 function CorksDurabilityGump.Resize()
 	local windowName = "CorksDurabilityGump"
 	local scrollChild = windowName .. "ListScrollChild"
@@ -194,19 +191,6 @@ function CorksDurabilityGump.Resize()
 		return
 	end
 
-	local listW, _ = WindowGetDimensions(windowName .. "List")
-	-- Scrollbar is 20px, leave 20px for inner margin
-	local rowW = listW - 20
-
-	WindowSetDimensions(scrollChild, rowW, rowCount * 22)
-
-	for i = 1, rowCount do
-		local rowName = scrollChild .. "Row" .. i
-		if DoesWindowNameExist(rowName) then
-			WindowSetDimensions(rowName, rowW, 22)
-			-- Item label fills row width minus space for durability at the right.
-			-- Durability label keeps its template right-anchor so no repositioning needed.
-			WindowSetDimensions(rowName .. "ItemName", rowW - 100, 20)
-		end
-	end
+	local scrollW, _ = WindowGetDimensions(scrollChild)
+	WindowSetDimensions(scrollChild, scrollW, rowCount * 22)
 end

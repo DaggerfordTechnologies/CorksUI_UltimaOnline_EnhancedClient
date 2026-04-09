@@ -3,12 +3,12 @@
 
     <Window name="CorksDurabilityGumpRowTemplate">
       <Size>
-        <AbsPoint x="340" y="22" />
+        <AbsPoint x="380" y="22" />
       </Size>
       <Windows>
         <Label name="$parentItemName" font="UO_DefaultText" maxchars="128" textalign="left" handleinput="false">
           <Size>
-            <AbsPoint x="240" y="20" />
+            <AbsPoint x="260" y="20" />
           </Size>
           <Anchors>
             <Anchor point="left" relativePoint="left">
@@ -17,9 +17,9 @@
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
         </Label>
-        <Label name="$parentDurability" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
+        <Label name="$parentDurability" font="UO_DefaultText" maxchars="32" textalign="right" handleinput="false">
           <Size>
-            <AbsPoint x="80" y="20" />
+            <AbsPoint x="100" y="20" />
           </Size>
           <Anchors>
             <Anchor point="right" relativePoint="right">
@@ -33,7 +33,7 @@
 
     <Window name="CorksDurabilityGump" movable="true" layer="default">
       <Size>
-        <AbsPoint x="360" y="400" />
+        <AbsPoint x="400" y="400" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
@@ -57,7 +57,7 @@
 
         <Label name="$parentHeaderItem" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
           <Size>
-            <AbsPoint x="240" y="20" />
+            <AbsPoint x="260" y="20" />
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
@@ -66,9 +66,9 @@
           </Anchors>
           <Color r="255" g="200" b="50" a="255" />
         </Label>
-        <Label name="$parentHeaderDur" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
+        <Label name="$parentHeaderDur" font="UO_DefaultText" maxchars="32" textalign="right" handleinput="false">
           <Size>
-            <AbsPoint x="80" y="20" />
+            <AbsPoint x="100" y="20" />
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
@@ -80,7 +80,7 @@
 
         <ScrollWindow name="$parentList" childscrollwindow="$parentScrollChild" scrollbar="$parentScrollbar" lineheight="22" autoHideScrollBar="true">
           <Size>
-            <AbsPoint x="340" y="320" />
+            <AbsPoint x="380" y="320" />
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
@@ -91,7 +91,7 @@
             <VerticalScrollbar name="$parentScrollbar" inherits="StandardVertScroll" />
             <Window name="$parentScrollChild">
               <Size>
-                <AbsPoint x="320" y="320" />
+                <AbsPoint x="360" y="320" />
               </Size>
               <Anchors>
                 <Anchor point="topleft" relativePoint="topleft" />
