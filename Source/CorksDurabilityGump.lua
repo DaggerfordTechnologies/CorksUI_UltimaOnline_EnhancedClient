@@ -131,7 +131,7 @@ function CorksDurabilityGump.Update()
 				if rowCount == 1 then
 					WindowAddAnchor(rowName, "topleft", scrollChild, "topleft", 0, 0)
 				else
-					WindowAddAnchor(rowName, "topleft", scrollChild .. "Row" .. (rowCount - 1), "bottomleft", 0, 0)
+					WindowAddAnchor(rowName, "bottomleft", scrollChild .. "Row" .. (rowCount - 1), "topleft", 0, 0)
 				end
 
 				-- Item name
