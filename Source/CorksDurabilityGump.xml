@@ -91,7 +91,7 @@
             <VerticalScrollbar name="$parentScrollbar" inherits="StandardVertScroll" />
             <Window name="$parentScrollChild">
               <Size>
-                <AbsPoint x="360" y="320" />
+                <AbsPoint x="360" y="418" />
               </Size>
               <Anchors>
                 <Anchor point="topleft" relativePoint="topleft" />

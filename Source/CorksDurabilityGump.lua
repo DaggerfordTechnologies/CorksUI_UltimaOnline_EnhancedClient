@@ -8,6 +8,7 @@ CorksDurabilityGump.DURABILITY_TID = 1060639
 CorksDurabilityGump.REFRESH_INTERVAL = 10
 CorksDurabilityGump.RefreshTimer = 0
 CorksDurabilityGump.RowCount = 0
+CorksDurabilityGump.MAX_ROWS = 19  -- Max equippable slots
 
 CorksDurabilityGump.SlotNames = {
 	[1]  = "Head",
@@ -31,10 +32,6 @@ CorksDurabilityGump.SlotNames = {
 	[19] = "Pants",
 }
 
--- Logical width of the scroll child as defined in the XML template.
--- Never derived at runtime to avoid feedback with window scale.
-CorksDurabilityGump.SCROLL_CHILD_WIDTH = 360
-
 ----------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------
@@ -49,12 +46,39 @@ function CorksDurabilityGump.Initialize()
 
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
 
+	-- Pre-create all rows once at load time so they are always children of
+	-- the unscaled window. Updating text in-place avoids CreateWindowFromTemplate
+	-- being called under a scaled parent, which causes scale inheritance issues.
+	CorksDurabilityGump.CreateRows()
+
 	WindowUtils.RestoreWindowPosition("CorksDurabilityGump")
 	CorksDurabilityGump.Update()
 end
 
 function CorksDurabilityGump.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksDurabilityGump")
+end
+
+function CorksDurabilityGump.CreateRows()
+	local windowName = "CorksDurabilityGump"
+	local scrollChild = windowName .. "ListScrollChild"
+
+	for i = 1, CorksDurabilityGump.MAX_ROWS do
+		local rowName = scrollChild .. "Row" .. i
+		if not DoesWindowNameExist(rowName) then
+			CreateWindowFromTemplate(rowName, "CorksDurabilityGumpRowTemplate", scrollChild)
+			if i == 1 then
+				WindowAddAnchor(rowName, "topleft", scrollChild, "topleft", 0, 0)
+			else
+				WindowAddAnchor(rowName, "bottomleft", scrollChild .. "Row" .. (i - 1), "topleft", 0, 0)
+			end
+		end
+		WindowSetShowing(rowName, false)
+	end
+
+	-- Set scroll child to full height of all rows once at creation time.
+	-- Never resized again, so WindowSetDimensions never fires under a scaled parent.
+	WindowSetDimensions(scrollChild, 360, CorksDurabilityGump.MAX_ROWS * 22)
 end
 
 function CorksDurabilityGump.OnPaperdollEvent()
@@ -98,14 +122,13 @@ function CorksDurabilityGump.Update()
 		return
 	end
 
-	-- Destroy old rows
-	for i = 1, CorksDurabilityGump.RowCount do
-		local oldRow = scrollChild .. "Row" .. i
-		if DoesWindowNameExist(oldRow) then
-			DestroyWindow(oldRow)
+	-- Hide all rows first
+	for i = 1, CorksDurabilityGump.MAX_ROWS do
+		local rowName = scrollChild .. "Row" .. i
+		if DoesWindowNameExist(rowName) then
+			WindowSetShowing(rowName, false)
 		end
 	end
-	CorksDurabilityGump.RowCount = 0
 
 	local rowCount = 0
 
@@ -127,13 +150,7 @@ function CorksDurabilityGump.Update()
 				end
 
 				local rowName = scrollChild .. "Row" .. rowCount
-				CreateWindowFromTemplate(rowName, "CorksDurabilityGumpRowTemplate", scrollChild)
-
-				if rowCount == 1 then
-					WindowAddAnchor(rowName, "topleft", scrollChild, "topleft", 0, 0)
-				else
-					WindowAddAnchor(rowName, "bottomleft", scrollChild .. "Row" .. (rowCount - 1), "topleft", 0, 0)
-				end
+				WindowSetShowing(rowName, true)
 
 				LabelSetText(rowName .. "ItemName", itemName)
 
@@ -160,20 +177,15 @@ function CorksDurabilityGump.Update()
 		end
 	end
 
-	-- If no items with durability found, show a placeholder row
+	-- If no items with durability, show placeholder in row 1
 	if rowCount == 0 then
 		rowCount = 1
 		local rowName = scrollChild .. "Row1"
-		CreateWindowFromTemplate(rowName, "CorksDurabilityGumpRowTemplate", scrollChild)
-		WindowAddAnchor(rowName, "topleft", scrollChild, "topleft", 0, 0)
+		WindowSetShowing(rowName, true)
 		LabelSetText(rowName .. "ItemName", L"No items with durability equipped.")
 		LabelSetTextColor(rowName .. "ItemName", 180, 180, 180)
 		LabelSetText(rowName .. "Durability", L"")
 	end
 
 	CorksDurabilityGump.RowCount = rowCount
-
-	-- Update scroll child height only. Width is always the XML constant —
-	-- never derived from WindowGetDimensions to avoid any scale feedback.
-	WindowSetDimensions(scrollChild, CorksDurabilityGump.SCROLL_CHILD_WIDTH, rowCount * 22)
 end
