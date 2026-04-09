@@ -8,8 +8,7 @@ CorksDurabilityGump.DURABILITY_TID = 1060639
 CorksDurabilityGump.REFRESH_INTERVAL = 10
 CorksDurabilityGump.RefreshTimer = 0
 CorksDurabilityGump.RowCount = 0
-
-CorksDurabilityGump.NeedsInitialUpdate = false
+CorksDurabilityGump.NeedsResize = false
 
 CorksDurabilityGump.SlotNames = {
 	[1]  = "Head",
@@ -48,7 +47,7 @@ function CorksDurabilityGump.Initialize()
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
 
 	WindowUtils.RestoreWindowPosition("CorksDurabilityGump")
-	CorksDurabilityGump.NeedsInitialUpdate = true
+	CorksDurabilityGump.Update()
 end
 
 function CorksDurabilityGump.Shutdown()
@@ -62,9 +61,9 @@ function CorksDurabilityGump.OnPaperdollEvent()
 end
 
 function CorksDurabilityGump.OnUpdate(timePassed)
-	if CorksDurabilityGump.NeedsInitialUpdate then
-		CorksDurabilityGump.NeedsInitialUpdate = false
-		CorksDurabilityGump.Update()
+	if CorksDurabilityGump.NeedsResize then
+		CorksDurabilityGump.NeedsResize = false
+		CorksDurabilityGump.Resize()
 		return
 	end
 	CorksDurabilityGump.RefreshTimer = CorksDurabilityGump.RefreshTimer + timePassed
@@ -88,6 +87,8 @@ function CorksDurabilityGump.Toggle()
 	end
 end
 
+-- Phase 1: build rows and set text. Resize is deferred to next frame so
+-- LabelGetTextDimensions can return valid measurements after layout.
 function CorksDurabilityGump.Update()
 	local windowName = "CorksDurabilityGump"
 	local scrollChild = windowName .. "ListScrollChild"
@@ -111,8 +112,6 @@ function CorksDurabilityGump.Update()
 	CorksDurabilityGump.RowCount = 0
 
 	local rowCount = 0
-	local maxItemWidth = 0
-	local maxDurWidth = 0
 
 	for index = 1, WindowData.Paperdoll[playerId].numSlots do
 		local slotData = WindowData.Paperdoll[playerId][index]
@@ -126,7 +125,6 @@ function CorksDurabilityGump.Update()
 				local current = tonumber(dur[1])
 				local max = tonumber(dur[2])
 
-				-- Get item name (first property line)
 				local itemName = ItemProperties.GetObjectProperties(objectId, 1, "CorksDurabilityGump")
 				if not itemName then
 					itemName = L"Unknown"
@@ -141,48 +139,32 @@ function CorksDurabilityGump.Update()
 					WindowAddAnchor(rowName, "bottomleft", scrollChild .. "Row" .. (rowCount - 1), "topleft", 0, 0)
 				end
 
-				-- Item name
 				LabelSetText(rowName .. "ItemName", itemName)
-				local itemW, _ = LabelGetTextDimensions(rowName .. "ItemName")
-				if itemW and itemW > maxItemWidth then
-					maxItemWidth = itemW
-				end
 
-				-- Durability text
 				local durText = towstring(tostring(current) .. " / " .. tostring(max))
 				LabelSetText(rowName .. "Durability", durText)
-				local durW, _ = LabelGetTextDimensions(rowName .. "Durability")
-				if durW and durW > maxDurWidth then
-					maxDurWidth = durW
-				end
 
-				-- Color based on durability percentage
 				local perc = 0
 				if max > 0 then
 					perc = math.floor((current / max) * 100)
 				end
 
 				if perc > 75 then
-					-- Green
 					LabelSetTextColor(rowName .. "Durability", 0, 255, 0)
 				elseif perc > 50 then
-					-- Yellow
 					LabelSetTextColor(rowName .. "Durability", 255, 255, 0)
 				elseif perc > 25 then
-					-- Orange
 					LabelSetTextColor(rowName .. "Durability", 255, 165, 0)
 				elseif perc > 10 then
-					-- Red
 					LabelSetTextColor(rowName .. "Durability", 255, 80, 0)
 				else
-					-- Bright red
 					LabelSetTextColor(rowName .. "Durability", 255, 0, 0)
 				end
 			end
 		end
 	end
 
-	-- If no items with durability found, show a message
+	-- If no items with durability found, show a placeholder row
 	if rowCount == 0 then
 		rowCount = 1
 		local rowName = scrollChild .. "Row1"
@@ -194,20 +176,54 @@ function CorksDurabilityGump.Update()
 	end
 
 	CorksDurabilityGump.RowCount = rowCount
+	CorksDurabilityGump.NeedsResize = true
+end
 
-	-- Measure header text width to ensure durability column fits both header and values
+-- Phase 2: measure label text and size the window to fit. Runs the frame
+-- after Update() so the layout engine has processed the new labels.
+function CorksDurabilityGump.Resize()
+	local windowName = "CorksDurabilityGump"
+	local scrollChild = windowName .. "ListScrollChild"
+	local rowCount = CorksDurabilityGump.RowCount
+
+	if not DoesWindowNameExist(windowName) or rowCount == 0 then
+		return
+	end
+
+	local maxItemWidth = 0
+	local maxDurWidth = 0
+
+	for i = 1, rowCount do
+		local rowName = scrollChild .. "Row" .. i
+		if DoesWindowNameExist(rowName) then
+			local itemW, _ = LabelGetTextDimensions(rowName .. "ItemName")
+			if itemW and itemW > maxItemWidth then
+				maxItemWidth = itemW
+			end
+			local durW, _ = LabelGetTextDimensions(rowName .. "Durability")
+			if durW and durW > maxDurWidth then
+				maxDurWidth = durW
+			end
+		end
+	end
+
+	-- Also account for the header label widths
+	local headerItemW, _ = LabelGetTextDimensions(windowName .. "HeaderItem")
+	if headerItemW and headerItemW > maxItemWidth then
+		maxItemWidth = headerItemW
+	end
 	local headerDurW, _ = LabelGetTextDimensions(windowName .. "HeaderDur")
 	if headerDurW and headerDurW > maxDurWidth then
 		maxDurWidth = headerDurW
 	end
 
 	-- Layout constants
-	-- Row content layout: leftMargin | itemLabel | gap | durLabel | rightPad
-	-- Row width = contentWidth - scrollPad  (scrollbar 20 + list-left offset 10 + inner margin 10)
-	local leftMargin = 8   -- item label left offset in row template (from XML anchor)
-	local gap        = 20  -- gap between item and durability columns
-	local rightPad   = 16  -- padding after durability label to row right edge
-	local scrollPad  = 40  -- accounts for scrollbar + list/window offsets
+	-- Row layout: leftMargin | itemLabel | gap | durLabel | rightPad
+	-- scrollPad = list x-offset(10) + scrollbar width(20) + right margin(10)
+	local leftMargin = 8
+	local gap        = 20
+	local rightPad   = 16
+	local scrollPad  = 40
 	local minWidth   = 250
 
 	local durLabelWidth = maxDurWidth + 16
@@ -215,24 +231,20 @@ function CorksDurabilityGump.Update()
 		durLabelWidth = 80
 	end
 
-	-- Derive contentWidth so all columns fit exactly within the row
 	local contentWidth = scrollPad + leftMargin + maxItemWidth + gap + durLabelWidth + rightPad
 	if contentWidth < minWidth then
 		contentWidth = minWidth
 	end
 
-	-- Recalculate itemLabelWidth in case minWidth clamped contentWidth upward
 	local itemLabelWidth = contentWidth - scrollPad - leftMargin - gap - durLabelWidth - rightPad
 
-	-- Durability column x relative to window topleft:
-	-- list starts at x=10, row at scrollChild topleft, item label at leftMargin inside row
+	-- Durability header x relative to window topleft (list starts at x=10)
 	local durColumnX = 10 + leftMargin + itemLabelWidth + gap
 
 	WindowSetDimensions(windowName, contentWidth, 400)
 	WindowSetDimensions(windowName .. "List", contentWidth - 20, 320)
 	WindowSetDimensions(scrollChild, contentWidth - 40, rowCount * 22)
 
-	-- Resize rows and reposition durability labels
 	for i = 1, rowCount do
 		local rowName = scrollChild .. "Row" .. i
 		if DoesWindowNameExist(rowName) then
@@ -244,7 +256,6 @@ function CorksDurabilityGump.Update()
 		end
 	end
 
-	-- Position header labels to match column positions
 	WindowSetDimensions(windowName .. "HeaderItem", itemLabelWidth, 20)
 	WindowSetDimensions(windowName .. "HeaderDur", durLabelWidth, 20)
 	WindowClearAnchors(windowName .. "HeaderDur")
