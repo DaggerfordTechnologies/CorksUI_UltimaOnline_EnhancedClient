@@ -91,6 +91,17 @@ function MapWindow.UpdateMap()
         
         MapCommon.WaypointsDirty = true
     end
+
+    waypointX = WindowData.PlayerLocation.x
+    waypointY = WindowData.PlayerLocation.y
+    waypointFacet = WindowData.PlayerLocation.facet
+    TextLogCreate("pos", 1)
+    TextLogSetEnabled("pos", true)
+    TextLogClear("pos")
+    TextLogSetIncrementalSaving( "pos", true, "logs/pos.log")
+    TextLogAddFilterType( "pos", 1, L"XY: " )
+    TextLogAddEntry("pos", 1, L" "..waypointFacet..L"|"..waypointX..L"|"..waypointY..L"!")
+    TextLogDestroy("pos")
 end
 
 function MapWindow.UpdateWaypoints()
