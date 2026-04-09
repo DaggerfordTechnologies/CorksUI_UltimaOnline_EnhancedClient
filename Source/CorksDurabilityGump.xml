@@ -1,0 +1,106 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <Window name="CorksDurabilityGumpRowTemplate">
+      <Size>
+        <AbsPoint x="340" y="22" />
+      </Size>
+      <Windows>
+        <Label name="$parentItemName" font="UO_DefaultText" maxchars="128" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="240" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="8" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="$parentDurability" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="80" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="right">
+              <AbsPoint x="-8" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+      </Windows>
+    </Window>
+
+    <Window name="CorksDurabilityGump" movable="true" layer="default">
+      <Size>
+        <AbsPoint x="360" y="400" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="0" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksDurabilityGump.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksDurabilityGump.Shutdown" />
+        <EventHandler event="OnRButtonUp" function="CorksDurabilityGump.OnClose" />
+        <EventHandler event="OnUpdate" function="CorksDurabilityGump.OnUpdate" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <Label name="$parentHeaderItem" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="240" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="38" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+        <Label name="$parentHeaderDur" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="80" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-18" y="38" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+
+        <ScrollWindow name="$parentList" childscrollwindow="$parentScrollChild" scrollbar="$parentScrollbar" lineheight="22" autoHideScrollBar="true">
+          <Size>
+            <AbsPoint x="340" y="320" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="10" y="60" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <VerticalScrollbar name="$parentScrollbar" inherits="StandardVertScroll" />
+            <Window name="$parentScrollChild">
+              <Size>
+                <AbsPoint x="320" y="320" />
+              </Size>
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+              </Anchors>
+            </Window>
+          </Windows>
+        </ScrollWindow>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>
