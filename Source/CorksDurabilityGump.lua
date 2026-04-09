@@ -8,7 +8,6 @@ CorksDurabilityGump.DURABILITY_TID = 1060639
 CorksDurabilityGump.REFRESH_INTERVAL = 10
 CorksDurabilityGump.RefreshTimer = 0
 CorksDurabilityGump.RowCount = 0
-CorksDurabilityGump.NeedsResize = false
 
 CorksDurabilityGump.SlotNames = {
 	[1]  = "Head",
@@ -31,6 +30,10 @@ CorksDurabilityGump.SlotNames = {
 	[18] = "Cape",
 	[19] = "Pants",
 }
+
+-- Logical width of the scroll child as defined in the XML template.
+-- Never derived at runtime to avoid feedback with window scale.
+CorksDurabilityGump.SCROLL_CHILD_WIDTH = 360
 
 ----------------------------------------------------------------
 -- Functions
@@ -61,11 +64,6 @@ function CorksDurabilityGump.OnPaperdollEvent()
 end
 
 function CorksDurabilityGump.OnUpdate(timePassed)
-	if CorksDurabilityGump.NeedsResize then
-		CorksDurabilityGump.NeedsResize = false
-		CorksDurabilityGump.Resize()
-		return
-	end
 	CorksDurabilityGump.RefreshTimer = CorksDurabilityGump.RefreshTimer + timePassed
 	if CorksDurabilityGump.RefreshTimer >= CorksDurabilityGump.REFRESH_INTERVAL then
 		CorksDurabilityGump.RefreshTimer = 0
@@ -87,8 +85,6 @@ function CorksDurabilityGump.Toggle()
 	end
 end
 
--- Phase 1: build rows and set text. Resize is deferred to next frame so
--- LabelGetTextDimensions can return valid measurements after layout.
 function CorksDurabilityGump.Update()
 	local windowName = "CorksDurabilityGump"
 	local scrollChild = windowName .. "ListScrollChild"
@@ -176,21 +172,8 @@ function CorksDurabilityGump.Update()
 	end
 
 	CorksDurabilityGump.RowCount = rowCount
-	CorksDurabilityGump.NeedsResize = true
-end
 
--- Phase 2: update the scroll child height to match the number of rows.
--- All widths stay at XML template values — never touch them dynamically
--- to avoid feedback loops with WindowGetDimensions under scaling.
-function CorksDurabilityGump.Resize()
-	local windowName = "CorksDurabilityGump"
-	local scrollChild = windowName .. "ListScrollChild"
-	local rowCount = CorksDurabilityGump.RowCount
-
-	if not DoesWindowNameExist(windowName) or rowCount == 0 then
-		return
-	end
-
-	local scrollW, _ = WindowGetDimensions(scrollChild)
-	WindowSetDimensions(scrollChild, scrollW, rowCount * 22)
+	-- Update scroll child height only. Width is always the XML constant —
+	-- never derived from WindowGetDimensions to avoid any scale feedback.
+	WindowSetDimensions(scrollChild, CorksDurabilityGump.SCROLL_CHILD_WIDTH, rowCount * 22)
 end
