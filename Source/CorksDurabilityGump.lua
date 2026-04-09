@@ -207,6 +207,13 @@ function CorksDurabilityGump.Resize()
 		end
 	end
 
+	-- If all measurements are zero the layout engine hasn't processed the labels yet.
+	-- Defer to the next frame and try again.
+	if maxItemWidth == 0 and maxDurWidth == 0 then
+		CorksDurabilityGump.NeedsResize = true
+		return
+	end
+
 	-- Also account for the header label widths
 	local headerItemW, _ = LabelGetTextDimensions(windowName .. "HeaderItem")
 	if headerItemW and headerItemW > maxItemWidth then
@@ -241,7 +248,11 @@ function CorksDurabilityGump.Resize()
 	-- Durability header x relative to window topleft (list starts at x=10)
 	local durColumnX = 10 + leftMargin + itemLabelWidth + gap
 
+	-- Preserve the user-applied scale (set via mouse wheel) when resizing.
+	-- Without this, calling WindowSetDimensions resets the visual scale.
+	local currentScale = WindowGetScale(windowName)
 	WindowSetDimensions(windowName, contentWidth, 400)
+	WindowSetScale(windowName, currentScale)
 	WindowSetDimensions(windowName .. "List", contentWidth - 20, 320)
 	WindowSetDimensions(scrollChild, contentWidth - 40, rowCount * 22)
 
