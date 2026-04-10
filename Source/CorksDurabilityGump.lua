@@ -8,6 +8,7 @@ CorksDurabilityGump.DURABILITY_TID = 1060639
 CorksDurabilityGump.REFRESH_INTERVAL = 10
 CorksDurabilityGump.RefreshTimer = 0
 CorksDurabilityGump.RowCount = 0
+CorksDurabilityGump.CurrentHeight = 0
 CorksDurabilityGump.MAX_ROWS = 19  -- Max equippable slots
 
 CorksDurabilityGump.SlotNames = {
@@ -186,6 +187,15 @@ function CorksDurabilityGump.Update()
 	CorksDurabilityGump.RowCount = rowCount
 
 	-- Resize the window to fit the visible rows exactly.
-	-- Safe to call on the root window (parent is Root at scale 1.0).
-	WindowSetDimensions(windowName, 400, rowCount * 22 + 80)
+	-- WindowSetDimensions forces a subtree layout recalculation which resets
+	-- inherited scale on dynamically-created child windows, so re-apply the
+	-- current scale immediately after to restore it. Only resize when the
+	-- height actually changes to minimise how often this happens.
+	local targetHeight = rowCount * 22 + 80
+	if targetHeight ~= CorksDurabilityGump.CurrentHeight then
+		CorksDurabilityGump.CurrentHeight = targetHeight
+		local scale = WindowGetScale(windowName)
+		WindowSetDimensions(windowName, 400, targetHeight)
+		WindowSetScale(windowName, scale)
+	end
 end
