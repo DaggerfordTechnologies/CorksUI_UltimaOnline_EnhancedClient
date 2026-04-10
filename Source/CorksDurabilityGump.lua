@@ -75,10 +75,6 @@ function CorksDurabilityGump.CreateRows()
 		end
 		WindowSetShowing(rowName, false)
 	end
-
-	-- Set scroll child to full height of all rows once at creation time.
-	-- Never resized again, so WindowSetDimensions never fires under a scaled parent.
-	WindowSetDimensions(scrollChild, 360, CorksDurabilityGump.MAX_ROWS * 22)
 end
 
 function CorksDurabilityGump.OnPaperdollEvent()
