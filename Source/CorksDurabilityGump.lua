@@ -47,9 +47,7 @@ function CorksDurabilityGump.Initialize()
 
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
 
-	-- Pre-create all rows once at load time so they are always children of
-	-- the unscaled window. Updating text in-place avoids CreateWindowFromTemplate
-	-- being called under a scaled parent, which causes scale inheritance issues.
+	-- Rows are defined statically in XML, so just hide them all until Update populates them.
 	CorksDurabilityGump.CreateRows()
 
 	WindowUtils.RestoreWindowPosition("CorksDurabilityGump")
@@ -61,20 +59,9 @@ function CorksDurabilityGump.Shutdown()
 end
 
 function CorksDurabilityGump.CreateRows()
-	local windowName = "CorksDurabilityGump"
-	local scrollChild = windowName .. "ListScrollChild"
-
+	local scrollChild = "CorksDurabilityGumpListScrollChild"
 	for i = 1, CorksDurabilityGump.MAX_ROWS do
-		local rowName = scrollChild .. "Row" .. i
-		if not DoesWindowNameExist(rowName) then
-			CreateWindowFromTemplate(rowName, "CorksDurabilityGumpRowTemplate", scrollChild)
-			if i == 1 then
-				WindowAddAnchor(rowName, "topleft", scrollChild, "topleft", 0, 0)
-			else
-				WindowAddAnchor(rowName, "bottomleft", scrollChild .. "Row" .. (i - 1), "topleft", 0, 0)
-			end
-		end
-		WindowSetShowing(rowName, false)
+		WindowSetShowing(scrollChild .. "Row" .. i, false)
 	end
 end
 
@@ -121,10 +108,7 @@ function CorksDurabilityGump.Update()
 
 	-- Hide all rows first
 	for i = 1, CorksDurabilityGump.MAX_ROWS do
-		local rowName = scrollChild .. "Row" .. i
-		if DoesWindowNameExist(rowName) then
-			WindowSetShowing(rowName, false)
-		end
+		WindowSetShowing(scrollChild .. "Row" .. i, false)
 	end
 
 	local rowCount = 0
@@ -186,16 +170,13 @@ function CorksDurabilityGump.Update()
 
 	CorksDurabilityGump.RowCount = rowCount
 
-	-- Resize the window to fit the visible rows exactly.
-	-- WindowSetDimensions forces a subtree layout recalculation which resets
-	-- inherited scale on dynamically-created child windows, so re-apply the
-	-- current scale immediately after to restore it. Only resize when the
-	-- height actually changes to minimise how often this happens.
+	-- Resize the window and scroll child to fit the visible rows exactly.
+	-- Rows are statically defined in XML so WindowSetDimensions does not reset
+	-- their inherited scale. Only resize when row count actually changes.
 	local targetHeight = rowCount * 22 + 80
 	if targetHeight ~= CorksDurabilityGump.CurrentHeight then
 		CorksDurabilityGump.CurrentHeight = targetHeight
-		local scale = WindowGetScale(windowName)
 		WindowSetDimensions(windowName, 400, targetHeight)
-		WindowSetScale(windowName, scale)
+		WindowSetDimensions(scrollChild, 360, rowCount * 22)
 	end
 end

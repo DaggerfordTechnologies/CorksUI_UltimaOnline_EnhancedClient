@@ -91,11 +91,146 @@
             <VerticalScrollbar name="$parentScrollbar" inherits="StandardVertScroll" />
             <Window name="$parentScrollChild">
               <Size>
-                <AbsPoint x="360" y="418" />
+                <AbsPoint x="360" y="22" />
               </Size>
               <Anchors>
                 <Anchor point="topleft" relativePoint="topleft" />
               </Anchors>
+              <Windows>
+                <Window name="$parentRow1" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="0" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow2" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="22" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow3" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="44" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow4" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="66" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow5" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="88" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow6" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="110" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow7" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="132" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow8" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="154" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow9" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="176" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow10" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="198" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow11" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="220" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow12" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="242" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow13" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="264" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow14" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="286" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow15" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="308" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow16" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="330" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow17" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="352" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow18" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="374" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow19" inherits="CorksDurabilityGumpRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="396" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+              </Windows>
             </Window>
           </Windows>
         </ScrollWindow>
