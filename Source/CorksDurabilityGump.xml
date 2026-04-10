@@ -79,12 +79,12 @@
         </Label>
 
         <ScrollWindow name="$parentList" childscrollwindow="$parentScrollChild" scrollbar="$parentScrollbar" lineheight="22" autoHideScrollBar="true">
-          <Size>
-            <AbsPoint x="380" y="320" />
-          </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
               <AbsPoint x="10" y="60" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-10" y="-20" />
             </Anchor>
           </Anchors>
           <Windows>

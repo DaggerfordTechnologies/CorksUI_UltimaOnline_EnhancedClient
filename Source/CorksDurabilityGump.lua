@@ -184,4 +184,8 @@ function CorksDurabilityGump.Update()
 	end
 
 	CorksDurabilityGump.RowCount = rowCount
+
+	-- Resize the window to fit the visible rows exactly.
+	-- Safe to call on the root window (parent is Root at scale 1.0).
+	WindowSetDimensions(windowName, 400, rowCount * 22 + 80)
 end
