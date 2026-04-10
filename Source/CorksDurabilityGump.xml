@@ -3,12 +3,12 @@
 
     <Window name="CorksDurabilityGumpRowTemplate">
       <Size>
-        <AbsPoint x="380" y="22" />
+        <AbsPoint x="360" y="22" />
       </Size>
       <Windows>
         <Label name="$parentItemName" font="UO_DefaultText" maxchars="128" textalign="left" handleinput="false">
           <Size>
-            <AbsPoint x="260" y="20" />
+            <AbsPoint x="240" y="20" />
           </Size>
           <Anchors>
             <Anchor point="left" relativePoint="left">
