@@ -421,6 +421,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.ActionData[6101] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=865007, detailString=L"Target the next mobile based on Corks' Targeting notoriety filters.", nameString=L"Target Next (Notoriety)",  callback=L"script CorksTargeting.NextTarget()" }
 	ActionsWindow.ActionData[6102] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=865006, detailString=L"Target the previous mobile based on Corks' Targeting notoriety filters.", nameString=L"Target Previous (Notoriety)",  callback=L"script CorksTargeting.PrevTarget()" }
 	ActionsWindow.ActionData[6103] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Targeting settings window.", nameString=L"Corks' Targeting",  callback=L"script CorksTargeting.Toggle()" }
+	ActionsWindow.ActionData[6104] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Gear Watcher (durability) window.", nameString=L"Corks' Gear Watcher",  callback=L"script CorksDurabilityGump.Toggle()" }
 
 	-- 6000 -> 6100 :  CRAFTING UTILITIES
 	ActionsWindow.ActionData[6000] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=876001, detailString=GetStringFromTid(1155374), nameString=GetStringFromTid(1155373),  callback=L"script Actions.UnravelItem()" }
@@ -441,7 +442,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.Groups[1]  = { nameString=L"Items/Abilities",			nameTid=1079384, index={ 8, 9, 10, 26, 86, 87, 5950 } }
 	ActionsWindow.Groups[2]  = { nameString=L"Combat",					nameTid=1077417, index={ 27, 28, 67, 68 } }
 	ActionsWindow.Groups[3]  = { nameString=L"Virtues",					nameTid=1077439, index={ 58, 59, 60, 61, 62, 63, 64, 65 } }
-	ActionsWindow.Groups[4]  = { nameString=L"Equipment",				nameTid=1154982, index={ 1, 2, 85, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119, 4120, 4121, 4122, 4123, 4124, 4125, 4126, 4127, 4128, 4129, 4130, 4131, 4132, 4133, 4134, 4135, 4136 } }
+	ActionsWindow.Groups[4]  = { nameString=L"Equipment",				nameTid=1154982, index={ 1, 2, 85, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119, 4120, 4121, 4122, 4123, 4124, 4125, 4126, 4127, 4128, 4129, 4130, 4131, 4132, 4133, 4134, 4135, 4136, 6104 } }
 	ActionsWindow.Groups[5]  = { nameString=L"Cursor Targeting",		nameTid=1094876, index={ 17, 19, 20, 21, 56, 66, 90, 5700 } }
 	ActionsWindow.Groups[6]  = { nameString=L"Targeting",				nameTid=1079383, index={ 55, 22, 71, 77, 23, 72, 78, 24, 73, 79, 69, 74, 80, 70, 75, 81, 25, 76, 82, 11, 5200, 5201, 5202, 5203, 5204, 5205, 5206, 5207, 6100, 6101, 6102 } }
 	ActionsWindow.Groups[7]  = { nameString=L"Pet Targeting",			nameTid=1154968, index={ 5351, 5301, 5352, 5302, 5353, 5303, 5354, 5304, 5355, 5305 } }
