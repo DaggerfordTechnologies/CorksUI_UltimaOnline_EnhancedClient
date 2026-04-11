@@ -109,9 +109,11 @@ end
 
 function CorksTargeting.Toggle()
 	local wndName = "CorksTargetingWindow"
+	if not DoesWindowNameExist(wndName) then
+		return
+	end
 	local showing = WindowGetShowing(wndName)
-	showing = not showing
-	WindowSetShowing(wndName, showing)
+	WindowSetShowing(wndName, not showing)
 end
 
 function CorksTargeting.OnClose()
@@ -235,21 +237,21 @@ function CorksTargeting.NearTarget()
 	CorksTargeting.SyncFromButtons()
 
 	local mobileList = CorksTargeting.GetMobileList()
-	local id = {}
+	local candidates = {}
 	for i = 1, table.getn(mobileList) do
 		local mobileId = mobileList[i]
 		if CorksTargeting.TargetAllowed(mobileId) then
-			local dist = GetDistanceFromPlayer(mobileId)
-			id[dist] = mobileId
+			table.insert(candidates, { id = mobileId, dist = GetDistanceFromPlayer(mobileId) })
 		end
 	end
-	for i, value in pairsByKeys(id) do
-		if (TargetWindow.TargetId == id[i]) then
+	table.sort(candidates, function(a, b) return a.dist < b.dist end)
+	for _, entry in ipairs(candidates) do
+		if (TargetWindow.TargetId == entry.id) then
 			return
 		end
-		if CorksTargeting.TargetAllowed(id[i]) then
-			CorksTargeting.SelectTarget(id[i])
-			if (WindowGetShowing("TargetWindow") and TargetWindow.TargetId == id[i]) then
+		if CorksTargeting.TargetAllowed(entry.id) then
+			CorksTargeting.SelectTarget(entry.id)
+			if (WindowGetShowing("TargetWindow") and TargetWindow.TargetId == entry.id) then
 				return
 			end
 		end
@@ -312,9 +314,14 @@ end
 function CorksTargeting.PrevTarget()
 	CorksTargeting.SyncFromButtons()
 
-	local max = table.getn(TargetWindow.PreviousTargets)
-	if (TargetWindow.TargetId) then
-		table.remove(TargetWindow.PreviousTargets, max)
+	local currentId = TargetWindow.TargetId
+	if currentId and currentId ~= 0 then
+		for i = table.getn(TargetWindow.PreviousTargets), 1, -1 do
+			if TargetWindow.PreviousTargets[i] == currentId then
+				table.remove(TargetWindow.PreviousTargets, i)
+				break
+			end
+		end
 	end
 	local previous = CorksTargeting.SearchValidPrevTarget()
 	if (previous and previous.id ~= TargetWindow.TargetId) then
