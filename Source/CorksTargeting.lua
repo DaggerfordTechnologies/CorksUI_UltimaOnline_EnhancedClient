@@ -55,7 +55,7 @@ function CorksTargeting.Initialize()
 		if i == 2 then
 			WindowAddAnchor(templateName, "topleft", "CorksTargetingWindowScrollChild", "topleft", 10, 5)
 		else
-			WindowAddAnchor(templateName, "topleft", "CorksNotoCheck_" .. (i - 1), "bottomleft", 0, 8)
+			WindowAddAnchor(templateName, "bottomleft", "CorksNotoCheck_" .. (i - 1), "topleft", 0, 8)
 		end
 	end
 
@@ -66,7 +66,7 @@ function CorksTargeting.Initialize()
 	LabelSetText(playersTemplate .. "Label", L"Players Only")
 	LabelSetTextColor(playersTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(playersTemplate .. "Button", CorksTargeting.PlayersOnly)
-	WindowAddAnchor(playersTemplate, "topleft", "CorksNotoCheck_8", "bottomleft", 0, 20)
+	WindowAddAnchor(playersTemplate, "bottomleft", "CorksNotoCheck_8", "topleft", 0, 20)
 
 	-- Create Ignore Summons checkbox
 	local summonsTemplate = "CorksIgnoreSummonsCheck"
@@ -75,7 +75,7 @@ function CorksTargeting.Initialize()
 	LabelSetText(summonsTemplate .. "Label", L"Ignore Summons")
 	LabelSetTextColor(summonsTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(summonsTemplate .. "Button", CorksTargeting.IgnoreSummons)
-	WindowAddAnchor(summonsTemplate, "topleft", playersTemplate, "bottomleft", 0, 8)
+	WindowAddAnchor(summonsTemplate, "bottomleft", playersTemplate, "topleft", 0, 8)
 
 	WindowUtils.SetWindowTitle("CorksTargetingWindow", L"Corks' Targeting")
 	CorksTargeting.Initialized = true
