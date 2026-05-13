@@ -416,7 +416,7 @@ function ActionsWindow.InitActionData()
 	-- 5950 -> 5999 :  ITEMS/ABILITIES
 	ActionsWindow.ActionData[5950] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=875600, detailString=GetStringFromTid(1155134), nameString=GetStringFromTid(1155133),  callback=L"script Actions.LoadShuri()" }
 	
-	-- 6100 -> 6149 :  CORKS' TARGETING
+	-- 6100 -> 6149 :  CORKS' CUSTOM CODE
 	ActionsWindow.ActionData[6100] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=865008, detailString=L"Target the nearest mobile based on Corks' Targeting notoriety filters.", nameString=L"Target Nearest (Notoriety)",  callback=L"script CorksTargeting.NearTarget()" }
 	ActionsWindow.ActionData[6101] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=865007, detailString=L"Target the next mobile based on Corks' Targeting notoriety filters.", nameString=L"Target Next (Notoriety)",  callback=L"script CorksTargeting.NextTarget()" }
 	ActionsWindow.ActionData[6102] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=865006, detailString=L"Target the previous mobile based on Corks' Targeting notoriety filters.", nameString=L"Target Previous (Notoriety)",  callback=L"script CorksTargeting.PrevTarget()" }
