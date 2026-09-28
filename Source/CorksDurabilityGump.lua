@@ -11,6 +11,10 @@ CorksDurabilityGump.RowCount = 0
 CorksDurabilityGump.CurrentHeight = 0
 CorksDurabilityGump.MAX_ROWS = 19  -- Max equippable slots
 
+-- The window background image can't be drawn shorter than 90px and starts 28px
+-- down, so a shorter window lets it spill past the frame at the bottom.
+CorksDurabilityGump.MIN_HEIGHT = 120
+
 CorksDurabilityGump.SlotNames = {
 	[1]  = "Head",
 	[2]  = "Neck",
@@ -176,7 +180,7 @@ function CorksDurabilityGump.Update()
 	-- Resize the window and scroll child to fit the visible rows exactly.
 	-- Rows are statically defined in XML so WindowSetDimensions does not reset
 	-- their inherited scale. Only resize when row count actually changes.
-	local targetHeight = rowCount * 22 + 80
+	local targetHeight = math.max(rowCount * 22 + 80, CorksDurabilityGump.MIN_HEIGHT)
 	if targetHeight ~= CorksDurabilityGump.CurrentHeight then
 		CorksDurabilityGump.CurrentHeight = targetHeight
 		WindowSetDimensions(windowName, 400, targetHeight)
