@@ -19,7 +19,6 @@ Custom user interface additions for the **Ultima Online Enhanced Client**. Corks
 1. Copy the `CorksUI` folder into your client's `UserInterface` folder, for example:
    `C:\...\Ultima Online Enhanced\UserInterface\CorksUI`
 2. Start the client, open **Options → Interface**, and select **CorksUI** as the custom UI.
-3. Log in (or type `/reloadui` if you are already in game).
 
 ## Features
 
