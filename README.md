@@ -6,7 +6,7 @@ Custom user interface additions for the **Ultima Online Enhanced Client**. Corks
   <img src="TargetingGump.png" alt="Corks' Targeting window" height="300">
   <img src="GearWatcher.png" alt="Corks' Gear Watcher window" height="300">
   <img src="TimersGump.png" alt="Corks' Potion Timer window" height="200">
-</p>
+</p> 
 
 ## Contents
 
