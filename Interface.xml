@@ -88,6 +88,7 @@
 	<Include file="Source/VendorSearch.xml"/>
 	<Include file="Source/CorksTargeting.xml"/>
 	<Include file="Source/CorksDurabilityGump.xml"/>
+	<Include file="Source/CorksTimers.xml"/>
 	<Include file="Source/QuickStats.xml"/>
 	<Include file="Source/FontSelector.xml"/>
 	<Include file="Source/LegacyRunebook.xml"/>
@@ -151,6 +152,7 @@
 		<Script file="Source/Actions.lua"/>
 		<Script file="Source/CorksTargeting.lua"/>
 		<Script file="Source/CorksDurabilityGump.lua"/>
+		<Script file="Source/CorksTimers.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>
 		<Script file="Source/ContainersInfo.lua"/>

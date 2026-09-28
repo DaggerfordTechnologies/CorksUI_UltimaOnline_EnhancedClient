@@ -708,6 +708,7 @@ function Interface.CreateWindows()
 	CreateWindow( "CrystalPortal", false)
 	CreateWindow( "CorksTargetingWindow", true)
 	CreateWindow( "CorksDurabilityGump", true)
+	CreateWindow( "CorksTimers", true)
 	Interface.CreateTCTools()
 	
 	if( SystemData.Settings.Interface.showTipoftheDay ) then
@@ -1049,6 +1050,9 @@ function Interface.Update( timePassed )
 	Interface.ErrorTracker(ok, err)
 		
 	ok, err = pcall(CenterScreenText.OnUpdate, timePassed)	
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksTimers.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 	
 	ok, err = pcall(Interface.SOSWaypointsCleaner, timePassed)	
@@ -1772,6 +1776,9 @@ function Interface.NewChatText()
 	Interface.ErrorTracker(ok, err)
 	
 	ok, err = pcall(TextParsing.Taunts)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksTimers.OnChatText)
 	Interface.ErrorTracker(ok, err)
 	
 		

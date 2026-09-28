@@ -1,0 +1,51 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <Window name="CorksTimers" movable="true" layer="default">
+      <Size>
+        <AbsPoint x="220" y="84" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="-150" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksTimers.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksTimers.Shutdown" />
+        <EventHandler event="OnRButtonUp" function="CorksTimers.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <StatusBar name="$parentBar" foreground="WhiteLine" handleinput="false">
+          <Size>
+            <AbsPoint x="190" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="44" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+
+        <Label name="$parentTime" font="Arial_Black_Shadow_12" maxchars="32" textalign="center" handleinput="false" wordwrap="false" layer="overlay">
+          <Size>
+            <AbsPoint x="190" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="$parentBar" />
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>

@@ -1,6 +1,6 @@
 # CorksUI
 
-Custom user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a notoriety-aware targeting system, an equipment durability tracker and several Map Window improvements.
+Custom user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a notoriety-aware targeting system, an equipment durability tracker, a Greater Heal potion timer and several Map Window improvements.
 
 <p>
   <img src="TargetingGump.png" alt="Corks' Targeting window" height="300">
@@ -13,6 +13,7 @@ Custom user interface additions for the **Ultima Online Enhanced Client**. Corks
 - [Features](#features)
   - [Corks' Targeting](#corks-targeting)
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
+  - [Greater Heal Timer](#greater-heal-timer)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
 - [Saved Settings](#saved-settings)
@@ -78,6 +79,18 @@ A compact window that lists every equipped item that has durability, with its cu
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
+### Greater Heal Timer
+
+When you double-click a **Greater Heal** potion, a small **Greater Heal** window appears with a 10-second countdown bar. The bar is red while it counts down, then turns green and reads **Ready** for 3 seconds before the window hides.
+
+If a system message within 2 seconds of the double-click says **"You are already at full health"** or **"You must wait a few seconds before using another healing potion"**, the potion wasn't drunk, so the timer goes back to what it was showing before the click.
+
+Only double-clicks made in the UI count (backpack, container and paperdoll windows). Using a potion from a hotbar slot, a macro or an assistant program happens inside the client and doesn't start the timer.
+
+**Window controls:** drag it where you want it (it remembers the position); right-click to hide it and cancel the countdown; use the mouse wheel over it to scale it.
+
+The potion name, duration and rejection messages are set at the top of `Source/CorksTimers.lua`.
+
 ### Map Window Changes
 
 `Source/MapWindow.lua` replaces the default Map Window with these changes:
@@ -121,13 +134,15 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 ```text
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
-├── Interface.lua              Creates CorksTargetingWindow and CorksDurabilityGump at startup
+├── Interface.lua              Creates the Corks windows at startup and feeds the timer journal text
 └── Source/
     ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6104) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
     ├── CorksTargeting.xml     Targeting settings window
     ├── CorksDurabilityGump.lua  Gear Watcher logic
     ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
+    ├── CorksTimers.lua        Greater Heal timer: double-click trigger, journal checks and countdown
+    ├── CorksTimers.xml        Greater Heal timer window
     └── MapWindow.lua          Map Window changes
 ```
 
