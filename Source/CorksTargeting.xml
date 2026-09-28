@@ -2,7 +2,7 @@
 	<Windows>
 		<Window name="CorksTargetingWindow" movable="true" layer="popup">
 			<Size>
-				<AbsPoint x="280" y="460" />
+				<AbsPoint x="280" y="540" />
 			</Size>
 			<Anchors>
 				<Anchor point="center" relativePoint="center">
@@ -24,7 +24,7 @@
 				</Window>
 				<Window name="CorksTargetingWindowContent">
 					<Size>
-						<AbsPoint x="250" y="400" />
+						<AbsPoint x="250" y="480" />
 					</Size>
 					<Anchors>
 						<Anchor point="top" relativePoint="top">
@@ -54,8 +54,49 @@
 						</FullResizeImage>
 						<Window name="CorksTargetingWindowScrollChild">
 							<Size>
-								<AbsPoint x="230" y="350" />
+								<AbsPoint x="230" y="450" />
 							</Size>
+							<Windows>
+								<!-- Name filter (anchored from Lua under the checkboxes) -->
+								<Label name="CorksNameFilterLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+									<Size>
+										<AbsPoint x="220" y="20" />
+									</Size>
+								</Label>
+								<EditBox name="CorksNameFilterBox" font="UO_DefaultText" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
+									<Size>
+										<AbsPoint x="210" y="20" />
+									</Size>
+									<EventHandlers>
+										<EventHandler event="OnKeyEnter" function="CorksTargeting.OnNameFilterEnter" />
+										<EventHandler event="OnKeyEscape" function="CorksTargeting.OnNameFilterEnter" />
+									</EventHandlers>
+								</EditBox>
+								<Window name="CorksNameFilterBoxBG" handleinput="false">
+									<Size>
+										<AbsPoint x="220" y="30" />
+									</Size>
+									<Anchors>
+										<Anchor point="topleft" relativePoint="topleft" relativeTo="CorksNameFilterBox">
+											<AbsPoint x="-5" y="-5" />
+										</Anchor>
+									</Anchors>
+									<Windows>
+										<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+											<Anchors>
+												<Anchor point="topleft" relativePoint="topleft" />
+												<Anchor point="bottomright" relativePoint="bottomright" />
+											</Anchors>
+										</FullResizeImage>
+										<FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+											<Anchors>
+												<Anchor point="topleft" relativePoint="topleft" />
+												<Anchor point="bottomright" relativePoint="bottomright" />
+											</Anchors>
+										</FullResizeImage>
+									</Windows>
+								</Window>
+							</Windows>
 						</Window>
 					</Windows>
 				</Window>

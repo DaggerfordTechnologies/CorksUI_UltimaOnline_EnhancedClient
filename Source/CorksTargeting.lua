@@ -14,6 +14,10 @@ CorksTargeting.NotorietyFilter = {}
 CorksTargeting.PlayersOnly = false
 CorksTargeting.IgnoreSummons = false
 
+-- Name filter: comma separated, case-insensitive partial matches (empty = no filter)
+CorksTargeting.NameFilterText = L""
+CorksTargeting.NameFilters = {}
+
 CorksTargeting.NotorietyLabels = {
 	[2] = L"Innocent (Blue)",
 	[3] = L"Friend (Green)",
@@ -79,6 +83,32 @@ function CorksTargeting.Initialize()
 
 	WindowUtils.SetWindowTitle("CorksTargetingWindow", L"Corks' Targeting")
 	CorksTargeting.Initialized = true
+
+	-- Name filter last, and protected, so it can never break the rest of the window
+	local ok, err = pcall(CorksTargeting.InitNameFilter, summonsTemplate)
+	if not ok then
+		CorksTargeting.ReportError("init", err)
+	end
+end
+
+function CorksTargeting.InitNameFilter(anchorTo)
+	LabelSetText("CorksNameFilterLabel", L"Name contains (comma separated):")
+	LabelSetTextColor("CorksNameFilterLabel", 255, 255, 255)
+	WindowClearAnchors("CorksNameFilterLabel")
+	WindowAddAnchor("CorksNameFilterLabel", "bottomleft", anchorTo, "topleft", 0, 20)
+	WindowClearAnchors("CorksNameFilterBox")
+	WindowAddAnchor("CorksNameFilterBox", "bottomleft", "CorksNameFilterLabel", "topleft", 5, 10)
+
+	-- Saved value is optional; a failed load just means an empty filter
+	local ok, saved = pcall(Interface.LoadWString, "CorksTargetingNameFilter", L"")
+	if ok then
+		CorksTargeting.SetNameFilter(saved)
+	end
+	TextEditBoxSetText("CorksNameFilterBox", CorksTargeting.NameFilterText)
+end
+
+function CorksTargeting.ReportError(where, err)
+	pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting name filter (" .. where .. "): " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
 end
 
 function CorksTargeting.Shutdown()
@@ -105,6 +135,75 @@ function CorksTargeting.SyncFromButtons()
 		CorksTargeting.IgnoreSummons = ButtonGetPressedFlag("CorksIgnoreSummonsCheckButton")
 		Interface.SaveBoolean("CorksTargetingIgnoreSummons", CorksTargeting.IgnoreSummons)
 	end
+	if DoesWindowNameExist("CorksNameFilterBox") then
+		-- pcall so a bad filter can never stop targeting
+		local ok, err = pcall(CorksTargeting.SetNameFilter, TextEditBoxGetText("CorksNameFilterBox"))
+		if not ok then
+			CorksTargeting.ReportError("read", err)
+			CorksTargeting.NameFilters = {}
+		end
+		pcall(Interface.SaveWString, "CorksTargetingNameFilter", CorksTargeting.NameFilterText)
+	end
+end
+
+-- Parses L"orc, lich lord" into { L"orc", L"lich lord" } (lowercased, trimmed)
+-- type() reports "string" for both strings and wstrings, so probe with wstring.len
+function CorksTargeting.ToWString(text)
+	if text == nil then
+		return L""
+	end
+	if pcall(wstring.len, text) then
+		return text
+	end
+	return StringToWString(tostring(text))
+end
+
+function CorksTargeting.SetNameFilter(text)
+	text = CorksTargeting.ToWString(text)
+	CorksTargeting.NameFilterText = text
+	CorksTargeting.NameFilters = {}
+	local lower = CorksTargeting.ToWString(wstring.lower(text))
+	local len = wstring.len(lower)
+	local start = 1
+	while start <= len + 1 do
+		local comma = wstring.find(lower, L",", start, true)
+		local stop = (comma or (len + 1)) - 1
+		-- trim spaces from both ends
+		while start <= stop and wstring.sub(lower, start, start) == L" " do
+			start = start + 1
+		end
+		while stop >= start and wstring.sub(lower, stop, stop) == L" " do
+			stop = stop - 1
+		end
+		if stop >= start then
+			table.insert(CorksTargeting.NameFilters, wstring.sub(lower, start, stop))
+		end
+		if not comma then
+			break
+		end
+		start = comma + 1
+	end
+end
+
+function CorksTargeting.OnNameFilterEnter()
+	CorksTargeting.SyncFromButtons()
+	WindowAssignFocus("CorksNameFilterBox", false)
+end
+
+function CorksTargeting.NameAllowed(name)
+	if table.getn(CorksTargeting.NameFilters) == 0 then
+		return true
+	end
+	if name == nil then
+		return false
+	end
+	local lname = CorksTargeting.ToWString(wstring.lower(CorksTargeting.ToWString(name)))
+	for _, filter in ipairs(CorksTargeting.NameFilters) do
+		if wstring.find(lname, filter, 1, true) then
+			return true
+		end
+	end
+	return false
 end
 
 function CorksTargeting.Toggle()
@@ -198,7 +297,7 @@ function CorksTargeting.TargetAllowed(mobileId)
 	-- Check notoriety filter
 	local noto = data.Notoriety + 1
 	if noto >= 2 and noto <= 8 then
-		if (not CorksTargeting.NotorietyFilter[noto]) then
+		if (CorksTargeting.NotorietyFilter[noto] == false) then
 			return false
 		end
 	end
@@ -224,6 +323,14 @@ function CorksTargeting.TargetAllowed(mobileId)
 		if MobilesOnScreen.IsSummon(data.MobName, mobileId) then
 			return false
 		end
+	end
+
+	-- Check name filter
+	local ok, allowed = pcall(CorksTargeting.NameAllowed, data.MobName)
+	if not ok then
+		CorksTargeting.ReportError("match", allowed)
+	elseif not allowed then
+		return false
 	end
 
 	return true
