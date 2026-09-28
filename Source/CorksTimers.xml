@@ -1,0 +1,123 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- One row per running timer: name on top, countdown bar underneath -->
+    <Window name="CorksTimersRowTemplate" handleinput="false">
+      <Size>
+        <AbsPoint x="210" y="38" />
+      </Size>
+      <Windows>
+        <Label name="$parentName" font="UO_DefaultText" maxchars="64" textalign="center" handleinput="false" wordwrap="false">
+          <Size>
+            <AbsPoint x="210" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+          </Anchors>
+        </Label>
+        <StatusBar name="$parentBar" foreground="WhiteLine" handleinput="false">
+          <Size>
+            <AbsPoint x="210" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="0" y="19" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="$parentTime" font="Arial_Black_Shadow_12" maxchars="32" textalign="center" handleinput="false" wordwrap="false" layer="overlay">
+          <Size>
+            <AbsPoint x="210" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="$parentBar" />
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+      </Windows>
+    </Window>
+
+    <!-- Rows are defined up front (not created at runtime) so resizing the
+         window doesn't reset their scale. Keep in sync with CorksTimers.MAX_ROWS. -->
+    <Window name="CorksTimers" movable="true" layer="default">
+      <Size>
+        <AbsPoint x="240" y="96" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="-150" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksTimers.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksTimers.Shutdown" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+        <Window name="$parentRow1" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="44" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow2" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="82" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow3" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="120" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow4" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="158" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow5" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="196" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow6" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="234" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow7" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="272" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow8" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="310" />
+            </Anchor>
+          </Anchors>
+        </Window>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>

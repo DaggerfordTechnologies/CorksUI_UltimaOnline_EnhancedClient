@@ -1,6 +1,6 @@
 # CorksUI
 
-Custom user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a notoriety-aware targeting system, an equipment durability tracker and several Map Window improvements.
+Custom user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a notoriety-aware targeting system, an equipment durability tracker, potion timers and several Map Window improvements.
 
 <p>
   <img src="TargetingGump.png" alt="Corks' Targeting window" height="300">
@@ -13,6 +13,7 @@ Custom user interface additions for the **Ultima Online Enhanced Client**. Corks
 - [Features](#features)
   - [Corks' Targeting](#corks-targeting)
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
+  - [Potion Timers](#potion-timers)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
 - [Saved Settings](#saved-settings)
@@ -78,6 +79,25 @@ A compact window that lists every equipped item that has durability, with its cu
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
+### Potion Timers
+
+Double-clicking one of these potions adds a countdown to the **Corks' Timers** window:
+
+| Potion | Countdown | When it starts |
+| --- | --- | --- |
+| Greater Heal | 10 sec | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click. At full health or while still on cooldown no potion is drunk, so it doesn't start the timer |
+| Greater Conflagration | 30 sec | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 15 seconds of the double-click. A failed or cancelled throw doesn't use a potion, so it doesn't start the timer |
+| Supernova | 2 min | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click |
+| Barrab Hemolymph Concentrate (shown as "Barrab Hemolymph") | 20 min | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click |
+
+Each running timer gets its own row, with the potion's name in the potion's color and a bar that is red while it counts down, then turns green and reads **Ready** for 3 seconds before the row is removed. Rows are sorted alphabetically by potion name. The window stays open: it grows and shrinks to fit the running timers (up to 8) and shows "No active timers" when none are running.
+
+Only double-clicks made in the UI count (backpack, container and paperdoll windows). Using a potion from a hotbar slot, a macro or an assistant program happens inside the client and doesn't start a timer.
+
+**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it.
+
+Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
+
 ### Map Window Changes
 
 `Source/MapWindow.lua` replaces the default Map Window with these changes:
@@ -121,13 +141,15 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 ```text
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
-├── Interface.lua              Creates CorksTargetingWindow and CorksDurabilityGump at startup
+├── Interface.lua              Creates the Corks windows at startup and feeds the timer journal text
 └── Source/
     ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6104) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
     ├── CorksTargeting.xml     Targeting settings window
     ├── CorksDurabilityGump.lua  Gear Watcher logic
     ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
+    ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
+    ├── CorksTimers.xml        Corks' Timers window (8 rows defined up front)
     └── MapWindow.lua          Map Window changes
 ```
 
