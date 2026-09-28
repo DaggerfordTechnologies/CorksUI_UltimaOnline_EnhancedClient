@@ -133,10 +133,10 @@ function CorksDurabilityGump.Update()
 				local rowName = scrollChild .. "Row" .. rowCount
 				WindowSetShowing(rowName, true)
 
+				-- A label takes its color when its text is set, so set the color first.
+				-- Row 1 may have been gray from the "no items" placeholder.
+				LabelSetTextColor(rowName .. "ItemName", 255, 255, 255)
 				LabelSetText(rowName .. "ItemName", itemName)
-
-				local durText = towstring(tostring(current) .. " / " .. tostring(max))
-				LabelSetText(rowName .. "Durability", durText)
 
 				local perc = 0
 				if max > 0 then
@@ -154,6 +154,9 @@ function CorksDurabilityGump.Update()
 				else
 					LabelSetTextColor(rowName .. "Durability", 255, 0, 0)
 				end
+
+				local durText = towstring(tostring(current) .. " / " .. tostring(max))
+				LabelSetText(rowName .. "Durability", durText)
 			end
 		end
 	end
@@ -163,8 +166,8 @@ function CorksDurabilityGump.Update()
 		rowCount = 1
 		local rowName = scrollChild .. "Row1"
 		WindowSetShowing(rowName, true)
-		LabelSetText(rowName .. "ItemName", L"No items with durability equipped.")
 		LabelSetTextColor(rowName .. "ItemName", 180, 180, 180)
+		LabelSetText(rowName .. "ItemName", L"No items with durability equipped.")
 		LabelSetText(rowName .. "Durability", L"")
 	end
 
