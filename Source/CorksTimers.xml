@@ -7,14 +7,13 @@
         <AbsPoint x="210" y="38" />
       </Size>
       <Windows>
-        <Label name="$parentName" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false" wordwrap="false">
+        <Label name="$parentName" font="UO_DefaultText" maxchars="64" textalign="center" handleinput="false" wordwrap="false">
           <Size>
             <AbsPoint x="210" y="18" />
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft" />
           </Anchors>
-          <Color r="255" g="200" b="50" a="255" />
         </Label>
         <StatusBar name="$parentBar" foreground="WhiteLine" handleinput="false">
           <Size>
@@ -52,7 +51,6 @@
       <EventHandlers>
         <EventHandler event="OnInitialize" function="CorksTimers.Initialize" />
         <EventHandler event="OnShutdown" function="CorksTimers.Shutdown" />
-        <EventHandler event="OnRButtonUp" function="CorksTimers.OnClose" />
         <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
       </EventHandlers>
       <Windows>

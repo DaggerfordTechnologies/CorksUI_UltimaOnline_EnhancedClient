@@ -15,12 +15,18 @@ CorksTimers = {}
 --   startOnUse: the timer waits until the double-clicked stack goes down by one
 --     (or disappears, if it was the last one), checking for up to useWindow seconds
 --     (USE_WINDOW when not set).
+--
+-- The name in the row is drawn in the used potion's hue. Unhued potions (hue 0) get
+-- their color from the item art, so color is used for those. Set ignoreHue to
+-- always use color.
 CorksTimers.Timers = {
 	{
 		title       = L"Greater Heal",
 		itemName    = "greater heal",
 		objectType  = 3852,  -- heal potions of every strength share this type
 		duration    = 10,
+		color       = { r = 255, g = 230, b = 0 },  -- yellow
+		ignoreHue   = true,
 		-- Full health or still on cooldown means no potion is drunk, so no timer.
 		startOnUse  = true,
 		useWindow   = 3,  -- drinking is instant, no target to pick
@@ -29,8 +35,28 @@ CorksTimers.Timers = {
 		title       = L"Greater Conflagration",
 		itemName    = "greater conflagration",
 		duration    = 30,
+		color       = { r = 255, g = 140, b = 0 },  -- orange
+		ignoreHue   = true,
 		-- Thrown potions: a failed throw or a cancelled target doesn't use one up.
 		startOnUse  = true,
+	},
+	{
+		title       = L"Supernova",
+		itemName    = "supernova",
+		duration    = 120,
+		color       = { r = 170, g = 80, b = 255 },  -- purple
+		ignoreHue   = true,
+		startOnUse  = true,
+		useWindow   = 3,  -- drunk, not thrown
+	},
+	{
+		title       = L"Barrab Hemolymph",
+		itemName    = "barrab hemolymph",
+		duration    = 1200,  -- 20 minutes
+		color       = { r = 60, g = 220, b = 60 },  -- green
+		ignoreHue   = true,
+		startOnUse  = true,
+		useWindow   = 3,
 	},
 }
 
@@ -49,7 +75,14 @@ CorksTimers.USE_WINDOW = 15
 -- How long "Ready" stays on screen before a row is removed.
 CorksTimers.READY_DISPLAY_TIME = 3
 
+-- Row name color when neither the potion's hue nor the entry gives one.
+CorksTimers.DEFAULT_COLOR = { r = 255, g = 200, b = 50 }
+
 CorksTimers.VisibleRows = 0
+
+-- Name text and color last drawn on each row, so a row is only relabelled when its
+-- timer (or that timer's color) changes.
+CorksTimers.RowLabels = {}
 
 ----------------------------------------------------------------
 -- Functions
@@ -66,10 +99,10 @@ function CorksTimers.Initialize()
 
 	WindowSetScale("CorksTimers", SystemData.Settings.Interface.customUiScale * 0.80)
 	WindowUtils.LoadScale("CorksTimers")
-	WindowUtils.SetWindowTitle("CorksTimers", L"Timers")
+	WindowUtils.SetWindowTitle("CorksTimers", L"Corks' Timers")
 
 	WindowUtils.RestoreWindowPosition("CorksTimers")
-	WindowSetShowing("CorksTimers", false)
+	CorksTimers.Refresh()
 
 	-- Every double-click in the UI (backpack, containers, paperdoll) goes through
 	-- UserActionUseItem, so wrap it once to see which object was used.
@@ -89,14 +122,6 @@ function CorksTimers.Reset(timer)
 	timer.pending = 0
 	timer.previous = nil
 	CorksTimers.StopWatching(timer)
-end
-
--- Right-click hides the window and cancels every timer.
-function CorksTimers.OnClose()
-	for _, timer in ipairs(CorksTimers.Timers) do
-		CorksTimers.Reset(timer)
-	end
-	CorksTimers.Refresh()
 end
 
 function CorksTimers.IsActive(timer)
@@ -167,6 +192,7 @@ function CorksTimers.StartWatching(timer, objectId)
 	timer.watch = {
 		objectId = objectId,
 		quantity = itemData.quantity,
+		hueId = itemData.hueId,
 		timeLeft = timer.useWindow or CorksTimers.USE_WINDOW,
 	}
 end
@@ -194,6 +220,9 @@ function CorksTimers.CheckWatch(timer, timePassed)
 
 	if used then
 		CorksTimers.StopWatching(timer)
+		if not timer.ignoreHue then
+			timer.textColor = CorksTimers.GetHueColor(watch.hueId)
+		end
 		timer.remaining = timer.duration
 		timer.ready = 0
 		CorksTimers.Refresh()
@@ -288,35 +317,54 @@ function CorksTimers.UpdateTimer(timer, timePassed)
 	return false
 end
 
--- Fill the rows with the running timers, in table order, and size the window to fit.
+-- Fill the rows with the running timers, sorted by name, and size the window to fit.
+-- The window stays open; with nothing running it shows a placeholder row.
 function CorksTimers.Refresh()
 	if not DoesWindowNameExist("CorksTimers") then
 		return
 	end
 
-	local rowCount = 0
+	local active = {}
 	for _, timer in ipairs(CorksTimers.Timers) do
-		if CorksTimers.IsActive(timer) and rowCount < CorksTimers.MAX_ROWS then
-			rowCount = rowCount + 1
-			CorksTimers.DrawRow("CorksTimersRow" .. rowCount, timer)
+		if CorksTimers.IsActive(timer) then
+			table.insert(active, timer)
 		end
 	end
-
-	for i = rowCount + 1, CorksTimers.MAX_ROWS do
-		WindowSetShowing("CorksTimersRow" .. i, false)
+	table.sort(active, CorksTimers.CompareTitles)
+	while #active > CorksTimers.MAX_ROWS do
+		table.remove(active)
 	end
+	local rowCount = math.max(#active, 1)
 
-	if rowCount == 0 then
-		WindowSetShowing("CorksTimers", false)
-		return
-	end
-
-	-- Only the root window is resized; resizing rows would reset their scale.
+	-- Resize before drawing: resizing makes the engine redo the window's layout,
+	-- which can undo colors set on the rows beforehand. Only the root window is
+	-- resized; resizing rows would reset their scale.
 	if rowCount ~= CorksTimers.VisibleRows then
 		CorksTimers.VisibleRows = rowCount
 		WindowSetDimensions("CorksTimers", CorksTimers.WINDOW_WIDTH, 58 + rowCount * CorksTimers.ROW_HEIGHT)
 	end
+
+	if #active == 0 then
+		CorksTimers.DrawPlaceholder("CorksTimersRow1")
+	end
+	for i, timer in ipairs(active) do
+		CorksTimers.DrawRow("CorksTimersRow" .. i, timer)
+	end
+	for i = rowCount + 1, CorksTimers.MAX_ROWS do
+		WindowSetShowing("CorksTimersRow" .. i, false)
+	end
+
 	WindowSetShowing("CorksTimers", true)
+end
+
+function CorksTimers.CompareTitles(a, b)
+	if not a.sortKey then
+		a.sortKey = string.lower(WStringToString(a.title))
+	end
+	if not b.sortKey then
+		b.sortKey = string.lower(WStringToString(b.title))
+	end
+	return a.sortKey < b.sortKey
 end
 
 function CorksTimers.DrawRow(rowName, timer)
@@ -324,16 +372,58 @@ function CorksTimers.DrawRow(rowName, timer)
 	local label = rowName .. "Time"
 
 	WindowSetShowing(rowName, true)
-	LabelSetText(rowName .. "Name", timer.title)
+	WindowSetShowing(bar, true)
+	WindowSetShowing(label, true)
+	CorksTimers.SetRowName(rowName, timer.title, timer.textColor or timer.color or CorksTimers.DEFAULT_COLOR)
 	StatusBarSetMaximumValue(bar, timer.duration)
 
 	if timer.remaining > 0 then
 		WindowSetTintColor(bar, 255, 60, 60)
 		StatusBarSetCurrentValue(bar, timer.remaining)
-		LabelSetText(label, towstring(string.format("%.1f sec", timer.remaining)))
+		LabelSetText(label, CorksTimers.FormatTime(timer.remaining))
 	else
 		WindowSetTintColor(bar, 0, 200, 0)
 		StatusBarSetCurrentValue(bar, timer.duration)
 		LabelSetText(label, L"Ready")
 	end
+end
+
+function CorksTimers.DrawPlaceholder(rowName)
+	WindowSetShowing(rowName, true)
+	WindowSetShowing(rowName .. "Bar", false)
+	WindowSetShowing(rowName .. "Time", false)
+	CorksTimers.SetRowName(rowName, L"No active timers", { r = 180, g = 180, b = 180 })
+end
+
+-- A label takes its color when its text is set, and setting the same text again
+-- doesn't redraw it. So set the color first, then clear and reset the text.
+function CorksTimers.SetRowName(rowName, text, color)
+	local last = CorksTimers.RowLabels[rowName]
+	if last and last.text == text and last.r == color.r and last.g == color.g and last.b == color.b then
+		return
+	end
+	CorksTimers.RowLabels[rowName] = { text = text, r = color.r, g = color.g, b = color.b }
+
+	local label = rowName .. "Name"
+	LabelSetTextColor(label, color.r, color.g, color.b)
+	LabelSetText(label, L"")
+	LabelSetText(label, text)
+end
+
+-- "1:59" for a minute or more, "9.3 sec" below that.
+function CorksTimers.FormatTime(seconds)
+	if seconds >= 60 then
+		local whole = math.ceil(seconds)
+		return towstring(string.format("%d:%02d", math.floor(whole / 60), whole % 60))
+	end
+	return towstring(string.format("%.1f sec", seconds))
+end
+
+-- RGB for a hue, or nil for an unhued item.
+function CorksTimers.GetHueColor(hueId)
+	if not hueId or hueId == 0 then
+		return nil
+	end
+	local r, g, b = HueRGBAValue(hueId)
+	return { r = r, g = g, b = b }
 end
