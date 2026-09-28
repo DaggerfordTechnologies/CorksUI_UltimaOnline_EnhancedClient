@@ -2,9 +2,10 @@
 
 Custom user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a notoriety-aware targeting system, an equipment durability tracker and several Map Window improvements.
 
-![Corks' Targeting window](TargetingGump.png)
-
-![Corks' Gear Watcher window](GearWatcher.png)
+<p>
+  <img src="TargetingGump.png" alt="Corks' Targeting window" height="300">
+  <img src="GearWatcher.png" alt="Corks' Gear Watcher window" height="300">
+</p>
 
 ## Contents
 
