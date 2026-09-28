@@ -65,6 +65,10 @@ CorksTimers.MAX_ROWS = 8
 CorksTimers.ROW_HEIGHT = 38
 CorksTimers.WINDOW_WIDTH = 240
 
+-- The window background image can't be drawn shorter than 90px and starts 28px
+-- down, so a shorter window lets it spill past the frame at the bottom.
+CorksTimers.MIN_HEIGHT = 120
+
 -- How long after a double-click a rejection message can still cancel the timer.
 CorksTimers.REJECT_WINDOW = 2
 
@@ -341,7 +345,8 @@ function CorksTimers.Refresh()
 	-- resized; resizing rows would reset their scale.
 	if rowCount ~= CorksTimers.VisibleRows then
 		CorksTimers.VisibleRows = rowCount
-		WindowSetDimensions("CorksTimers", CorksTimers.WINDOW_WIDTH, 58 + rowCount * CorksTimers.ROW_HEIGHT)
+		local height = math.max(58 + rowCount * CorksTimers.ROW_HEIGHT, CorksTimers.MIN_HEIGHT)
+		WindowSetDimensions("CorksTimers", CorksTimers.WINDOW_WIDTH, height)
 	end
 
 	if #active == 0 then

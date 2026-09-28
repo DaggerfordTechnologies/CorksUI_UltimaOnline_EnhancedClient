@@ -41,7 +41,7 @@
          window doesn't reset their scale. Keep in sync with CorksTimers.MAX_ROWS. -->
     <Window name="CorksTimers" movable="true" layer="default">
       <Size>
-        <AbsPoint x="240" y="96" />
+        <AbsPoint x="240" y="120" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
