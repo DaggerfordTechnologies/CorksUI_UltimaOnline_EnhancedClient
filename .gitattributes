@@ -9,6 +9,8 @@ tests               export-ignore
 .gitattributes      export-ignore
 
 # README screenshots; GitHub shows them from the repo, so the README still has them
+ChatFilter.png      export-ignore
+CustomUI.png        export-ignore
 GearWatcher.png     export-ignore
 TargetingGump.png   export-ignore
 TimersGump.png      export-ignore
