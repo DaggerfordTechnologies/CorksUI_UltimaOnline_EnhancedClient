@@ -1,0 +1,405 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- One row per filter: check box plus the message it hides -->
+    <Window name="CorksChatFilterRowTemplate">
+      <Size>
+        <AbsPoint x="350" y="24" />
+      </Size>
+      <Windows>
+        <Button name="$parentButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="5" y="0" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksChatFilter.OnRowButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentLabel" font="UO_DefaultText" maxchars="256" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="315" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+              <AbsPoint x="8" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksChatFilter.OnRowLabel" />
+          </EventHandlers>
+        </Label>
+      </Windows>
+    </Window>
+
+    <Window name="CorksChatFilter" movable="true" layer="popup">
+      <Size>
+        <AbsPoint x="400" y="500" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="0" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksChatFilter.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksChatFilter.Shutdown" />
+        <EventHandler event="OnUpdate" function="CorksChatFilter.OnUpdate" />
+        <EventHandler event="OnRButtonUp" function="CorksChatFilter.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <!-- On/off switch for the whole filter, laid out like a list row -->
+        <Window name="$parentEnable" inherits="CorksChatFilterRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="36" />
+            </Anchor>
+          </Anchors>
+        </Window>
+
+        <!-- Rows are defined up front (not created at runtime) so resizing the
+             list doesn't reset their scale. Keep in sync with CorksChatFilter.MAX_ROWS. -->
+        <ScrollWindow name="$parentList" childscrollwindow="$parentScrollChild" scrollbar="$parentScrollbar" lineheight="24" autoHideScrollBar="true">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="10" y="62" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-10" y="-200" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <VerticalScrollbar name="$parentScrollbar" inherits="StandardVertScroll" />
+            <Window name="$parentScrollChild">
+              <Size>
+                <AbsPoint x="350" y="24" />
+              </Size>
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+              </Anchors>
+              <Windows>
+                <Window name="$parentRow1" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="0" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow2" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="24" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow3" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="48" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow4" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="72" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow5" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="96" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow6" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="120" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow7" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="144" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow8" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="168" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow9" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="192" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow10" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="216" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow11" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="240" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow12" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="264" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow13" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="288" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow14" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="312" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow15" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="336" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow16" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="360" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow17" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="384" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow18" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="408" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow19" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="432" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow20" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="456" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow21" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="480" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow22" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="504" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow23" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="528" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow24" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="552" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow25" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="576" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow26" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="600" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow27" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="624" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow28" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="648" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow29" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="672" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow30" inherits="CorksChatFilterRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="696" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+              </Windows>
+            </Window>
+          </Windows>
+        </ScrollWindow>
+
+        <!-- Last system message seen, for the Block Last button -->
+        <Label name="$parentLastHeader" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="360" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft">
+              <AbsPoint x="18" y="-182" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+        <Label name="$parentLastText" font="UO_DefaultText" maxchars="256" textalign="left" handleinput="false" wordwrap="true">
+          <Size>
+            <AbsPoint x="360" y="36" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft" relativeTo="$parentLastHeader">
+              <AbsPoint x="0" y="2" />
+            </Anchor>
+          </Anchors>
+          <Color r="200" g="200" b="200" a="255" />
+        </Label>
+
+        <Button name="$parentBlockLastButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="18" y="-84" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksChatFilter.OnBlockLast" />
+          </EventHandlers>
+        </Button>
+        <Button name="$parentRemoveButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-84" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksChatFilter.OnRemoveUnchecked" />
+          </EventHandlers>
+        </Button>
+
+        <!-- Free text filter for messages that have no cliloc number -->
+        <Label name="$parentTextLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="360" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft">
+              <AbsPoint x="18" y="-76" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <EditBox name="$parentTextBox" font="UO_DefaultText" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
+          <Size>
+            <AbsPoint x="350" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="23" y="-25" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnKeyEnter" function="CorksChatFilter.OnTextEnter" />
+            <EventHandler event="OnKeyEscape" function="CorksChatFilter.OnTextEscape" />
+          </EventHandlers>
+        </EditBox>
+        <Window name="$parentTextBoxBG" handleinput="false">
+          <Size>
+            <AbsPoint x="360" y="30" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" relativeTo="$parentTextBox">
+              <AbsPoint x="-5" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+            <FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+          </Windows>
+        </Window>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>
