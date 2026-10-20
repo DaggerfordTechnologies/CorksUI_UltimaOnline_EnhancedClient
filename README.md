@@ -1,6 +1,6 @@
 # CorksUI
 
-Custom lightweight user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a scalable notoriety-aware targeting system, an equipment durability tracker, potion timers and several Map Window improvements.
+Custom lightweight user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a scalable notoriety-aware targeting system, an equipment durability tracker, potion timers, a system message chat filter and several Map Window improvements.
 
 <p>
   <img src="TargetingGump.png" alt="Corks' Targeting window" height="300">
@@ -15,6 +15,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Targeting](#corks-targeting)
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
   - [Potion Timers](#potion-timers)
+  - [Corks' Chat Filter](#corks-chat-filter)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
 - [Saved Settings](#saved-settings)
@@ -99,6 +100,23 @@ Only double-clicks made in the UI count (backpack, container and paperdoll windo
 
 Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
 
+### Corks' Chat Filter
+
+Choose which system messages are kept out of the chat window.
+
+**Opening the window:** Actions → **Communication** → **Corks' Chat Filter**.
+
+- **Checked rows are hidden.** The list starts with a few common messages (all unchecked), such as "You must wait to perform another action." and the bandage messages. Click a check box or its text to turn it on or off. The change applies straight away.
+- **Block Last** hides the last system message shown under "Last system message". Messages with a cliloc number are matched by that number, so blocking a message that names an item or player hides that message whatever name it shows. Messages without a number are matched on their full text.
+- **Hide messages containing:** type part of a message and press **Enter** to hide every system message containing it. Matching ignores case.
+- **Remove Unchecked** removes the unchecked rows you added. The starting rows always stay.
+
+Row colors: white rows are the starting list, gold rows were added with Block Last and blue "Contains:" rows are text matches. The list holds up to 30 rows.
+
+Only system messages are filtered; speech, party and guild chat are never hidden. A hidden message is still read by the rest of the UI, so potion timers, buff tracking and spell messages keep working. The filter only affects the chat window: messages the client also draws over your character's head still appear there.
+
+**Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
+
 ### Map Window Changes
 
 `Source/MapWindow.lua` replaces the default Map Window with these changes:
@@ -120,6 +138,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6102 | Target Previous (Notoriety) | Targeting | `CorksTargeting.PrevTarget()` |
 | 6103 | Corks' Targeting | Targeting | `CorksTargeting.Toggle()` |
 | 6104 | Corks' Gear Watcher | Equipment | `CorksDurabilityGump.Toggle()` |
+| 6105 | Corks' Chat Filter | Communication | `CorksChatFilter.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
@@ -133,6 +152,8 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksTargetingPlayersOnly` | Players Only |
 | `CorksTargetingIgnoreSummons` | Ignore Summons |
 | `CorksTargetingNameFilter` | Name filter text |
+| `CorksChatFilterPreset<cliloc>` | Chat Filter starting rows (checked or not) |
+| `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
@@ -142,15 +163,17 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 ```text
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
-├── Interface.lua              Creates the Corks windows at startup and feeds the timer journal text
+├── Interface.lua              Creates the Corks windows at startup and feeds journal text to the timers and chat filter
 └── Source/
-    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6104) to the Actions menu
+    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6105) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
     ├── CorksTargeting.xml     Targeting settings window
     ├── CorksDurabilityGump.lua  Gear Watcher logic
     ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
     ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
     ├── CorksTimers.xml        Corks' Timers window (8 rows defined up front)
+    ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window logic
+    ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
     └── MapWindow.lua          Map Window changes
 ```
 

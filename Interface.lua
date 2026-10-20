@@ -709,6 +709,7 @@ function Interface.CreateWindows()
 	CreateWindow( "CorksTargetingWindow", true)
 	CreateWindow( "CorksDurabilityGump", true)
 	CreateWindow( "CorksTimers", true)
+	CreateWindow( "CorksChatFilter", false)
 	Interface.CreateTCTools()
 	
 	if( SystemData.Settings.Interface.showTipoftheDay ) then
@@ -1758,7 +1759,10 @@ function Interface.NewChatText()
 
 	ok, ignore = pcall(TextParsing.IgnoreTextManager)
 	Interface.ErrorTracker(ok, ignore)
-	
+	if ok and ignore then
+		ign = true
+	end
+
 	ok, err = pcall(TextParsing.ForceOverhead)
 	Interface.ErrorTracker(ok, err)
 	
@@ -1780,6 +1784,15 @@ function Interface.NewChatText()
 
 	ok, err = pcall(CorksTimers.OnChatText)
 	Interface.ErrorTracker(ok, err)
+
+	-- A filtered message still goes through every parser here (timers, buffs, spells);
+	-- it is only kept out of the chat log.
+	local blocked
+	ok, blocked = pcall(CorksChatFilter.OnChatText)
+	Interface.ErrorTracker(ok, blocked)
+	if ok and blocked then
+		ign = true
+	end
 	
 		
 	ok, err = pcall(TextParsing.CenterScreenText, timePassed)	

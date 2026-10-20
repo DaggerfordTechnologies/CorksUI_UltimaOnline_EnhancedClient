@@ -422,6 +422,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.ActionData[6102] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=865006, detailString=L"Target the previous mobile based on Corks' Targeting notoriety filters.", nameString=L"Target Previous (Notoriety)",  callback=L"script CorksTargeting.PrevTarget()" }
 	ActionsWindow.ActionData[6103] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Targeting settings window.", nameString=L"Corks' Targeting",  callback=L"script CorksTargeting.Toggle()" }
 	ActionsWindow.ActionData[6104] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Gear Watcher (durability) window.", nameString=L"Corks' Gear Watcher",  callback=L"script CorksDurabilityGump.Toggle()" }
+	ActionsWindow.ActionData[6105] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Chat Filter window to pick which system messages are hidden from chat.", nameString=L"Corks' Chat Filter",  callback=L"script CorksChatFilter.Toggle()" }
 
 	-- 6000 -> 6100 :  CRAFTING UTILITIES
 	ActionsWindow.ActionData[6000] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=876001, detailString=GetStringFromTid(1155374), nameString=GetStringFromTid(1155373),  callback=L"script Actions.UnravelItem()" }
@@ -452,7 +453,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.Groups[11] = { nameString=L"Pet Commands",			nameTid=1079385, index={ 5120, 5121, 5122, 29, 30, 31, 32, 34, 35, 36, 5123  } }
 	ActionsWindow.Groups[12] = { nameString=L"Boat Commands",			nameTid=1079386, index={ 5156, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 53, 54, 5150, 5151, 5152, 5153, 5154, 5155 } }
 	ActionsWindow.Groups[13] = { nameString=L"Cannons",					nameTid=1116354, index={ 4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008 } }
-	ActionsWindow.Groups[14] = { nameString=L"Communication",			nameTid=1094744, index={ 5100, 5107, 5101, 5116, 5102, 5103, 5104, 5105, 5108, 5109, 5111, 5110, 5106, 5112, 5113, 5114, 5115, 4, 5, 6, 7, 12, 13, 5117, 5118 } }
+	ActionsWindow.Groups[14] = { nameString=L"Communication",			nameTid=1094744, index={ 5100, 5107, 5101, 5116, 5102, 5103, 5104, 5105, 5108, 5109, 5111, 5110, 5106, 5112, 5113, 5114, 5115, 4, 5, 6, 7, 12, 13, 5117, 5118, 6105 } }
 	ActionsWindow.Groups[15] = { nameString=L"Other",					nameTid=1044294, index={ 15, 14, 16, 83, 84, 57, 5720, 5721, 5722, 5723, 5724, 5725, 5726, 5727, 5728, 5729, 5730, 5731, 5732, 5733, 5735, 5736, 5737, 5738, 5739, 5740, 5741, 5742, 5743, 5744, 5745, 5746, 5747, 5748, 5749 } }
 	ActionsWindow.Groups[16] = { nameString=L"Menu Actions",			nameTid=1154979, index={ 5001, 5002, 5003, 5004, 5005, 5006, 89, 5007, 88, 5008, 5009, 5010, 5011, 5012, 5013, 3, 5014, 5015, 5016, 5017 } }
 	ActionsWindow.Groups[17] = { nameString=GetStringFromTid(1155463),							 index={ 4300, 4301, 4302, 4303, 4304, 4305, 4306 } }
