@@ -23,7 +23,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
 2. Start the client, open **Options → Interface**, and select **CorksUI** as the custom UI.
 
 <p>
-  <img src="CustomUI.png" alt="Choose custom UI" height="200">
+  <img src="CustomUI.png" alt="Choose custom UI" height="400">
 </p>
 
 ## Features
