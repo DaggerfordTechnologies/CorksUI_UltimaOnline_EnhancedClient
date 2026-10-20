@@ -1055,6 +1055,9 @@ function Interface.Update( timePassed )
 
 	ok, err = pcall(CorksTimers.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
 	
 	ok, err = pcall(Interface.SOSWaypointsCleaner, timePassed)	
 	Interface.ErrorTracker(ok, err)

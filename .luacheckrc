@@ -5,8 +5,8 @@
 -- The client runs Lua 5.1 with its own API and loads every UI file into one shared
 -- global table, so luacheck can't see where most names come from. globals_default_ui
 -- lists every capitalized global the Base and default UI use (found by running
--- luacheck over them), plus TextLogAddFilterType from the Custom UI docs, so a name
--- outside it is most likely a typo. Rebuild it if a client patch adds API functions.
+-- luacheck over them), so a name that's neither there nor in globals_documented is
+-- most likely a typo. Rebuild it if a client patch adds API functions.
 --
 -- The client's Lua also has a "continue" keyword that luacheck and luac5.1 don't
 -- know, so a file that uses it fails to parse. No CorksUI file uses it.
@@ -443,7 +443,6 @@ globals_default_ui = {
 	"TextEditBoxSetText",
 	"TextEditBoxSetTextColor",
 	"TextLogAddEntry",
-	"TextLogAddFilterType",
 	"TextLogClear",
 	"TextLogCreate",
 	"TextLogDestroy",
@@ -613,8 +612,18 @@ globals_leaked = {
 	"timePassed", "timer", "waypointFacet", "waypointX", "waypointY", "whisperTarget",
 }
 
-for _, list in ipairs({ globals_default_ui, globals_leaked }) do
+-- Client functions from the Custom UI docs that the default UI never calls.
+globals_documented = {
+	"LogDisplayRemoveLog", "TextLogAddFilterType", "TextLogGetEntry", "TextLogGetNumEntries",
+}
+
+for _, list in ipairs({ globals_default_ui, globals_leaked, globals_documented }) do
 	for _, name in ipairs(list) do
 		table.insert(globals, name)
 	end
 end
+
+-- State the test stand-ins share, kept global so the fake client functions can see it.
+files["tests"] = {
+	globals = { "displays", "logs", "overheadShown", "printed" },
+}

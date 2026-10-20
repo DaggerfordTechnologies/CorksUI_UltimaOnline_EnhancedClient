@@ -58,17 +58,14 @@
           </Anchors>
         </Window>
 
-        <Label name="$parentHeader" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
-          <Size>
-            <AbsPoint x="360" y="20" />
-          </Size>
+        <!-- On/off switch for the whole filter, laid out like a list row -->
+        <Window name="$parentEnable" inherits="CorksChatFilterRowTemplate">
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="18" y="38" />
+              <AbsPoint x="13" y="36" />
             </Anchor>
           </Anchors>
-          <Color r="255" g="200" b="50" a="255" />
-        </Label>
+        </Window>
 
         <!-- Rows are defined up front (not created at runtime) so resizing the
              list doesn't reset their scale. Keep in sync with CorksChatFilter.MAX_ROWS. -->
