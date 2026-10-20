@@ -22,9 +22,14 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
    `C:\...\Ultima Online Enhanced\UserInterface\CorksUI`
 2. Start the client, open **Options → Interface**, and select **CorksUI** as the custom UI.
 
+<p>
+  <img src="CustomUI.png" alt="Choose custom UI" height="200">
+</p>
+
 ## Features
 
 ### Corks' Targeting
+
 <p>
   <img src="TargetingGump.png" alt="Corks' Targeting" height="300">
 </p>
@@ -57,6 +62,7 @@ Selecting a target this way does not pop up the context menu.
 **Window controls:** right-click to close; use the mouse wheel over the window to scale it. It snaps to other windows and remembers its position.
 
 ### Corks' Gear Watcher (Durability)
+
 <p>
   <img src="GearWatcher.png" alt="Corks' Gear Watcher" height="300">
 </p>
@@ -82,9 +88,11 @@ A compact window that lists every equipped item that has durability, with its cu
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
 ### Potion Timers
+
 <p>
   <img src="TimersGump.png" alt="Corks' Potion Timer" height="200">
 </p>
+
 Double-clicking one of these potions adds a countdown to the **Corks' Timers** window:
 
 | Potion | Countdown | When it starts |
@@ -103,9 +111,11 @@ Only double-clicks made in the UI count (backpack, container and paperdoll windo
 Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
 
 ### Corks' Chat Filter
+
 <p>
   <img src="ChatFilter.png" alt="Corks' Chat Filter" height="300">
 </p>
+
 Choose which game messages are kept out of the chat window and off your character's head.
 
 **Opening the window:** Actions → **Communication** → **Corks' Chat Filter**.
