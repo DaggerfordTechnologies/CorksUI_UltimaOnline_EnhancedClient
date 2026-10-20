@@ -104,7 +104,7 @@ Timers are defined in the `CorksTimers.Timers` table at the top of `Source/Corks
 
 ### Corks' Chat Filter
 <p>
-  <img src="ChatFilter.png" alt="Corks' Chat Filter" height="200">
+  <img src="ChatFilter.png" alt="Corks' Chat Filter" height="300">
 </p>
 Choose which game messages are kept out of the chat window and off your character's head.
 
