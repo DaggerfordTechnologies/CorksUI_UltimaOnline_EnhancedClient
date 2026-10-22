@@ -58,6 +58,16 @@ CorksTimers.Timers = {
 		startOnUse  = true,
 		useWindow   = 3,
 	},
+	{
+		title       = L"Seed of Life",
+		itemName    = "seed of life",
+		duration    = 600,  -- 10 minutes
+		color       = { r = 0, g = 200, b = 180 },  -- teal
+		ignoreHue   = true,
+		-- Full health or still on cooldown means no seed is eaten, so no timer.
+		startOnUse  = true,
+		useWindow   = 3,
+	},
 }
 
 -- Rows defined in CorksTimers.xml. Timers beyond this many at once aren't shown.

@@ -93,7 +93,7 @@ A compact window that lists every equipped item that has durability, with its cu
   <img src="TimersGump.png" alt="Corks' Potion Timer" height="200">
 </p>
 
-Double-clicking one of these potions adds a countdown to the **Corks' Timers** window:
+Double-clicking one of these potions or items adds a countdown to the **Corks' Timers** window:
 
 | Potion | Countdown | When it starts |
 | --- | --- | --- |
@@ -101,6 +101,7 @@ Double-clicking one of these potions adds a countdown to the **Corks' Timers** w
 | Greater Conflagration | 30 sec | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 15 seconds of the double-click. A failed or cancelled throw doesn't use a potion, so it doesn't start the timer |
 | Supernova | 2 min | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click |
 | Barrab Hemolymph Concentrate (shown as "Barrab Hemolymph") | 20 min | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click |
+| Seed of Life | 10 min | Once the seed stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click. At full health or while still on cooldown no seed is eaten, so it doesn't start the timer |
 
 Each running timer gets its own row, with the potion's name in the potion's color and a bar that is red while it counts down, then turns green and reads **Ready** for 3 seconds before the row is removed. Rows are sorted alphabetically by potion name. The window stays open: it grows and shrinks to fit the running timers (up to 8) and shows "No active timers" when none are running.
 
