@@ -14,7 +14,14 @@ CorksTimers = {}
 --     to how it was.
 --   startOnUse: the timer waits until the double-clicked stack goes down by one
 --     (or disappears, if it was the last one), checking for up to useWindow seconds
---     (USE_WINDOW when not set).
+--     (USE_WINDOW when not set). With watchProperties, a change in the item's
+--     properties counts too, for items that use up charges instead of being used up.
+--
+-- Timers that share a group replace each other: when one starts, the others in
+-- its group are cleared.
+--
+-- alsoStarts lists the itemName of other timers that start along with this one,
+-- for items that share a cooldown.
 --
 -- The name in the row is drawn in the used potion's hue. Unhued potions (hue 0) get
 -- their color from the item art, so color is used for those. Set ignoreHue to
@@ -58,10 +65,84 @@ CorksTimers.Timers = {
 		startOnUse  = true,
 		useWindow   = 3,
 	},
+	{
+		title       = L"Seed of Life",
+		itemName    = "seed of life",
+		duration    = 600,  -- 10 minutes
+		color       = { r = 0, g = 200, b = 180 },  -- teal
+		ignoreHue   = true,
+		-- Full health or still on cooldown means no seed is eaten, so no timer.
+		startOnUse  = true,
+		useWindow   = 3,
+	},
+	{
+		title       = L"Mana Draught",
+		itemName    = "mana draught",
+		duration    = 600,  -- 10 minutes
+		color       = { r = 70, g = 130, b = 255 },  -- blue
+		ignoreHue   = true,
+		-- If no draught is drunk (still on cooldown, for example), there is no timer.
+		startOnUse  = true,
+		useWindow   = 3,
+	},
+	{
+		title       = L"Stat Loss Removal",
+		itemName    = "stat loss removal",  -- whichever way round "potion" goes in the name
+		duration    = 600,  -- 10 minutes
+		color       = { r = 255, g = 255, b = 255 },  -- white
+		ignoreHue   = true,
+		-- If no potion is drunk (still on cooldown, for example), there is no timer.
+		startOnUse  = true,
+		useWindow   = 3,
+	},
+	-- Balms: only one runs at a time. Using a different balm while one is running
+	-- asks whether to replace it; accepting uses up the new balm, so its timer
+	-- starts and the old one is cleared, and declining uses none, so nothing
+	-- changes. Using the same balm again restarts its timer. useWindow is left at
+	-- USE_WINDOW to leave time to answer that prompt.
+	{
+		title       = L"Healing Stone",
+		itemName    = "healing stone",
+		duration    = 15,  -- 15 seconds
+		color       = { r = 255, g = 215, b = 140 },  -- light gold
+		ignoreHue   = true,
+		-- The stone stays in the pack; its points go down when it heals.
+		startOnUse  = true,
+		watchProperties = true,
+		useWindow   = 3,
+		alsoStarts  = { "greater heal" },
+	},
+	{
+		title       = L"Balm of Strength",
+		itemName    = "balm of strength",
+		group       = "balm",
+		duration    = 1800,  -- 30 minutes
+		color       = { r = 255, g = 90, b = 90 },  -- red
+		ignoreHue   = true,
+		startOnUse  = true,
+	},
+	{
+		title       = L"Balm of Swiftness",
+		itemName    = "balm of swiftness",
+		group       = "balm",
+		duration    = 1800,  -- 30 minutes
+		color       = { r = 120, g = 220, b = 255 },  -- light blue
+		ignoreHue   = true,
+		startOnUse  = true,
+	},
+	{
+		title       = L"Balm of Wisdom",
+		itemName    = "balm of wisdom",
+		group       = "balm",
+		duration    = 1800,  -- 30 minutes
+		color       = { r = 255, g = 120, b = 200 },  -- pink
+		ignoreHue   = true,
+		startOnUse  = true,
+	},
 }
 
 -- Rows defined in CorksTimers.xml. Timers beyond this many at once aren't shown.
-CorksTimers.MAX_ROWS = 8
+CorksTimers.MAX_ROWS = 9
 CorksTimers.ROW_HEIGHT = 38
 CorksTimers.WINDOW_WIDTH = 240
 
@@ -199,13 +280,34 @@ function CorksTimers.StartWatching(timer, objectId)
 		hueId = itemData.hueId,
 		timeLeft = timer.useWindow or CorksTimers.USE_WINDOW,
 	}
+
+	if timer.watchProperties then
+		RegisterWindowData(WindowData.ItemProperties.Type, objectId)
+		timer.watch.properties = CorksTimers.GetPropertiesText(objectId)
+	end
 end
 
 function CorksTimers.StopWatching(timer)
 	if timer.watch then
 		UnregisterWindowData(WindowData.ObjectInfo.Type, timer.watch.objectId)
+		if timer.watch.properties then
+			UnregisterWindowData(WindowData.ItemProperties.Type, timer.watch.objectId)
+		end
 		timer.watch = nil
 	end
+end
+
+-- All of an object's property lines as one string, or "" when they aren't loaded.
+function CorksTimers.GetPropertiesText(objectId)
+	local data = WindowData.ItemProperties[objectId]
+	if not data or not data.PropertiesList then
+		return ""
+	end
+	local lines = {}
+	for i, line in ipairs(data.PropertiesList) do
+		lines[i] = WStringToString(line)
+	end
+	return table.concat(lines, "\n")
 end
 
 function CorksTimers.CheckWatch(timer, timePassed)
@@ -219,6 +321,8 @@ function CorksTimers.CheckWatch(timer, timePassed)
 		local itemData = WindowData.ObjectInfo[watch.objectId]
 		if itemData and itemData.quantity and itemData.quantity < watch.quantity then
 			used = true
+		elseif watch.properties and watch.properties ~= "" then
+			used = CorksTimers.GetPropertiesText(watch.objectId) ~= watch.properties
 		end
 	end
 
@@ -229,6 +333,8 @@ function CorksTimers.CheckWatch(timer, timePassed)
 		end
 		timer.remaining = timer.duration
 		timer.ready = 0
+		CorksTimers.ClearGroup(timer)
+		CorksTimers.StartLinked(timer)
 		CorksTimers.Refresh()
 		return
 	end
@@ -236,6 +342,35 @@ function CorksTimers.CheckWatch(timer, timePassed)
 	watch.timeLeft = watch.timeLeft - timePassed
 	if watch.timeLeft <= 0 then
 		CorksTimers.StopWatching(timer)
+	end
+end
+
+-- Clear the other timers in the started timer's group; it has replaced them.
+function CorksTimers.ClearGroup(timer)
+	if not timer.group then
+		return
+	end
+	for _, other in ipairs(CorksTimers.Timers) do
+		if other ~= timer and other.group == timer.group then
+			CorksTimers.Reset(other)
+		end
+	end
+end
+
+-- Start the timers listed in the started timer's alsoStarts.
+function CorksTimers.StartLinked(timer)
+	if not timer.alsoStarts then
+		return
+	end
+	for _, other in ipairs(CorksTimers.Timers) do
+		for _, itemName in ipairs(timer.alsoStarts) do
+			if other.itemName == itemName then
+				other.remaining = other.duration
+				other.ready = 0
+				other.pending = 0
+				other.previous = nil
+			end
+		end
 	end
 end
 
