@@ -20,6 +20,9 @@ CorksTimers = {}
 -- Timers that share a group replace each other: when one starts, the others in
 -- its group are cleared.
 --
+-- alsoStarts lists the itemName of other timers that start along with this one,
+-- for items that share a cooldown.
+--
 -- The name in the row is drawn in the used potion's hue. Unhued potions (hue 0) get
 -- their color from the item art, so color is used for those. Set ignoreHue to
 -- always use color.
@@ -107,6 +110,7 @@ CorksTimers.Timers = {
 		startOnUse  = true,
 		watchProperties = true,
 		useWindow   = 3,
+		alsoStarts  = { "greater heal" },
 	},
 	{
 		title       = L"Balm of Strength",
@@ -330,6 +334,7 @@ function CorksTimers.CheckWatch(timer, timePassed)
 		timer.remaining = timer.duration
 		timer.ready = 0
 		CorksTimers.ClearGroup(timer)
+		CorksTimers.StartLinked(timer)
 		CorksTimers.Refresh()
 		return
 	end
@@ -348,6 +353,23 @@ function CorksTimers.ClearGroup(timer)
 	for _, other in ipairs(CorksTimers.Timers) do
 		if other ~= timer and other.group == timer.group then
 			CorksTimers.Reset(other)
+		end
+	end
+end
+
+-- Start the timers listed in the started timer's alsoStarts.
+function CorksTimers.StartLinked(timer)
+	if not timer.alsoStarts then
+		return
+	end
+	for _, other in ipairs(CorksTimers.Timers) do
+		for _, itemName in ipairs(timer.alsoStarts) do
+			if other.itemName == itemName then
+				other.remaining = other.duration
+				other.ready = 0
+				other.pending = 0
+				other.previous = nil
+			end
 		end
 	end
 end
