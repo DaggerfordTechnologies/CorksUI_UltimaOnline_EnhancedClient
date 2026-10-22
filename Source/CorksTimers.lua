@@ -14,7 +14,8 @@ CorksTimers = {}
 --     to how it was.
 --   startOnUse: the timer waits until the double-clicked stack goes down by one
 --     (or disappears, if it was the last one), checking for up to useWindow seconds
---     (USE_WINDOW when not set).
+--     (USE_WINDOW when not set). With watchProperties, a change in the item's
+--     properties counts too, for items that use up charges instead of being used up.
 --
 -- Timers that share a group replace each other: when one starts, the others in
 -- its group are cleared.
@@ -97,6 +98,17 @@ CorksTimers.Timers = {
 	-- changes. Using the same balm again restarts its timer. useWindow is left at
 	-- USE_WINDOW to leave time to answer that prompt.
 	{
+		title       = L"Healing Stone",
+		itemName    = "healing stone",
+		duration    = 15,  -- 15 seconds
+		color       = { r = 255, g = 215, b = 140 },  -- light gold
+		ignoreHue   = true,
+		-- The stone stays in the pack; its points go down when it heals.
+		startOnUse  = true,
+		watchProperties = true,
+		useWindow   = 3,
+	},
+	{
 		title       = L"Balm of Strength",
 		itemName    = "balm of strength",
 		group       = "balm",
@@ -126,7 +138,7 @@ CorksTimers.Timers = {
 }
 
 -- Rows defined in CorksTimers.xml. Timers beyond this many at once aren't shown.
-CorksTimers.MAX_ROWS = 8
+CorksTimers.MAX_ROWS = 9
 CorksTimers.ROW_HEIGHT = 38
 CorksTimers.WINDOW_WIDTH = 240
 
@@ -264,13 +276,34 @@ function CorksTimers.StartWatching(timer, objectId)
 		hueId = itemData.hueId,
 		timeLeft = timer.useWindow or CorksTimers.USE_WINDOW,
 	}
+
+	if timer.watchProperties then
+		RegisterWindowData(WindowData.ItemProperties.Type, objectId)
+		timer.watch.properties = CorksTimers.GetPropertiesText(objectId)
+	end
 end
 
 function CorksTimers.StopWatching(timer)
 	if timer.watch then
 		UnregisterWindowData(WindowData.ObjectInfo.Type, timer.watch.objectId)
+		if timer.watch.properties then
+			UnregisterWindowData(WindowData.ItemProperties.Type, timer.watch.objectId)
+		end
 		timer.watch = nil
 	end
+end
+
+-- All of an object's property lines as one string, or "" when they aren't loaded.
+function CorksTimers.GetPropertiesText(objectId)
+	local data = WindowData.ItemProperties[objectId]
+	if not data or not data.PropertiesList then
+		return ""
+	end
+	local lines = {}
+	for i, line in ipairs(data.PropertiesList) do
+		lines[i] = WStringToString(line)
+	end
+	return table.concat(lines, "\n")
 end
 
 function CorksTimers.CheckWatch(timer, timePassed)
@@ -284,6 +317,8 @@ function CorksTimers.CheckWatch(timer, timePassed)
 		local itemData = WindowData.ObjectInfo[watch.objectId]
 		if itemData and itemData.quantity and itemData.quantity < watch.quantity then
 			used = true
+		elseif watch.properties and watch.properties ~= "" then
+			used = CorksTimers.GetPropertiesText(watch.objectId) ~= watch.properties
 		end
 	end
 

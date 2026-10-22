@@ -116,6 +116,13 @@
             </Anchor>
           </Anchors>
         </Window>
+        <Window name="$parentRow9" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="348" />
+            </Anchor>
+          </Anchors>
+        </Window>
       </Windows>
     </Window>
 
