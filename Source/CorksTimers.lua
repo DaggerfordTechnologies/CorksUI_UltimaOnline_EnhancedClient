@@ -16,6 +16,9 @@ CorksTimers = {}
 --     (or disappears, if it was the last one), checking for up to useWindow seconds
 --     (USE_WINDOW when not set).
 --
+-- Timers that share a group replace each other: when one starts, the others in
+-- its group are cleared.
+--
 -- The name in the row is drawn in the used potion's hue. Unhued potions (hue 0) get
 -- their color from the item art, so color is used for those. Set ignoreHue to
 -- always use color.
@@ -67,6 +70,48 @@ CorksTimers.Timers = {
 		-- Full health or still on cooldown means no seed is eaten, so no timer.
 		startOnUse  = true,
 		useWindow   = 3,
+	},
+	{
+		title       = L"Mana Draught",
+		itemName    = "mana draught",
+		duration    = 600,  -- 10 minutes
+		color       = { r = 70, g = 130, b = 255 },  -- blue
+		ignoreHue   = true,
+		-- If no draught is drunk (still on cooldown, for example), there is no timer.
+		startOnUse  = true,
+		useWindow   = 3,
+	},
+	-- Balms: only one runs at a time. Using a different balm while one is running
+	-- asks whether to replace it; accepting uses up the new balm, so its timer
+	-- starts and the old one is cleared, and declining uses none, so nothing
+	-- changes. Using the same balm again restarts its timer. useWindow is left at
+	-- USE_WINDOW to leave time to answer that prompt.
+	{
+		title       = L"Balm of Strength",
+		itemName    = "balm of strength",
+		group       = "balm",
+		duration    = 1800,  -- 30 minutes
+		color       = { r = 255, g = 90, b = 90 },  -- red
+		ignoreHue   = true,
+		startOnUse  = true,
+	},
+	{
+		title       = L"Balm of Swiftness",
+		itemName    = "balm of swiftness",
+		group       = "balm",
+		duration    = 1800,  -- 30 minutes
+		color       = { r = 120, g = 220, b = 255 },  -- light blue
+		ignoreHue   = true,
+		startOnUse  = true,
+	},
+	{
+		title       = L"Balm of Wisdom",
+		itemName    = "balm of wisdom",
+		group       = "balm",
+		duration    = 1800,  -- 30 minutes
+		color       = { r = 255, g = 120, b = 200 },  -- pink
+		ignoreHue   = true,
+		startOnUse  = true,
 	},
 }
 
@@ -239,6 +284,7 @@ function CorksTimers.CheckWatch(timer, timePassed)
 		end
 		timer.remaining = timer.duration
 		timer.ready = 0
+		CorksTimers.ClearGroup(timer)
 		CorksTimers.Refresh()
 		return
 	end
@@ -246,6 +292,18 @@ function CorksTimers.CheckWatch(timer, timePassed)
 	watch.timeLeft = watch.timeLeft - timePassed
 	if watch.timeLeft <= 0 then
 		CorksTimers.StopWatching(timer)
+	end
+end
+
+-- Clear the other timers in the started timer's group; it has replaced them.
+function CorksTimers.ClearGroup(timer)
+	if not timer.group then
+		return
+	end
+	for _, other in ipairs(CorksTimers.Timers) do
+		if other ~= timer and other.group == timer.group then
+			CorksTimers.Reset(other)
+		end
 	end
 end
 
