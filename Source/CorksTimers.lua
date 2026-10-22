@@ -81,6 +81,16 @@ CorksTimers.Timers = {
 		startOnUse  = true,
 		useWindow   = 3,
 	},
+	{
+		title       = L"Stat Loss Removal",
+		itemName    = "stat loss removal",  -- whichever way round "potion" goes in the name
+		duration    = 600,  -- 10 minutes
+		color       = { r = 255, g = 255, b = 255 },  -- white
+		ignoreHue   = true,
+		-- If no potion is drunk (still on cooldown, for example), there is no timer.
+		startOnUse  = true,
+		useWindow   = 3,
+	},
 	-- Balms: only one runs at a time. Using a different balm while one is running
 	-- asks whether to replace it; accepting uses up the new balm, so its timer
 	-- starts and the old one is cleared, and declining uses none, so nothing
