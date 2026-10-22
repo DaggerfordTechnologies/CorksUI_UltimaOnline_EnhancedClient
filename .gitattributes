@@ -1,6 +1,5 @@
 # Files left out of GitHub's "Download ZIP" and release source archives, which
-# only need what the client loads (plus the README for the install steps).
-# A git clone still gets everything.
+# only need what the client loads. A git clone still gets everything.
 
 # Development tools and tests
 tests               export-ignore
@@ -8,11 +7,10 @@ tests               export-ignore
 .markdownlint.json  export-ignore
 .gitattributes      export-ignore
 
-# README screenshots; GitHub shows them from the repo, so the README still has them
+# README and its screenshots; GitHub shows them from the repo
 README.md           export-ignore
 ChatFilter.png      export-ignore
 CustomUI.png        export-ignore
 GearWatcher.png     export-ignore
 TargetingGump.png   export-ignore
 TimersGump.png      export-ignore
-README.md           export-ignore
