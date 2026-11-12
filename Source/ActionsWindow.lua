@@ -442,11 +442,11 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.Groups = {}
 	
 	ActionsWindow.Groups[1]  = { nameString=L"Items/Abilities",			nameTid=1079384, index={ 8, 9, 10, 26, 86, 87, 5950 } }
-	ActionsWindow.Groups[2]  = { nameString=L"Combat",					nameTid=1077417, index={ 27, 28, 67, 68, 6106 } }
+	ActionsWindow.Groups[2]  = { nameString=L"Combat",					nameTid=1077417, index={ 27, 28, 67, 68 } }
 	ActionsWindow.Groups[3]  = { nameString=L"Virtues",					nameTid=1077439, index={ 58, 59, 60, 61, 62, 63, 64, 65 } }
-	ActionsWindow.Groups[4]  = { nameString=L"Equipment",				nameTid=1154982, index={ 1, 2, 85, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119, 4120, 4121, 4122, 4123, 4124, 4125, 4126, 4127, 4128, 4129, 4130, 4131, 4132, 4133, 4134, 4135, 4136, 6104 } }
+	ActionsWindow.Groups[4]  = { nameString=L"Equipment",				nameTid=1154982, index={ 1, 2, 85, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119, 4120, 4121, 4122, 4123, 4124, 4125, 4126, 4127, 4128, 4129, 4130, 4131, 4132, 4133, 4134, 4135, 4136 } }
 	ActionsWindow.Groups[5]  = { nameString=L"Cursor Targeting",		nameTid=1094876, index={ 17, 19, 20, 21, 56, 66, 90, 5700 } }
-	ActionsWindow.Groups[6]  = { nameString=L"Targeting",				nameTid=1079383, index={ 55, 22, 71, 77, 23, 72, 78, 24, 73, 79, 69, 74, 80, 70, 75, 81, 25, 76, 82, 11, 5200, 5201, 5202, 5203, 5204, 5205, 5206, 5207, 6100, 6101, 6102, 6103 } }
+	ActionsWindow.Groups[6]  = { nameString=L"Targeting",				nameTid=1079383, index={ 55, 22, 71, 77, 23, 72, 78, 24, 73, 79, 69, 74, 80, 70, 75, 81, 25, 76, 82, 11, 5200, 5201, 5202, 5203, 5204, 5205, 5206, 5207 } }
 	ActionsWindow.Groups[7]  = { nameString=L"Pet Targeting",			nameTid=1154968, index={ 5351, 5301, 5352, 5302, 5353, 5303, 5354, 5304, 5355, 5305 } }
 	ActionsWindow.Groups[8]  = { nameString=GetStringFromTid(1155462),						 index={ 5400, 5450, 5401, 5451, 5402, 5452, 5403, 5453, 5404, 5454 } }
 	ActionsWindow.Groups[9]  = { nameString=L"Petballs",				nameTid=1154980, index={ 5500, 5501, 5502, 5503, 5504, 5505, 5506, 5507, 5508, 5509, 5510, 5511, 5512, 5513, 5514 } }
@@ -454,7 +454,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.Groups[11] = { nameString=L"Pet Commands",			nameTid=1079385, index={ 5120, 5121, 5122, 29, 30, 31, 32, 34, 35, 36, 5123  } }
 	ActionsWindow.Groups[12] = { nameString=L"Boat Commands",			nameTid=1079386, index={ 5156, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 53, 54, 5150, 5151, 5152, 5153, 5154, 5155 } }
 	ActionsWindow.Groups[13] = { nameString=L"Cannons",					nameTid=1116354, index={ 4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008 } }
-	ActionsWindow.Groups[14] = { nameString=L"Communication",			nameTid=1094744, index={ 5100, 5107, 5101, 5116, 5102, 5103, 5104, 5105, 5108, 5109, 5111, 5110, 5106, 5112, 5113, 5114, 5115, 4, 5, 6, 7, 12, 13, 5117, 5118, 6105 } }
+	ActionsWindow.Groups[14] = { nameString=L"Communication",			nameTid=1094744, index={ 5100, 5107, 5101, 5116, 5102, 5103, 5104, 5105, 5108, 5109, 5111, 5110, 5106, 5112, 5113, 5114, 5115, 4, 5, 6, 7, 12, 13, 5117, 5118 } }
 	ActionsWindow.Groups[15] = { nameString=L"Other",					nameTid=1044294, index={ 15, 14, 16, 83, 84, 57, 5720, 5721, 5722, 5723, 5724, 5725, 5726, 5727, 5728, 5729, 5730, 5731, 5732, 5733, 5735, 5736, 5737, 5738, 5739, 5740, 5741, 5742, 5743, 5744, 5745, 5746, 5747, 5748, 5749 } }
 	ActionsWindow.Groups[16] = { nameString=L"Menu Actions",			nameTid=1154979, index={ 5001, 5002, 5003, 5004, 5005, 5006, 89, 5007, 88, 5008, 5009, 5010, 5011, 5012, 5013, 3, 5014, 5015, 5016, 5017 } }
 	ActionsWindow.Groups[17] = { nameString=GetStringFromTid(1155463),							 index={ 4300, 4301, 4302, 4303, 4304, 4305, 4306 } }
@@ -465,6 +465,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.Groups[22] = { nameString=GetStringFromTid(1155468),							 index={ 5850, 5851, 5852, 5853, 5854, 5855, 5856, 5857, 5858, 5859, 5860, 5861, 5862, 5863, 5864, 5865, 5866, 5867 } } 
 	ActionsWindow.Groups[23] = { nameString=GetStringFromTid(1155372),						 index={ 6000, 6001, 6002, 6003, 6004, 6005, 6006 } } 
 	ActionsWindow.Groups[24] = { nameString=GetStringFromTid(1155120),						 index={ 5900, 5901, 5902, 5903, 5904, 5905, 5906, 5907, 5908, 5909, 5910, 5911, 5912, 5913, 5914 } } 
+	ActionsWindow.Groups[25] = { nameString=L"Corks Addons",						 index={ 6100, 6101, 6102, 6103, 6104, 6105, 6106 } }
 end
 
 ActionsWindow.OFFSET_FROM_TOP = 50
