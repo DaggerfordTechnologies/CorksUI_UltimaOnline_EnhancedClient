@@ -92,10 +92,10 @@ A compact window that lists every equipped item that has durability, with its cu
 ### Potion Timers
 
 <p>
-  <img src="TimersGump.png" alt="Corks' Potion Timer" height="200">
+  <img src="TimersGump.png" alt="Consumables Timer" height="200">
 </p>
 
-Double-clicking one of these potions or items adds a countdown to the **Corks' Timers** window:
+Double-clicking one of these potions or items adds a countdown to the **Consumables Timer** window:
 
 | Potion | Countdown | When it starts |
 | --- | --- | --- |
@@ -250,7 +250,7 @@ CorksUI/
     ├── CorksDurabilityGump.lua  Gear Watcher logic
     ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
     ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
-    ├── CorksTimers.xml        Corks' Timers window (9 rows defined up front)
+    ├── CorksTimers.xml        Consumables Timer window (9 rows defined up front)
     ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
     ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
     ├── CorksDropAlerts.lua    Event Drops: artifact graphic for drop messages you add, session drop count
