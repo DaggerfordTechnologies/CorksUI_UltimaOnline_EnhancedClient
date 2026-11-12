@@ -185,6 +185,11 @@ function CorksTargeting.SetNameFilter(text)
 	end
 end
 
+-- Clicking the box gives it keyboard focus so typing goes into it.
+function CorksTargeting.OnNameFilterClick()
+	WindowAssignFocus("CorksNameFilterBox", true)
+end
+
 function CorksTargeting.OnNameFilterEnter()
 	CorksTargeting.SyncFromButtons()
 	WindowAssignFocus("CorksNameFilterBox", false)
