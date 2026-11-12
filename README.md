@@ -130,14 +130,15 @@ A second timer window, laid out like the potion timers, for combat abilities. A 
 | --- | --- |
 | Evasion | 20 sec |
 | War Cry | 20 min |
+| Rejuvenate (Chivalry mastery) | 1 hour |
 
-Because it follows the buff icons, it works however you use the ability: hotbar, macro or spellbook.
+Evasion and War Cry follow their buff icons. Rejuvenate is instant and has no buff icon, so its row skips the active stage: the cooldown starts when the game message "You feel completely rejuvenated!" arrives. Either way it works however you use the ability: hotbar, macro or spellbook.
 
 **Opening the window:** Actions → **Corks Addons** → **Combat Timers**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Timers keep counting while it is closed.
 
 **Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to close it.
 
-Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Source/CorksCombatTimers.lua`, each with the id of its buff icon and its cooldown.
+Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Source/CorksCombatTimers.lua`, each with its cooldown and either the id of its buff icon (`buffId`) or the game message that shows it was used (`triggerTexts`).
 
 ### Corks' Chat Filter
 
@@ -222,7 +223,7 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 ```text
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
-├── Interface.lua              Creates the Corks windows at startup, feeds journal text to the timers and chat filter, and runs the chat log copy each frame
+├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows and the chat filter, and runs the chat log copy each frame
 └── Source/
     ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6107) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
@@ -231,7 +232,7 @@ CorksUI/
     ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
     ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
     ├── CorksTimers.xml        Corks' Timers window (9 rows defined up front)
-    ├── CorksCombatTimers.lua  Combat timers: Evasion and War Cry, driven by buff icons
+    ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
     ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)

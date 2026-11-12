@@ -1792,6 +1792,9 @@ function Interface.NewChatText()
 	ok, err = pcall(CorksTimers.OnChatText)
 	Interface.ErrorTracker(ok, err)
 
+	ok, err = pcall(CorksCombatTimers.OnChatText)
+	Interface.ErrorTracker(ok, err)
+
 	-- A filtered message still goes through every parser here (timers, buffs, spells);
 	-- it is only kept out of the chat log.
 	local blocked

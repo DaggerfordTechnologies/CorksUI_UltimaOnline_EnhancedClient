@@ -4,12 +4,17 @@
 
 CorksCombatTimers = {}
 
--- Each entry becomes a row while its ability is up or cooling down. The client
--- shows a buff icon while the ability is active; buffId is that icon's id.
+-- Each entry becomes a row while its ability is up or cooling down. An ability is
+-- spotted one of two ways:
+--
+--   buffId: the client shows a buff icon while the ability is active; this is that
+--     icon's id. The row goes through all three stages below.
+--   triggerTexts: for instant abilities with no buff icon. When a game message
+--     containing one of these (lowercase) arrives, the cooldown starts.
 --
 --   Active:   from when the buff appears until it ends, using the buff's own timer
 --             (activeDuration is used when the buff doesn't send one).
---   Cooldown: from when the buff ends, for cooldown seconds.
+--   Cooldown: from when the buff ends (or the trigger message), for cooldown seconds.
 --   Ready:    shown for READY_DISPLAY_TIME seconds, then the row is removed.
 CorksCombatTimers.Timers = {
 	{
@@ -25,6 +30,12 @@ CorksCombatTimers.Timers = {
 		activeDuration = 10,
 		cooldown       = 1200,  -- 20 minutes
 		color          = { r = 255, g = 90, b = 90 },  -- red
+	},
+	{
+		title          = L"Rejuvenate",  -- Chivalry mastery
+		triggerTexts   = { "you feel completely rejuvenated" },
+		cooldown       = 3600,  -- 1 hour
+		color          = { r = 255, g = 215, b = 140 },  -- light gold
 	},
 }
 
@@ -144,6 +155,35 @@ function CorksCombatTimers.OnBuffEvent()
 			end
 			CorksCombatTimers.Refresh()
 			return
+		end
+	end
+end
+
+-- Called for every journal line from Interface.NewChatText.
+-- Only game messages count, so a player saying the phrase won't start a timer. Some
+-- game messages arrive on other channels than SYSTEM, but they all carry a TextID;
+-- text players type never does.
+function CorksCombatTimers.OnChatText()
+	if not SystemData.Text then
+		return
+	end
+	local isGameMessage = SystemData.TextChannelID == SystemData.ChatLogFilters.SYSTEM
+		or (SystemData.TextID ~= nil and SystemData.TextID ~= 0)
+	if not isGameMessage then
+		return
+	end
+
+	local text
+	for _, timer in ipairs(CorksCombatTimers.Timers) do
+		if timer.triggerTexts then
+			text = text or string.lower(WStringToString(SystemData.Text))
+			for _, trigger in ipairs(timer.triggerTexts) do
+				if string.find(text, trigger, 1, true) then
+					CorksCombatTimers.StartCooldown(timer)
+					CorksCombatTimers.Refresh()
+					break
+				end
+			end
 		end
 	end
 end
