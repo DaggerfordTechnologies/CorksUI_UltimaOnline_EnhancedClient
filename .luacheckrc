@@ -23,6 +23,7 @@ ignore = { "61.", "62." }
 -- Tables CorksUI defines itself.
 globals = {
 	"CorksChatFilter",
+	"CorksCombatTimers",
 	"CorksDurabilityGump",
 	"CorksTargeting",
 	"CorksTimers",

@@ -174,9 +174,16 @@ CorksTimers.RowLabels = {}
 ----------------------------------------------------------------
 
 function CorksTimers.Initialize()
+	-- Toggle can recreate the window mid-session; keep any timers already running.
 	for _, timer in ipairs(CorksTimers.Timers) do
-		CorksTimers.Reset(timer)
+		if timer.remaining == nil then
+			CorksTimers.Reset(timer)
+		end
 	end
+
+	-- The rows are new windows, so forget what was drawn on the old ones.
+	CorksTimers.VisibleRows = 0
+	CorksTimers.RowLabels = {}
 
 	for i = 1, CorksTimers.MAX_ROWS do
 		WindowSetShowing("CorksTimersRow" .. i, false)
@@ -199,6 +206,36 @@ end
 
 function CorksTimers.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksTimers")
+end
+
+-- The window only opens when the user turns it on with the Consumable Timers action.
+-- Whether it's open is saved, so it opens again at login if it was open when the
+-- client closed (Interface.lua reads the setting when it creates the window).
+-- Timers keep running while it's closed.
+
+-- Right-click closes the window until the action opens it again.
+function CorksTimers.OnClose()
+	CorksTimers.SetOpen(false)
+end
+
+-- Open or close the window, creating it again if it was destroyed.
+function CorksTimers.Toggle()
+	local open = DoesWindowNameExist("CorksTimers") and WindowGetShowing("CorksTimers")
+	CorksTimers.SetOpen(not open)
+end
+
+function CorksTimers.SetOpen(open)
+	Interface.SaveBoolean("CorksTimersOpen", open)
+	if not DoesWindowNameExist("CorksTimers") then
+		if open then
+			CreateWindow("CorksTimers", true)
+		end
+		return
+	end
+	WindowSetShowing("CorksTimers", open)
+	if open then
+		CorksTimers.Refresh()
+	end
 end
 
 function CorksTimers.Reset(timer)
@@ -457,7 +494,8 @@ function CorksTimers.UpdateTimer(timer, timePassed)
 end
 
 -- Fill the rows with the running timers, sorted by name, and size the window to fit.
--- The window stays open; with nothing running it shows a placeholder row.
+-- With nothing running it shows a placeholder row. Refresh doesn't change whether
+-- the window is showing; only SetOpen does.
 function CorksTimers.Refresh()
 	if not DoesWindowNameExist("CorksTimers") then
 		return
@@ -493,8 +531,6 @@ function CorksTimers.Refresh()
 	for i = rowCount + 1, CorksTimers.MAX_ROWS do
 		WindowSetShowing("CorksTimersRow" .. i, false)
 	end
-
-	WindowSetShowing("CorksTimers", true)
 end
 
 function CorksTimers.CompareTitles(a, b)

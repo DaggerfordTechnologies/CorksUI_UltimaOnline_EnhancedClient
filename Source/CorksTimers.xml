@@ -51,6 +51,7 @@
       <EventHandlers>
         <EventHandler event="OnInitialize" function="CorksTimers.Initialize" />
         <EventHandler event="OnShutdown" function="CorksTimers.Shutdown" />
+        <EventHandler event="OnRButtonUp" function="CorksTimers.OnClose" />
         <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
       </EventHandlers>
       <Windows>

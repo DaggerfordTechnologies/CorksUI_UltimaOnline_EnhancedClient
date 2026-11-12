@@ -706,10 +706,11 @@ function Interface.CreateWindows()
 	CreateWindow( "CenterScreenText", true)
 	CreateWindow( "WarShield", Interface.WarShield)
 	CreateWindow( "CrystalPortal", false)
-	CreateWindow( "CorksTargetingWindow", true)
-	CreateWindow( "CorksDurabilityGump", true)
-	CreateWindow( "CorksTimers", true)
-	CreateWindow( "CorksChatFilter", false)
+	CreateWindow( "CorksTargetingWindow", Interface.LoadBoolean("CorksTargetingWindowOpen", false))
+	CreateWindow( "CorksDurabilityGump", Interface.LoadBoolean("CorksDurabilityGumpOpen", false))
+	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
+	CreateWindow( "CorksCombatTimers", Interface.LoadBoolean("CorksCombatTimersOpen", false))
+	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
 	Interface.CreateTCTools()
 	
 	if( SystemData.Settings.Interface.showTipoftheDay ) then
@@ -1054,6 +1055,9 @@ function Interface.Update( timePassed )
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksTimers.OnUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksCombatTimers.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
@@ -1788,6 +1792,9 @@ function Interface.NewChatText()
 	ok, err = pcall(CorksTimers.OnChatText)
 	Interface.ErrorTracker(ok, err)
 
+	ok, err = pcall(CorksCombatTimers.OnChatText)
+	Interface.ErrorTracker(ok, err)
+
 	-- A filtered message still goes through every parser here (timers, buffs, spells);
 	-- it is only kept out of the chat log.
 	local blocked
@@ -1888,9 +1895,38 @@ function Interface.ChatWindowResetTextBox ()
 
 end
 
+-- Chat-line commands the server doesn't know, handled here instead of being sent.
+Interface.ChatAliases = {
+	["/reloadui"] = function() InterfaceCore.ReloadUI() end,
+}
+
+-- Every line typed in chat is sent with SendChat, whichever Enter handler the chat
+-- box ends up calling, so wrap it to catch aliases before they reach the server.
+function Interface.SendChat(channel, text, ...)
+	local alias
+	local ok, err = pcall(function()
+		local command = string.lower(string.match(WStringToString(text or L""), "^%s*(.-)%s*$"))
+		alias = Interface.ChatAliases[command]
+	end)
+	Interface.ErrorTracker(ok, err)
+
+	if alias then
+		ok, err = pcall(alias)
+		Interface.ErrorTracker(ok, err)
+		return
+	end
+	return Interface.OriginalSendChat(channel, text, ...)
+end
+
+if SendChat and not Interface.OriginalSendChat then
+	Interface.OriginalSendChat = SendChat
+	SendChat = Interface.SendChat
+end
+
 function Interface.ChatWindowOnKeyEnter()
     local chatChannel = L""
     local chatText = ChatWindowContainerTextInput.Text
+
     if (NewChatWindow.curChannel == 16) then
 		WindowUtils.ChatPrint( chatText, NewChatWindow.curChannel)
 		WindowAssignFocus( "ChatWindowContainerTextInput", false )

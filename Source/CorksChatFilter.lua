@@ -475,20 +475,34 @@ function CorksChatFilter.OnTextEscape()
 	WindowAssignFocus("CorksChatFilterTextBox", false)
 end
 
+-- The window only opens when the user turns it on with the Chat Filter action.
+-- Whether it's open is saved, so it opens again at login if it was open when the
+-- client closed (Interface.lua reads the setting when it creates the window).
+-- The window is always created, so the filter works while it's closed.
+
+-- Open or close the window, creating it again if it was destroyed.
 function CorksChatFilter.Toggle()
-	if not DoesWindowNameExist("CorksChatFilter") then
-		return
-	end
-	local showing = WindowGetShowing("CorksChatFilter")
-	if showing then
-		CorksChatFilter.SyncFromButtons()
-	end
-	WindowSetShowing("CorksChatFilter", not showing)
+	local open = DoesWindowNameExist("CorksChatFilter") and WindowGetShowing("CorksChatFilter")
+	CorksChatFilter.SetOpen(not open)
 end
 
+-- Right-click closes the window until the action opens it again.
 function CorksChatFilter.OnClose()
-	CorksChatFilter.SyncFromButtons()
-	WindowSetShowing("CorksChatFilter", false)
+	CorksChatFilter.SetOpen(false)
+end
+
+function CorksChatFilter.SetOpen(open)
+	Interface.SaveBoolean("CorksChatFilterOpen", open)
+	if not DoesWindowNameExist("CorksChatFilter") then
+		if open then
+			CreateWindow("CorksChatFilter", true)
+		end
+		return
+	end
+	if not open then
+		CorksChatFilter.SyncFromButtons()
+	end
+	WindowSetShowing("CorksChatFilter", open)
 end
 
 ----------------------------------------------------------------

@@ -9,6 +9,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Targeting](#corks-targeting)
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
   - [Potion Timers](#potion-timers)
+  - [Combat Timers](#combat-timers)
   - [Corks' Chat Filter](#corks-chat-filter)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
@@ -36,7 +37,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
 
 A configurable replacement for the Target Next, Nearest and Previous hotkeys. It only cycles through mobiles that pass the filters you pick.
 
-**Opening the window:** Actions → **Targeting** → **Corks' Targeting**. Drag it to a hotbar to toggle the settings window.
+**Opening the window:** Actions → **Corks Addons** → **Targeting Gump**. Drag it to a hotbar to toggle the settings window. The window is closed by default. If it is open when you log out it opens again next time, until you close it. The targeting actions work whether or not it is open.
 
 #### Filters
 
@@ -51,7 +52,7 @@ All filters work together: a mobile has to pass every enabled filter to be targe
 
 #### Targeting actions
 
-Found under Actions → Targeting. Drag them to a hotbar or bind them to keys.
+Found under Actions → Corks Addons. Drag them to a hotbar or bind them to keys.
 
 - **Target Nearest (Notoriety)**: the closest mobile that passes the filters.
 - **Target Next (Notoriety)**: steps forward through the mobiles on screen, wrapping around at the end.
@@ -69,7 +70,7 @@ Selecting a target this way does not pop up the context menu.
 
 A compact window that lists every equipped item that has durability, with its current and maximum value.
 
-**Opening the window:** Actions → **Equipment** → **Corks' Gear Watcher**.
+**Opening the window:** Actions → **Corks Addons** → **Durability Gump**. The window is closed by default. If it is open when you log out it opens again next time, until you close it.
 
 - It updates when your paperdoll changes and also refreshes every 10 seconds.
 - The window resizes to fit the number of items.
@@ -104,18 +105,40 @@ Double-clicking one of these potions or items adds a countdown to the **Corks' T
 | Seed of Life | 10 min | Once the seed stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click. At full health or while still on cooldown no seed is eaten, so it doesn't start the timer |
 | Mana Draught | 10 min | Once the draught stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click. If no draught is drunk (while still on cooldown, for example), it doesn't start the timer |
 | Stat Loss Removal | 10 min | Once the potion stack you double-clicked goes down by one (or disappears, if it was your last), within 3 seconds of the double-click. If no potion is drunk (while still on cooldown, for example), it doesn't start the timer |
-| Healing Stone | 15 min | Once the points left on the stone you double-clicked go down, within 3 seconds of the double-click. If the stone doesn't heal you, its points don't change, so it doesn't start the timer. When it starts, the Greater Heal timer starts too |
+| Healing Stone | 15 sec | Once the points left on the stone you double-clicked go down, within 3 seconds of the double-click. If the stone doesn't heal you, its points don't change, so it doesn't start the timer. When it starts, the Greater Heal timer starts too |
 | Balm of Strength | 30 min | Once the balm stack you double-clicked goes down by one (or disappears, if it was your last), within 15 seconds of the double-click. Only one balm runs at a time: if you accept the prompt to replace your current balm, its timer is removed and the new one starts; if you decline, nothing changes. Using the same balm again restarts its timer |
 | Balm of Swiftness | 30 min | Once the balm stack you double-clicked goes down by one (or disappears, if it was your last), within 15 seconds of the double-click. Only one balm runs at a time: if you accept the prompt to replace your current balm, its timer is removed and the new one starts; if you decline, nothing changes. Using the same balm again restarts its timer |
 | Balm of Wisdom | 30 min | Once the balm stack you double-clicked goes down by one (or disappears, if it was your last), within 15 seconds of the double-click. Only one balm runs at a time: if you accept the prompt to replace your current balm, its timer is removed and the new one starts; if you decline, nothing changes. Using the same balm again restarts its timer |
 
-Each running timer gets its own row, with the potion's name in the potion's color and a bar that is red while it counts down, then turns green and reads **Ready** for 3 seconds before the row is removed. Rows are sorted alphabetically by potion name. The window stays open: it grows and shrinks to fit the running timers (up to 9) and shows "No active timers" when none are running.
+Each running timer gets its own row, with the potion's name in the potion's color and a bar that is red while it counts down, then turns green and reads **Ready** for 3 seconds before the row is removed. Rows are sorted alphabetically by potion name. The window grows and shrinks to fit the running timers (up to 9) and shows "No active timers" when none are running.
 
 Only double-clicks made in the UI count (backpack, container and paperdoll windows). Using a potion from a hotbar slot, a macro or an assistant program happens inside the client and doesn't start a timer.
 
-**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it.
+**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to close it. The window is closed by default: open it with the **Consumable Timers** action (Corks Addons group) or `/script CorksTimers.Toggle()`. If it is open when you log out it opens again next time, until you close it. Timers keep counting while it is closed.
 
 Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
+
+### Combat Timers
+
+A second timer window, laid out like the potion timers, for combat abilities. A row appears when the ability's buff icon appears, and goes through three stages:
+
+1. **Active** (blue bar): counts down the time the ability has left, taken from the buff icon.
+2. **Cooldown** (red bar): starts when the buff ends and counts down until you can use the ability again.
+3. **Ready** (green bar): shown for 3 seconds, then the row is removed.
+
+| Ability | Cooldown |
+| --- | --- |
+| Evasion | 20 sec |
+| War Cry | 20 min |
+| Rejuvenate (Chivalry mastery) | 1 hour |
+
+Evasion and War Cry follow their buff icons. Rejuvenate is instant and has no buff icon, so its row skips the active stage: the cooldown starts when the game message "You feel completely rejuvenated!" arrives. Either way it works however you use the ability: hotbar, macro or spellbook.
+
+**Opening the window:** Actions → **Corks Addons** → **Combat Timers**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Timers keep counting while it is closed.
+
+**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to close it.
+
+Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Source/CorksCombatTimers.lua`, each with its cooldown and either the id of its buff icon (`buffId`) or the game message that shows it was used (`triggerTexts`).
 
 ### Corks' Chat Filter
 
@@ -125,7 +148,7 @@ Timers are defined in the `CorksTimers.Timers` table at the top of `Source/Corks
 
 Choose which game messages are kept out of the chat window and off your character's head.
 
-**Opening the window:** Actions → **Communication** → **Corks' Chat Filter**.
+**Opening the window:** Actions → **Corks Addons** → **Chat Filter**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. The filter keeps working while it is closed.
 
 - **Hide the checked system messages in chat** (the gold check box at the top) turns the whole filter on or off. It's on by default. Turning it off puts the chat window straight back to the game's own log.
 - **Checked rows are hidden.** The list starts with a few common messages (all unchecked), such as "You must wait to perform another action." and the bandage messages. Click a check box or its text to turn it on or off. The change applies straight away.
@@ -164,14 +187,18 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 
 | ID | Name | Group | Script |
 | --- | --- | --- | --- |
-| 6100 | Target Nearest (Notoriety) | Targeting | `CorksTargeting.NearTarget()` |
-| 6101 | Target Next (Notoriety) | Targeting | `CorksTargeting.NextTarget()` |
-| 6102 | Target Previous (Notoriety) | Targeting | `CorksTargeting.PrevTarget()` |
-| 6103 | Corks' Targeting | Targeting | `CorksTargeting.Toggle()` |
-| 6104 | Corks' Gear Watcher | Equipment | `CorksDurabilityGump.Toggle()` |
-| 6105 | Corks' Chat Filter | Communication | `CorksChatFilter.Toggle()` |
+| 6100 | Target Nearest (Notoriety) | Corks Addons | `CorksTargeting.NearTarget()` |
+| 6101 | Target Next (Notoriety) | Corks Addons | `CorksTargeting.NextTarget()` |
+| 6102 | Target Previous (Notoriety) | Corks Addons | `CorksTargeting.PrevTarget()` |
+| 6103 | Targeting Gump | Corks Addons | `CorksTargeting.Toggle()` |
+| 6104 | Durability Gump | Corks Addons | `CorksDurabilityGump.Toggle()` |
+| 6105 | Chat Filter | Corks Addons | `CorksChatFilter.Toggle()` |
+| 6106 | Consumable Timers | Corks Addons | `CorksTimers.Toggle()` |
+| 6107 | Combat Timers | Corks Addons | `CorksCombatTimers.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
+
+Type `/reloadui` on the chat line to reload the UI (the same as `/script InterfaceCore.ReloadUI()`).
 
 ## Saved Settings
 
@@ -186,6 +213,7 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksChatFilterEnabled` | Chat Filter on/off |
 | `CorksChatFilterPreset<cliloc>` | Chat Filter starting rows (checked or not) |
 | `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
+| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
@@ -195,15 +223,17 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 ```text
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
-├── Interface.lua              Creates the Corks windows at startup, feeds journal text to the timers and chat filter, and runs the chat log copy each frame
+├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows and the chat filter, and runs the chat log copy each frame
 └── Source/
-    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6105) to the Actions menu
+    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6107) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
     ├── CorksTargeting.xml     Targeting settings window
     ├── CorksDurabilityGump.lua  Gear Watcher logic
     ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
     ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
-    ├── CorksTimers.xml        Corks' Timers window (8 rows defined up front)
+    ├── CorksTimers.xml        Corks' Timers window (9 rows defined up front)
+    ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
+    ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
     └── MapWindow.lua          Map Window changes
