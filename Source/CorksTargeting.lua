@@ -206,18 +206,34 @@ function CorksTargeting.NameAllowed(name)
 	return false
 end
 
+-- The window only opens when the user turns it on with the Targeting Gump action.
+-- Whether it's open is saved, so it opens again at login if it was open when the
+-- client closed (Interface.lua reads the setting when it creates the window).
+-- The window is always created, so the targeting actions work while it's closed.
+
+-- Open or close the window, creating it again if it was destroyed.
 function CorksTargeting.Toggle()
-	local wndName = "CorksTargetingWindow"
-	if not DoesWindowNameExist(wndName) then
-		return
-	end
-	local showing = WindowGetShowing(wndName)
-	WindowSetShowing(wndName, not showing)
+	local open = DoesWindowNameExist("CorksTargetingWindow") and WindowGetShowing("CorksTargetingWindow")
+	CorksTargeting.SetOpen(not open)
 end
 
+-- Right-click closes the window until the action opens it again.
 function CorksTargeting.OnClose()
-	CorksTargeting.SyncFromButtons()
-	WindowSetShowing("CorksTargetingWindow", false)
+	CorksTargeting.SetOpen(false)
+end
+
+function CorksTargeting.SetOpen(open)
+	Interface.SaveBoolean("CorksTargetingWindowOpen", open)
+	if not DoesWindowNameExist("CorksTargetingWindow") then
+		if open then
+			CreateWindow("CorksTargetingWindow", true)
+		end
+		return
+	end
+	if not open then
+		CorksTargeting.SyncFromButtons()
+	end
+	WindowSetShowing("CorksTargetingWindow", open)
 end
 
 

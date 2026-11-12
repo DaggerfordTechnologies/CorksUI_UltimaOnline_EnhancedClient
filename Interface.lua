@@ -706,10 +706,10 @@ function Interface.CreateWindows()
 	CreateWindow( "CenterScreenText", true)
 	CreateWindow( "WarShield", Interface.WarShield)
 	CreateWindow( "CrystalPortal", false)
-	CreateWindow( "CorksTargetingWindow", true)
-	CreateWindow( "CorksDurabilityGump", true)
+	CreateWindow( "CorksTargetingWindow", Interface.LoadBoolean("CorksTargetingWindowOpen", false))
+	CreateWindow( "CorksDurabilityGump", Interface.LoadBoolean("CorksDurabilityGumpOpen", false))
 	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
-	CreateWindow( "CorksChatFilter", false)
+	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
 	Interface.CreateTCTools()
 	
 	if( SystemData.Settings.Interface.showTipoftheDay ) then

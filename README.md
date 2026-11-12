@@ -36,7 +36,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
 
 A configurable replacement for the Target Next, Nearest and Previous hotkeys. It only cycles through mobiles that pass the filters you pick.
 
-**Opening the window:** Actions → **Targeting** → **Corks' Targeting**. Drag it to a hotbar to toggle the settings window.
+**Opening the window:** Actions → **Corks Addons** → **Targeting Gump**. Drag it to a hotbar to toggle the settings window. The window is closed by default. If it is open when you log out it opens again next time, until you close it. The targeting actions work whether or not it is open.
 
 #### Filters
 
@@ -51,7 +51,7 @@ All filters work together: a mobile has to pass every enabled filter to be targe
 
 #### Targeting actions
 
-Found under Actions → Targeting. Drag them to a hotbar or bind them to keys.
+Found under Actions → Corks Addons. Drag them to a hotbar or bind them to keys.
 
 - **Target Nearest (Notoriety)**: the closest mobile that passes the filters.
 - **Target Next (Notoriety)**: steps forward through the mobiles on screen, wrapping around at the end.
@@ -69,7 +69,7 @@ Selecting a target this way does not pop up the context menu.
 
 A compact window that lists every equipped item that has durability, with its current and maximum value.
 
-**Opening the window:** Actions → **Equipment** → **Corks' Gear Watcher**.
+**Opening the window:** Actions → **Corks Addons** → **Durability Gump**. The window is closed by default. If it is open when you log out it opens again next time, until you close it.
 
 - It updates when your paperdoll changes and also refreshes every 10 seconds.
 - The window resizes to fit the number of items.
@@ -125,7 +125,7 @@ Timers are defined in the `CorksTimers.Timers` table at the top of `Source/Corks
 
 Choose which game messages are kept out of the chat window and off your character's head.
 
-**Opening the window:** Actions → **Communication** → **Corks' Chat Filter**.
+**Opening the window:** Actions → **Corks Addons** → **Chat Filter**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. The filter keeps working while it is closed.
 
 - **Hide the checked system messages in chat** (the gold check box at the top) turns the whole filter on or off. It's on by default. Turning it off puts the chat window straight back to the game's own log.
 - **Checked rows are hidden.** The list starts with a few common messages (all unchecked), such as "You must wait to perform another action." and the bandage messages. Click a check box or its text to turn it on or off. The change applies straight away.

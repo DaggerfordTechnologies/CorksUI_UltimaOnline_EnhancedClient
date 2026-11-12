@@ -83,17 +83,32 @@ function CorksDurabilityGump.OnUpdate(timePassed)
 	end
 end
 
+-- The window only opens when the user turns it on with the Durability Gump action.
+-- Whether it's open is saved, so it opens again at login if it was open when the
+-- client closed (Interface.lua reads the setting when it creates the window).
+
+-- Right-click closes the window until the action opens it again.
 function CorksDurabilityGump.OnClose()
-	WindowSetShowing("CorksDurabilityGump", false)
+	CorksDurabilityGump.SetOpen(false)
 end
 
+-- Open or close the window, creating it again if it was destroyed.
 function CorksDurabilityGump.Toggle()
-	if DoesWindowNameExist("CorksDurabilityGump") then
-		local showing = WindowGetShowing("CorksDurabilityGump")
-		WindowSetShowing("CorksDurabilityGump", not showing)
-		if not showing then
-			CorksDurabilityGump.Update()
+	local open = DoesWindowNameExist("CorksDurabilityGump") and WindowGetShowing("CorksDurabilityGump")
+	CorksDurabilityGump.SetOpen(not open)
+end
+
+function CorksDurabilityGump.SetOpen(open)
+	Interface.SaveBoolean("CorksDurabilityGumpOpen", open)
+	if not DoesWindowNameExist("CorksDurabilityGump") then
+		if open then
+			CreateWindow("CorksDurabilityGump", true)
 		end
+		return
+	end
+	WindowSetShowing("CorksDurabilityGump", open)
+	if open then
+		CorksDurabilityGump.Update()
 	end
 end
 
