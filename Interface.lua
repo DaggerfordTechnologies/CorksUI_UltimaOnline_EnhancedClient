@@ -1888,9 +1888,25 @@ function Interface.ChatWindowResetTextBox ()
 
 end
 
+-- Chat-line commands the server doesn't know, handled here instead of being sent.
+Interface.ChatAliases = {
+	["/reloadui"] = function() InterfaceCore.ReloadUI() end,
+}
+
 function Interface.ChatWindowOnKeyEnter()
     local chatChannel = L""
     local chatText = ChatWindowContainerTextInput.Text
+
+    local command = string.lower(string.match(WStringToString(chatText or L""), "^%s*(.-)%s*$"))
+    local alias = Interface.ChatAliases[command]
+    if alias then
+		ChatWindow.ResetTextBox ()
+		WindowAssignFocus( "ChatWindowContainerTextInput", false )
+		WindowSetShowing( "ChatWindowContainer", false )
+		alias()
+		return
+    end
+
     if (NewChatWindow.curChannel == 16) then
 		WindowUtils.ChatPrint( chatText, NewChatWindow.curChannel)
 		WindowAssignFocus( "ChatWindowContainerTextInput", false )

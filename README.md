@@ -174,6 +174,8 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
+Type `/reloadui` on the chat line to reload the UI (the same as `/script InterfaceCore.ReloadUI()`).
+
 ## Saved Settings
 
 Settings are stored in the client's normal interface settings, so each character keeps its own.
