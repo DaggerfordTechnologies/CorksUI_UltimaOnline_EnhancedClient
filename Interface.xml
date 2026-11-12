@@ -90,6 +90,7 @@
 	<Include file="Source/CorksDurabilityGump.xml"/>
 	<Include file="Source/CorksTimers.xml"/>
 	<Include file="Source/CorksCombatTimers.xml"/>
+	<Include file="Source/CorksDropAlerts.xml"/>
 	<Include file="Source/CorksChatFilter.xml"/>
 	<Include file="Source/QuickStats.xml"/>
 	<Include file="Source/FontSelector.xml"/>

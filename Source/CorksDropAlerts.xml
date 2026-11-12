@@ -1,0 +1,234 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- One row per drop message: check box plus "[count] message" -->
+    <Window name="CorksDropAlertsRowTemplate">
+      <Size>
+        <AbsPoint x="370" y="24" />
+      </Size>
+      <Windows>
+        <Button name="$parentButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="5" y="0" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksDropAlerts.OnRowButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentLabel" font="UO_DefaultText" maxchars="256" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="335" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+              <AbsPoint x="8" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksDropAlerts.OnRowLabel" />
+          </EventHandlers>
+        </Label>
+      </Windows>
+    </Window>
+
+    <!-- Rows are defined up front (not created at runtime) so they keep their scale.
+         Keep in sync with CorksDropAlerts.MAX_ROWS. -->
+    <Window name="CorksDropAlertsWindow" movable="true" layer="popup">
+      <Size>
+        <AbsPoint x="420" y="460" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="0" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksDropAlerts.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksDropAlerts.Shutdown" />
+        <EventHandler event="OnUpdate" function="CorksDropAlerts.OnUpdate" />
+        <EventHandler event="OnRButtonUp" function="CorksDropAlerts.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <!-- Session total -->
+        <Label name="$parentTotal" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="380" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="38" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+        <Label name="$parentListHeader" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="380" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="64" />
+            </Anchor>
+          </Anchors>
+          <Color r="200" g="200" b="200" a="255" />
+        </Label>
+
+        <Window name="$parentRow1" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="88" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow2" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="112" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow3" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="136" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow4" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="160" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow5" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="184" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow6" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="208" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow7" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="232" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow8" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="256" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow9" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="280" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow10" inherits="CorksDropAlertsRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="13" y="304" />
+            </Anchor>
+          </Anchors>
+        </Window>
+
+        <Button name="$parentResetButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="18" y="-84" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksDropAlerts.OnReset" />
+          </EventHandlers>
+        </Button>
+        <Button name="$parentRemoveButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-84" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksDropAlerts.OnRemoveUnchecked" />
+          </EventHandlers>
+        </Button>
+
+        <!-- Add a drop message -->
+        <Label name="$parentTextLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="380" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft">
+              <AbsPoint x="18" y="-76" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <EditBox name="$parentTextBox" font="UO_DefaultText" taborder="1" maxchars="200" scrolling="horz" layer="overlay">
+          <Size>
+            <AbsPoint x="370" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="23" y="-25" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksDropAlerts.OnTextClick" />
+            <EventHandler event="OnKeyEnter" function="CorksDropAlerts.OnTextEnter" />
+            <EventHandler event="OnKeyEscape" function="CorksDropAlerts.OnTextEscape" />
+          </EventHandlers>
+        </EditBox>
+        <Window name="$parentTextBoxBG" handleinput="false">
+          <Size>
+            <AbsPoint x="380" y="30" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" relativeTo="$parentTextBox">
+              <AbsPoint x="-5" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+            <FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+          </Windows>
+        </Window>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>
