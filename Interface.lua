@@ -1893,24 +1893,32 @@ Interface.ChatAliases = {
 	["/reloadui"] = function() InterfaceCore.ReloadUI() end,
 }
 
+-- Every line typed in chat is sent with SendChat, whichever Enter handler the chat
+-- box ends up calling, so wrap it to catch aliases before they reach the server.
+function Interface.SendChat(channel, text, ...)
+	local alias
+	local ok, err = pcall(function()
+		local command = string.lower(string.match(WStringToString(text or L""), "^%s*(.-)%s*$"))
+		alias = Interface.ChatAliases[command]
+	end)
+	Interface.ErrorTracker(ok, err)
+
+	if alias then
+		ok, err = pcall(alias)
+		Interface.ErrorTracker(ok, err)
+		return
+	end
+	return Interface.OriginalSendChat(channel, text, ...)
+end
+
+if SendChat and not Interface.OriginalSendChat then
+	Interface.OriginalSendChat = SendChat
+	SendChat = Interface.SendChat
+end
+
 function Interface.ChatWindowOnKeyEnter()
     local chatChannel = L""
     local chatText = ChatWindowContainerTextInput.Text
-
-    local command = string.lower(string.match(WStringToString(chatText or L""), "^%s*(.-)%s*$"))
-    local alias = Interface.ChatAliases[command]
-    -- TEMP DEBUG: remove once /reloadui is confirmed working.
-    WindowUtils.ChatPrint(towstring("[CorksUI debug] Enter: '" .. command .. "' alias=" .. tostring(alias ~= nil)), SystemData.ChatLogFilters.SYSTEM)
-    if alias then
-		ChatWindow.ResetTextBox ()
-		WindowAssignFocus( "ChatWindowContainerTextInput", false )
-		WindowSetShowing( "ChatWindowContainer", false )
-		local ok, err = pcall(alias)
-		if not ok then
-			WindowUtils.ChatPrint(towstring("[CorksUI debug] alias error: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
-		end
-		return
-    end
 
     if (NewChatWindow.curChannel == 16) then
 		WindowUtils.ChatPrint( chatText, NewChatWindow.curChannel)
