@@ -191,7 +191,7 @@ function CorksTimers.Initialize()
 
 	WindowSetScale("CorksTimers", SystemData.Settings.Interface.customUiScale * 0.80)
 	WindowUtils.LoadScale("CorksTimers")
-	WindowUtils.SetWindowTitle("CorksTimers", L"Consumables Timer")
+	WindowUtils.SetWindowTitle("CorksTimers", L"Item Timers")
 
 	WindowUtils.RestoreWindowPosition("CorksTimers")
 	CorksTimers.Refresh()
