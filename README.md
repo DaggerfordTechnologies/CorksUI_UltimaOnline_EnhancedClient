@@ -113,7 +113,7 @@ Each running timer gets its own row, with the potion's name in the potion's colo
 
 Only double-clicks made in the UI count (backpack, container and paperdoll windows). Using a potion from a hotbar slot, a macro or an assistant program happens inside the client and doesn't start a timer.
 
-**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to hide it. A hidden window comes back on its own the next time a timer starts, or you can open it with the **Consumable Timers** action (Corks Addons group) or `/script CorksTimers.Toggle()`.
+**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to close it. The window is closed by default: open it with the **Consumable Timers** action (Corks Addons group) or `/script CorksTimers.Toggle()`. If it is open when you log out it opens again next time, until you close it. Timers keep counting while it is closed.
 
 Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
 

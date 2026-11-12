@@ -708,7 +708,7 @@ function Interface.CreateWindows()
 	CreateWindow( "CrystalPortal", false)
 	CreateWindow( "CorksTargetingWindow", true)
 	CreateWindow( "CorksDurabilityGump", true)
-	CreateWindow( "CorksTimers", true)
+	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
 	CreateWindow( "CorksChatFilter", false)
 	Interface.CreateTCTools()
 	

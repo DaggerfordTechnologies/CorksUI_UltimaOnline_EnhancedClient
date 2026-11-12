@@ -208,32 +208,34 @@ function CorksTimers.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksTimers")
 end
 
--- Right-click hides the window; it comes back when a timer starts or from Toggle.
+-- The window only opens when the user turns it on with the Consumable Timers action.
+-- Whether it's open is saved, so it opens again at login if it was open when the
+-- client closed (Interface.lua reads the setting when it creates the window).
+-- Timers keep running while it's closed.
+
+-- Right-click closes the window until the action opens it again.
 function CorksTimers.OnClose()
-	WindowSetShowing("CorksTimers", false)
+	CorksTimers.SetOpen(false)
 end
 
--- Show or hide the window, creating it again if it was destroyed.
+-- Open or close the window, creating it again if it was destroyed.
 function CorksTimers.Toggle()
-	if not DoesWindowNameExist("CorksTimers") then
-		CreateWindow("CorksTimers", true)
-		return
-	end
-	if WindowGetShowing("CorksTimers") then
-		WindowSetShowing("CorksTimers", false)
-	else
-		CorksTimers.Show()
-	end
+	local open = DoesWindowNameExist("CorksTimers") and WindowGetShowing("CorksTimers")
+	CorksTimers.SetOpen(not open)
 end
 
--- Bring the window back (creating it if needed) and redraw it.
-function CorksTimers.Show()
+function CorksTimers.SetOpen(open)
+	Interface.SaveBoolean("CorksTimersOpen", open)
 	if not DoesWindowNameExist("CorksTimers") then
-		CreateWindow("CorksTimers", true)
+		if open then
+			CreateWindow("CorksTimers", true)
+		end
 		return
 	end
-	WindowSetShowing("CorksTimers", true)
-	CorksTimers.Refresh()
+	WindowSetShowing("CorksTimers", open)
+	if open then
+		CorksTimers.Refresh()
+	end
 end
 
 function CorksTimers.Reset(timer)
@@ -271,7 +273,7 @@ function CorksTimers.OnItemUsed(objectId)
 			timer.pending = CorksTimers.REJECT_WINDOW
 			timer.remaining = timer.duration
 			timer.ready = 0
-			CorksTimers.Show()
+			CorksTimers.Refresh()
 			return
 		end
 	end
@@ -370,7 +372,7 @@ function CorksTimers.CheckWatch(timer, timePassed)
 		timer.ready = 0
 		CorksTimers.ClearGroup(timer)
 		CorksTimers.StartLinked(timer)
-		CorksTimers.Show()
+		CorksTimers.Refresh()
 		return
 	end
 
@@ -493,8 +495,7 @@ end
 
 -- Fill the rows with the running timers, sorted by name, and size the window to fit.
 -- With nothing running it shows a placeholder row. Refresh doesn't change whether
--- the window is showing, so a window hidden with a right-click stays hidden until
--- the next timer starts (Show) or it is toggled back on.
+-- the window is showing; only SetOpen does.
 function CorksTimers.Refresh()
 	if not DoesWindowNameExist("CorksTimers") then
 		return
