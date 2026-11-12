@@ -709,6 +709,7 @@ function Interface.CreateWindows()
 	CreateWindow( "CorksTargetingWindow", Interface.LoadBoolean("CorksTargetingWindowOpen", false))
 	CreateWindow( "CorksDurabilityGump", Interface.LoadBoolean("CorksDurabilityGumpOpen", false))
 	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
+	CreateWindow( "CorksCombatTimers", Interface.LoadBoolean("CorksCombatTimersOpen", false))
 	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
 	Interface.CreateTCTools()
 	
@@ -1054,6 +1055,9 @@ function Interface.Update( timePassed )
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksTimers.OnUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksCombatTimers.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)

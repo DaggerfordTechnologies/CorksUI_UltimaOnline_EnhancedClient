@@ -9,6 +9,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Targeting](#corks-targeting)
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
   - [Potion Timers](#potion-timers)
+  - [Combat Timers](#combat-timers)
   - [Corks' Chat Filter](#corks-chat-filter)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
@@ -117,6 +118,27 @@ Only double-clicks made in the UI count (backpack, container and paperdoll windo
 
 Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
 
+### Combat Timers
+
+A second timer window, laid out like the potion timers, for combat abilities. A row appears when the ability's buff icon appears, and goes through three stages:
+
+1. **Active** (blue bar): counts down the time the ability has left, taken from the buff icon.
+2. **Cooldown** (red bar): starts when the buff ends and counts down until you can use the ability again.
+3. **Ready** (green bar): shown for 3 seconds, then the row is removed.
+
+| Ability | Cooldown |
+| --- | --- |
+| Evasion | 20 sec |
+| War Cry | 20 min |
+
+Because it follows the buff icons, it works however you use the ability: hotbar, macro or spellbook.
+
+**Opening the window:** Actions → **Corks Addons** → **Combat Timers**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Timers keep counting while it is closed.
+
+**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to close it.
+
+Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Source/CorksCombatTimers.lua`, each with the id of its buff icon and its cooldown.
+
 ### Corks' Chat Filter
 
 <p>
@@ -171,6 +193,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6104 | Durability Gump | Corks Addons | `CorksDurabilityGump.Toggle()` |
 | 6105 | Chat Filter | Corks Addons | `CorksChatFilter.Toggle()` |
 | 6106 | Consumable Timers | Corks Addons | `CorksTimers.Toggle()` |
+| 6107 | Combat Timers | Corks Addons | `CorksCombatTimers.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
@@ -189,6 +212,7 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksChatFilterEnabled` | Chat Filter on/off |
 | `CorksChatFilterPreset<cliloc>` | Chat Filter starting rows (checked or not) |
 | `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
+| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
@@ -200,13 +224,15 @@ CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
 ├── Interface.lua              Creates the Corks windows at startup, feeds journal text to the timers and chat filter, and runs the chat log copy each frame
 └── Source/
-    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6105) to the Actions menu
+    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6107) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
     ├── CorksTargeting.xml     Targeting settings window
     ├── CorksDurabilityGump.lua  Gear Watcher logic
     ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
     ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
-    ├── CorksTimers.xml        Corks' Timers window (8 rows defined up front)
+    ├── CorksTimers.xml        Corks' Timers window (9 rows defined up front)
+    ├── CorksCombatTimers.lua  Combat timers: Evasion and War Cry, driven by buff icons
+    ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
     └── MapWindow.lua          Map Window changes

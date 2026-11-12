@@ -1,0 +1,61 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- Uses CorksTimersRowTemplate from CorksTimers.xml, which Interface.xml includes
+         first. Rows are defined up front (not created at runtime) so resizing the
+         window doesn't reset their scale. Keep in sync with CorksCombatTimers.MAX_ROWS. -->
+    <Window name="CorksCombatTimers" movable="true" layer="default">
+      <Size>
+        <AbsPoint x="240" y="120" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="260" y="-150" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksCombatTimers.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksCombatTimers.Shutdown" />
+        <EventHandler event="OnRButtonUp" function="CorksCombatTimers.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+        <Window name="$parentRow1" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="44" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow2" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="82" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow3" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="120" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentRow4" inherits="CorksTimersRowTemplate">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="15" y="158" />
+            </Anchor>
+          </Anchors>
+        </Window>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>

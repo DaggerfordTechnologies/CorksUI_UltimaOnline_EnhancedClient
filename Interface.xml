@@ -89,6 +89,7 @@
 	<Include file="Source/CorksTargeting.xml"/>
 	<Include file="Source/CorksDurabilityGump.xml"/>
 	<Include file="Source/CorksTimers.xml"/>
+	<Include file="Source/CorksCombatTimers.xml"/>
 	<Include file="Source/CorksChatFilter.xml"/>
 	<Include file="Source/QuickStats.xml"/>
 	<Include file="Source/FontSelector.xml"/>
@@ -154,6 +155,7 @@
 		<Script file="Source/CorksTargeting.lua"/>
 		<Script file="Source/CorksDurabilityGump.lua"/>
 		<Script file="Source/CorksTimers.lua"/>
+		<Script file="Source/CorksCombatTimers.lua"/>
 		<Script file="Source/CorksChatFilter.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>
