@@ -113,7 +113,7 @@ Each running timer gets its own row, with the potion's name in the potion's colo
 
 Only double-clicks made in the UI count (backpack, container and paperdoll windows). Using a potion from a hotbar slot, a macro or an assistant program happens inside the client and doesn't start a timer.
 
-**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to hide it. A hidden window comes back on its own the next time a timer starts, or you can open it with the **Corks' Timers** action (Corks Addons group) or `/script CorksTimers.Toggle()`.
+**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to hide it. A hidden window comes back on its own the next time a timer starts, or you can open it with the **Consumable Timers** action (Corks Addons group) or `/script CorksTimers.Toggle()`.
 
 Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
 
@@ -167,10 +167,10 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6100 | Target Nearest (Notoriety) | Corks Addons | `CorksTargeting.NearTarget()` |
 | 6101 | Target Next (Notoriety) | Corks Addons | `CorksTargeting.NextTarget()` |
 | 6102 | Target Previous (Notoriety) | Corks Addons | `CorksTargeting.PrevTarget()` |
-| 6103 | Corks' Targeting | Corks Addons | `CorksTargeting.Toggle()` |
-| 6104 | Corks' Gear Watcher | Corks Addons | `CorksDurabilityGump.Toggle()` |
-| 6105 | Corks' Chat Filter | Corks Addons | `CorksChatFilter.Toggle()` |
-| 6106 | Corks' Timers | Corks Addons | `CorksTimers.Toggle()` |
+| 6103 | Targeting Gump | Corks Addons | `CorksTargeting.Toggle()` |
+| 6104 | Durability Gump | Corks Addons | `CorksDurabilityGump.Toggle()` |
+| 6105 | Chat Filter | Corks Addons | `CorksChatFilter.Toggle()` |
+| 6106 | Consumable Timers | Corks Addons | `CorksTimers.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
