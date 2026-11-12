@@ -1899,11 +1899,16 @@ function Interface.ChatWindowOnKeyEnter()
 
     local command = string.lower(string.match(WStringToString(chatText or L""), "^%s*(.-)%s*$"))
     local alias = Interface.ChatAliases[command]
+    -- TEMP DEBUG: remove once /reloadui is confirmed working.
+    WindowUtils.ChatPrint(towstring("[CorksUI debug] Enter: '" .. command .. "' alias=" .. tostring(alias ~= nil)), SystemData.ChatLogFilters.SYSTEM)
     if alias then
 		ChatWindow.ResetTextBox ()
 		WindowAssignFocus( "ChatWindowContainerTextInput", false )
 		WindowSetShowing( "ChatWindowContainer", false )
-		alias()
+		local ok, err = pcall(alias)
+		if not ok then
+			WindowUtils.ChatPrint(towstring("[CorksUI debug] alias error: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+		end
 		return
     end
 
