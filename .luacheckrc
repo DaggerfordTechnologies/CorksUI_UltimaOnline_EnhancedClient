@@ -24,6 +24,7 @@ ignore = { "61.", "62." }
 globals = {
 	"CorksChatFilter",
 	"CorksCombatTimers",
+	"CorksDropAlerts",
 	"CorksDurabilityGump",
 	"CorksTargeting",
 	"CorksTimers",

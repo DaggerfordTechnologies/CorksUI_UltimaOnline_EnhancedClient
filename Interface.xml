@@ -156,6 +156,7 @@
 		<Script file="Source/CorksDurabilityGump.lua"/>
 		<Script file="Source/CorksTimers.lua"/>
 		<Script file="Source/CorksCombatTimers.lua"/>
+		<Script file="Source/CorksDropAlerts.lua"/>
 		<Script file="Source/CorksChatFilter.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>

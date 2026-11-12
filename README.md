@@ -10,6 +10,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
   - [Potion Timers](#potion-timers)
   - [Combat Timers](#combat-timers)
+  - [Event Drop Alerts](#event-drop-alerts)
   - [Corks' Chat Filter](#corks-chat-filter)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
@@ -140,6 +141,16 @@ Evasion and War Cry follow their buff icons. Rejuvenate is instant and has no bu
 
 Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Source/CorksCombatTimers.lua`, each with its cooldown and either the id of its buff icon (`buffId`) or the game message that shows it was used (`triggerTexts`).
 
+### Event Drop Alerts
+
+The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it, so CorksUI adds its own list.
+
+| Message | Event |
+| --- | --- |
+| "You recover an artifact bearing the mark of the Unhallowed" | Unhallowed |
+
+To add a new event, add part of its drop message, in lowercase, to the `CorksDropAlerts.Messages` table at the top of `Source/CorksDropAlerts.lua`. Only game messages count, so a player typing the phrase won't show the graphic. Don't add messages the default UI already handles (see `TextParsing.CenterScreenText` in the default UI), or the graphic plays twice.
+
 ### Corks' Chat Filter
 
 <p>
@@ -223,7 +234,7 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 ```text
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
-├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows and the chat filter, and runs the chat log copy each frame
+├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows, the drop alerts and the chat filter, and runs the chat log copy each frame
 └── Source/
     ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6107) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
@@ -234,6 +245,7 @@ CorksUI/
     ├── CorksTimers.xml        Corks' Timers window (9 rows defined up front)
     ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
     ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
+    ├── CorksDropAlerts.lua    Artifact graphic for event drop messages the default UI doesn't know
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
     └── MapWindow.lua          Map Window changes
