@@ -246,17 +246,40 @@ end
 -- Get all valid mobile targets from the engine directly
 ----------------------------------------------------------------
 
+-- Mobiles whose name data this file asked for, so it can be released when they leave.
+CorksTargeting.RegisteredNames = {}
+
+-- Every mobile the client knows about, nearest first, without you, your pets or your
+-- party. Built fresh on each key press: MobilesOnScreen's list only holds mobiles
+-- whose names had already loaded when it was last rebuilt, so newly arrived mobs
+-- could be missing from it.
 function CorksTargeting.GetMobileList()
-	-- Try MobilesOnScreen list first
-	if table.getn(MobilesOnScreen.MobilesSort) > 0 then
-		return MobilesOnScreen.MobilesSort
+	local targets = GetAllMobileTargets() or {}
+	local present = {}
+	local list = {}
+	for _, mobileId in pairs(targets) do
+		present[mobileId] = true
+		if mobileId ~= WindowData.PlayerStatus.PlayerId
+			and not MobilesOnScreen.IsPet(mobileId)
+			and not HealthBarManager.IsPartyMember(mobileId) then
+			table.insert(list, { id = mobileId, dist = GetDistanceFromPlayer(mobileId) })
+		end
 	end
-	-- Fall back to engine API
-	local targets = GetAllMobileTargets()
-	if targets then
-		return targets
+
+	-- Stop listening for mobiles that have gone.
+	for mobileId in pairs(CorksTargeting.RegisteredNames) do
+		if not present[mobileId] then
+			UnregisterWindowData(WindowData.MobileName.Type, mobileId)
+			CorksTargeting.RegisteredNames[mobileId] = nil
+		end
 	end
-	return {}
+
+	table.sort(list, function(a, b) return a.dist < b.dist end)
+	local ids = {}
+	for i, entry in ipairs(list) do
+		ids[i] = entry.id
+	end
+	return ids
 end
 
 ----------------------------------------------------------------
@@ -302,12 +325,20 @@ function CorksTargeting.TargetAllowed(mobileId)
 
 	local data = WindowData.MobileName[mobileId]
 	if (not data) then
-		RegisterWindowData(WindowData.MobileName.Type, mobileId)
+		-- Ask for the name and notoriety and keep asking: they arrive from the server
+		-- shortly after, so the mobile can be picked on the next key press.
+		-- GetMobileList releases the request once the mobile is gone.
+		if not CorksTargeting.RegisteredNames[mobileId] then
+			RegisterWindowData(WindowData.MobileName.Type, mobileId)
+			CorksTargeting.RegisteredNames[mobileId] = true
+		end
 		data = WindowData.MobileName[mobileId]
 		if (not data) then
-			UnregisterWindowData(WindowData.MobileName.Type, mobileId)
 			return false
 		end
+	end
+	if data.Notoriety == nil then
+		return false
 	end
 
 	-- Check visibility
