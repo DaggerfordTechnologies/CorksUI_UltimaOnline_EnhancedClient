@@ -10,7 +10,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
   - [Potion Timers](#potion-timers)
   - [Combat Timers](#combat-timers)
-  - [Event Drop Alerts](#event-drop-alerts)
+  - [Event Drops](#event-drops)
   - [Corks' Chat Filter](#corks-chat-filter)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
@@ -141,15 +141,21 @@ Evasion and War Cry follow their buff icons. Rejuvenate is instant and has no bu
 
 Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Source/CorksCombatTimers.lua`, each with its cooldown and either the id of its buff icon (`buffId`) or the game message that shows it was used (`triggerTexts`).
 
-### Event Drop Alerts
+### Event Drops
 
-The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it, so CorksUI adds its own list.
+The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it. The **Event Drops** window lets you add those messages yourself, and counts your drops.
 
-| Message | Event |
-| --- | --- |
-| "You recover an artifact bearing the mark of the Unhallowed" | Unhallowed |
+- **Drops this session** at the top counts every matching drop since you logged in (or reloaded the UI). **Reset Count** sets it back to 0.
+- Each saved message is a row showing `[count] message`. When a game message containing a checked one arrives, the artifact graphic shows and the drop is counted.
+- Type part of an event's drop message in the box at the bottom and press Enter to add it (up to 10 messages). Capitals don't matter.
+- Uncheck a message to turn it off, or uncheck it and press **Remove Unchecked** to delete it.
+- The list starts with "You recover an artifact bearing the mark of the Unhallowed".
 
-To add a new event, add part of its drop message, in lowercase, to the `CorksDropAlerts.Messages` table at the top of `Source/CorksDropAlerts.lua`. Only game messages count, so a player typing the phrase won't show the graphic. Don't add messages the default UI already handles (see `TextParsing.CenterScreenText` in the default UI), or the graphic plays twice.
+Only game messages count, so a player typing the phrase won't show the graphic. You can also add one of the default UI's own artifact messages to count those drops: it is counted, but the graphic isn't shown a second time.
+
+**Opening the window:** Actions → **Corks Addons** → **Event Drops**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Drops are counted while it is closed.
+
+**Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
 ### Corks' Chat Filter
 
@@ -206,6 +212,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6105 | Chat Filter | Corks Addons | `CorksChatFilter.Toggle()` |
 | 6106 | Consumable Timers | Corks Addons | `CorksTimers.Toggle()` |
 | 6107 | Combat Timers | Corks Addons | `CorksCombatTimers.Toggle()` |
+| 6108 | Event Drops | Corks Addons | `CorksDropAlerts.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
@@ -224,7 +231,8 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksChatFilterEnabled` | Chat Filter on/off |
 | `CorksChatFilterPreset<cliloc>` | Chat Filter starting rows (checked or not) |
 | `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
-| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
+| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksDropAlertsWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
+| `CorksDropAlertsCount`, `CorksDropAlertsText<n>`, `CorksDropAlertsOn<n>` | Event Drops messages (checked or not) |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
@@ -236,7 +244,7 @@ CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
 ├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows, the drop alerts and the chat filter, and runs the chat log copy each frame
 └── Source/
-    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6107) to the Actions menu
+    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6108) to the Actions menu
     ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
     ├── CorksTargeting.xml     Targeting settings window
     ├── CorksDurabilityGump.lua  Gear Watcher logic
@@ -245,7 +253,8 @@ CorksUI/
     ├── CorksTimers.xml        Corks' Timers window (9 rows defined up front)
     ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
     ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
-    ├── CorksDropAlerts.lua    Artifact graphic for event drop messages the default UI doesn't know
+    ├── CorksDropAlerts.lua    Event Drops: artifact graphic for drop messages you add, session drop count
+    ├── CorksDropAlerts.xml    Event Drops window (10 rows defined up front)
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
     └── MapWindow.lua          Map Window changes

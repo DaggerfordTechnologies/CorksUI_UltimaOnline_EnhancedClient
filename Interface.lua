@@ -710,6 +710,7 @@ function Interface.CreateWindows()
 	CreateWindow( "CorksDurabilityGump", Interface.LoadBoolean("CorksDurabilityGumpOpen", false))
 	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
 	CreateWindow( "CorksCombatTimers", Interface.LoadBoolean("CorksCombatTimersOpen", false))
+	CreateWindow( "CorksDropAlertsWindow", Interface.LoadBoolean("CorksDropAlertsWindowOpen", false))
 	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
 	Interface.CreateTCTools()
 	

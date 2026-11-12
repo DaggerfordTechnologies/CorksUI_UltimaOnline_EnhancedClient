@@ -425,6 +425,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.ActionData[6105] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Chat Filter to pick which system messages are hidden from chat.", nameString=L"Chat Filter",  callback=L"script CorksChatFilter.Toggle()" }
 	ActionsWindow.ActionData[6106] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Consumable Timers, which count down cooldowns for potions, balms and other consumables.", nameString=L"Consumable Timers",  callback=L"script CorksTimers.Toggle()" }
 	ActionsWindow.ActionData[6107] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Combat Timers, which count down Evasion, War Cry and Rejuvenate while active and on cooldown.", nameString=L"Combat Timers",  callback=L"script CorksCombatTimers.Toggle()" }
+	ActionsWindow.ActionData[6108] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close Event Drops, which shows the artifact graphic for event drop messages you add and counts your drops this session.", nameString=L"Event Drops",  callback=L"script CorksDropAlerts.Toggle()" }
 
 	-- 6000 -> 6100 :  CRAFTING UTILITIES
 	ActionsWindow.ActionData[6000] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=876001, detailString=GetStringFromTid(1155374), nameString=GetStringFromTid(1155373),  callback=L"script Actions.UnravelItem()" }
@@ -466,7 +467,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.Groups[22] = { nameString=GetStringFromTid(1155468),							 index={ 5850, 5851, 5852, 5853, 5854, 5855, 5856, 5857, 5858, 5859, 5860, 5861, 5862, 5863, 5864, 5865, 5866, 5867 } } 
 	ActionsWindow.Groups[23] = { nameString=GetStringFromTid(1155372),						 index={ 6000, 6001, 6002, 6003, 6004, 6005, 6006 } } 
 	ActionsWindow.Groups[24] = { nameString=GetStringFromTid(1155120),						 index={ 5900, 5901, 5902, 5903, 5904, 5905, 5906, 5907, 5908, 5909, 5910, 5911, 5912, 5913, 5914 } } 
-	ActionsWindow.Groups[25] = { nameString=L"Corks Addons",						 index={ 6100, 6101, 6102, 6103, 6104, 6105, 6106, 6107 } }
+	ActionsWindow.Groups[25] = { nameString=L"Corks Addons",						 index={ 6100, 6101, 6102, 6103, 6104, 6105, 6106, 6107, 6108 } }
 end
 
 ActionsWindow.OFFSET_FROM_TOP = 50
