@@ -109,11 +109,11 @@ Double-clicking one of these potions or items adds a countdown to the **Corks' T
 | Balm of Swiftness | 30 min | Once the balm stack you double-clicked goes down by one (or disappears, if it was your last), within 15 seconds of the double-click. Only one balm runs at a time: if you accept the prompt to replace your current balm, its timer is removed and the new one starts; if you decline, nothing changes. Using the same balm again restarts its timer |
 | Balm of Wisdom | 30 min | Once the balm stack you double-clicked goes down by one (or disappears, if it was your last), within 15 seconds of the double-click. Only one balm runs at a time: if you accept the prompt to replace your current balm, its timer is removed and the new one starts; if you decline, nothing changes. Using the same balm again restarts its timer |
 
-Each running timer gets its own row, with the potion's name in the potion's color and a bar that is red while it counts down, then turns green and reads **Ready** for 3 seconds before the row is removed. Rows are sorted alphabetically by potion name. The window stays open: it grows and shrinks to fit the running timers (up to 9) and shows "No active timers" when none are running.
+Each running timer gets its own row, with the potion's name in the potion's color and a bar that is red while it counts down, then turns green and reads **Ready** for 3 seconds before the row is removed. Rows are sorted alphabetically by potion name. The window grows and shrinks to fit the running timers (up to 9) and shows "No active timers" when none are running.
 
 Only double-clicks made in the UI count (backpack, container and paperdoll windows). Using a potion from a hotbar slot, a macro or an assistant program happens inside the client and doesn't start a timer.
 
-**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it.
+**Window controls:** drag it where you want it (it remembers the position); use the mouse wheel over it to scale it; right-click it to hide it. A hidden window comes back on its own the next time a timer starts, or you can open it with the **Corks' Timers** action (Combat group) or `/script CorksTimers.Toggle()`.
 
 Timers are defined in the `CorksTimers.Timers` table at the top of `Source/CorksTimers.lua`. Add an entry there to time another item.
 
@@ -170,6 +170,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6103 | Corks' Targeting | Targeting | `CorksTargeting.Toggle()` |
 | 6104 | Corks' Gear Watcher | Equipment | `CorksDurabilityGump.Toggle()` |
 | 6105 | Corks' Chat Filter | Communication | `CorksChatFilter.Toggle()` |
+| 6106 | Corks' Timers | Combat | `CorksTimers.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 

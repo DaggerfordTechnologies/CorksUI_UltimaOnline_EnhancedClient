@@ -174,9 +174,16 @@ CorksTimers.RowLabels = {}
 ----------------------------------------------------------------
 
 function CorksTimers.Initialize()
+	-- Toggle can recreate the window mid-session; keep any timers already running.
 	for _, timer in ipairs(CorksTimers.Timers) do
-		CorksTimers.Reset(timer)
+		if timer.remaining == nil then
+			CorksTimers.Reset(timer)
+		end
 	end
+
+	-- The rows are new windows, so forget what was drawn on the old ones.
+	CorksTimers.VisibleRows = 0
+	CorksTimers.RowLabels = {}
 
 	for i = 1, CorksTimers.MAX_ROWS do
 		WindowSetShowing("CorksTimersRow" .. i, false)
@@ -199,6 +206,34 @@ end
 
 function CorksTimers.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksTimers")
+end
+
+-- Right-click hides the window; it comes back when a timer starts or from Toggle.
+function CorksTimers.OnClose()
+	WindowSetShowing("CorksTimers", false)
+end
+
+-- Show or hide the window, creating it again if it was destroyed.
+function CorksTimers.Toggle()
+	if not DoesWindowNameExist("CorksTimers") then
+		CreateWindow("CorksTimers", true)
+		return
+	end
+	if WindowGetShowing("CorksTimers") then
+		WindowSetShowing("CorksTimers", false)
+	else
+		CorksTimers.Show()
+	end
+end
+
+-- Bring the window back (creating it if needed) and redraw it.
+function CorksTimers.Show()
+	if not DoesWindowNameExist("CorksTimers") then
+		CreateWindow("CorksTimers", true)
+		return
+	end
+	WindowSetShowing("CorksTimers", true)
+	CorksTimers.Refresh()
 end
 
 function CorksTimers.Reset(timer)
@@ -236,7 +271,7 @@ function CorksTimers.OnItemUsed(objectId)
 			timer.pending = CorksTimers.REJECT_WINDOW
 			timer.remaining = timer.duration
 			timer.ready = 0
-			CorksTimers.Refresh()
+			CorksTimers.Show()
 			return
 		end
 	end
@@ -335,7 +370,7 @@ function CorksTimers.CheckWatch(timer, timePassed)
 		timer.ready = 0
 		CorksTimers.ClearGroup(timer)
 		CorksTimers.StartLinked(timer)
-		CorksTimers.Refresh()
+		CorksTimers.Show()
 		return
 	end
 
@@ -457,7 +492,9 @@ function CorksTimers.UpdateTimer(timer, timePassed)
 end
 
 -- Fill the rows with the running timers, sorted by name, and size the window to fit.
--- The window stays open; with nothing running it shows a placeholder row.
+-- With nothing running it shows a placeholder row. Refresh doesn't change whether
+-- the window is showing, so a window hidden with a right-click stays hidden until
+-- the next timer starts (Show) or it is toggled back on.
 function CorksTimers.Refresh()
 	if not DoesWindowNameExist("CorksTimers") then
 		return
@@ -493,8 +530,6 @@ function CorksTimers.Refresh()
 	for i = rowCount + 1, CorksTimers.MAX_ROWS do
 		WindowSetShowing("CorksTimersRow" .. i, false)
 	end
-
-	WindowSetShowing("CorksTimers", true)
 end
 
 function CorksTimers.CompareTitles(a, b)

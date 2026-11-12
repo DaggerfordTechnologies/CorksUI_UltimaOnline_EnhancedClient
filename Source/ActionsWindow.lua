@@ -423,6 +423,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.ActionData[6103] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Targeting settings window.", nameString=L"Corks' Targeting",  callback=L"script CorksTargeting.Toggle()" }
 	ActionsWindow.ActionData[6104] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Gear Watcher (durability) window.", nameString=L"Corks' Gear Watcher",  callback=L"script CorksDurabilityGump.Toggle()" }
 	ActionsWindow.ActionData[6105] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Chat Filter window to pick which system messages are hidden from chat.", nameString=L"Corks' Chat Filter",  callback=L"script CorksChatFilter.Toggle()" }
+	ActionsWindow.ActionData[6106] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=860013, detailString=L"Open or close the Corks' Timers (potion timers) window.", nameString=L"Corks' Timers",  callback=L"script CorksTimers.Toggle()" }
 
 	-- 6000 -> 6100 :  CRAFTING UTILITIES
 	ActionsWindow.ActionData[6000] = { type=SystemData.UserAction.TYPE_SPEECH_USER_COMMAND,			inActionWindow=true, iconId=876001, detailString=GetStringFromTid(1155374), nameString=GetStringFromTid(1155373),  callback=L"script Actions.UnravelItem()" }
@@ -441,7 +442,7 @@ function ActionsWindow.InitActionData()
 	ActionsWindow.Groups = {}
 	
 	ActionsWindow.Groups[1]  = { nameString=L"Items/Abilities",			nameTid=1079384, index={ 8, 9, 10, 26, 86, 87, 5950 } }
-	ActionsWindow.Groups[2]  = { nameString=L"Combat",					nameTid=1077417, index={ 27, 28, 67, 68 } }
+	ActionsWindow.Groups[2]  = { nameString=L"Combat",					nameTid=1077417, index={ 27, 28, 67, 68, 6106 } }
 	ActionsWindow.Groups[3]  = { nameString=L"Virtues",					nameTid=1077439, index={ 58, 59, 60, 61, 62, 63, 64, 65 } }
 	ActionsWindow.Groups[4]  = { nameString=L"Equipment",				nameTid=1154982, index={ 1, 2, 85, 4100, 4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119, 4120, 4121, 4122, 4123, 4124, 4125, 4126, 4127, 4128, 4129, 4130, 4131, 4132, 4133, 4134, 4135, 4136, 6104 } }
 	ActionsWindow.Groups[5]  = { nameString=L"Cursor Targeting",		nameTid=1094876, index={ 17, 19, 20, 21, 56, 66, 90, 5700 } }
