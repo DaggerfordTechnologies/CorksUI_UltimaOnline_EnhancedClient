@@ -26,12 +26,15 @@ CorksTargeting.NameFilters = {}
 CorksTargeting.NotorietyLabels = {
 	[2] = L"Innocent (Blue)",
 	[3] = L"Friend (Green)",
-	[4] = L"Can Attack (Grey)",
-	[5] = L"Criminal (Grey)",
+	[4] = L"Attackable (Grey)",
 	[6] = L"Enemy (Orange)",
 	[7] = L"Murderer (Red)",
 	[8] = L"Invulnerable (Yellow)",
 }
+
+-- Checkboxes shown, in order. Criminal (5) has no checkbox of its own: both greys
+-- look the same, so the Grey checkbox (4) controls Criminal too.
+CorksTargeting.NotorietyShown = { 2, 3, 4, 6, 7, 8 }
 
 ----------------------------------------------------------------
 -- Functions
@@ -46,12 +49,14 @@ function CorksTargeting.Initialize()
 	for i = 2, 8 do
 		CorksTargeting.NotorietyFilter[i] = Interface.LoadBoolean("CorksTargetingNoto" .. i, true)
 	end
+	CorksTargeting.NotorietyFilter[5] = CorksTargeting.NotorietyFilter[4]
 	CorksTargeting.PlayersOnly = Interface.LoadBoolean("CorksTargetingPlayersOnly", false)
 	CorksTargeting.IgnoreSummons = Interface.LoadBoolean("CorksTargetingIgnoreSummons", false)
 	CorksTargeting.MaxDistance = CorksTargeting.ClampDistance(Interface.LoadNumber("CorksTargetingMaxDistance", 21))
 
 	-- Create filter checkboxes
-	for i = 2, 8 do
+	local previous = nil
+	for _, i in ipairs(CorksTargeting.NotorietyShown) do
 		local templateName = "CorksNotoCheck_" .. i
 		CreateWindowFromTemplate(templateName, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
 		ButtonSetCheckButtonFlag(templateName .. "Button", true)
@@ -62,11 +67,12 @@ function CorksTargeting.Initialize()
 
 		ButtonSetPressedFlag(templateName .. "Button", CorksTargeting.NotorietyFilter[i])
 
-		if i == 2 then
+		if previous == nil then
 			WindowAddAnchor(templateName, "topleft", "CorksTargetingWindowScrollChild", "topleft", 10, 5)
 		else
-			WindowAddAnchor(templateName, "bottomleft", "CorksNotoCheck_" .. (i - 1), "topleft", 0, 8)
+			WindowAddAnchor(templateName, "bottomleft", previous, "topleft", 0, 8)
 		end
+		previous = templateName
 	end
 
 	-- Create Players Only checkbox
@@ -173,13 +179,14 @@ function CorksTargeting.SyncFromButtons()
 	if not CorksTargeting.Initialized then
 		return
 	end
-	for i = 2, 8 do
+	for _, i in ipairs(CorksTargeting.NotorietyShown) do
 		local templateName = "CorksNotoCheck_" .. i
 		if DoesWindowNameExist(templateName .. "Button") then
 			CorksTargeting.NotorietyFilter[i] = ButtonGetPressedFlag(templateName .. "Button")
 			Interface.SaveBoolean("CorksTargetingNoto" .. i, CorksTargeting.NotorietyFilter[i])
 		end
 	end
+	CorksTargeting.NotorietyFilter[5] = CorksTargeting.NotorietyFilter[4]
 	if DoesWindowNameExist("CorksPlayersOnlyCheckButton") then
 		CorksTargeting.PlayersOnly = ButtonGetPressedFlag("CorksPlayersOnlyCheckButton")
 		Interface.SaveBoolean("CorksTargetingPlayersOnly", CorksTargeting.PlayersOnly)

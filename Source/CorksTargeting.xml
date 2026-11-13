@@ -2,7 +2,7 @@
 	<Windows>
 		<Window name="CorksTargetingWindow" movable="true" layer="popup">
 			<Size>
-				<AbsPoint x="280" y="540" />
+				<AbsPoint x="280" y="580" />
 			</Size>
 			<Anchors>
 				<Anchor point="center" relativePoint="center">
@@ -24,7 +24,7 @@
 				</Window>
 				<Window name="CorksTargetingWindowContent">
 					<Size>
-						<AbsPoint x="250" y="480" />
+						<AbsPoint x="250" y="520" />
 					</Size>
 					<Anchors>
 						<Anchor point="top" relativePoint="top">
@@ -54,7 +54,7 @@
 						</FullResizeImage>
 						<Window name="CorksTargetingWindowScrollChild">
 							<Size>
-								<AbsPoint x="230" y="450" />
+								<AbsPoint x="230" y="490" />
 							</Size>
 							<Windows>
 							</Windows>
@@ -63,7 +63,7 @@
 				</Window>
 				<!-- Name filter: a direct child of the root window (like the Chat Filter box) so
 				     the edit box gets clicks and keyboard focus. Anchored from Lua under the checkboxes. -->
-				<Label name="CorksNameFilterLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+				<Label name="CorksNameFilterLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="220" y="20" />
 					</Size>
@@ -103,12 +103,12 @@
 					</Windows>
 				</Window>
 				<!-- Max distance: anchored from Lua under the name filter box. -->
-				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="220" y="20" />
 					</Size>
 				</Label>
-				<SliderBar name="CorksMaxDistanceSlider" inherits="UO_Default_Horizontal_SliderBar">
+				<SliderBar name="CorksMaxDistanceSlider" inherits="UO_Default_Horizontal_SliderBar" layer="overlay">
 					<Size>
 						<AbsPoint x="210" y="16" />
 					</Size>
