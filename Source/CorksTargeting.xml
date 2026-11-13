@@ -2,7 +2,7 @@
 	<Windows>
 		<Window name="CorksTargetingWindow" movable="true" layer="popup">
 			<Size>
-				<AbsPoint x="280" y="540" />
+				<AbsPoint x="230" y="404" />
 			</Size>
 			<Anchors>
 				<Anchor point="center" relativePoint="center">
@@ -24,11 +24,11 @@
 				</Window>
 				<Window name="CorksTargetingWindowContent">
 					<Size>
-						<AbsPoint x="250" y="480" />
+						<AbsPoint x="200" y="354" />
 					</Size>
 					<Anchors>
 						<Anchor point="top" relativePoint="top">
-							<AbsPoint x="0" y="40" />
+							<AbsPoint x="0" y="36" />
 						</Anchor>
 					</Anchors>
 					<Windows>
@@ -54,7 +54,7 @@
 						</FullResizeImage>
 						<Window name="CorksTargetingWindowScrollChild">
 							<Size>
-								<AbsPoint x="230" y="450" />
+								<AbsPoint x="180" y="324" />
 							</Size>
 							<Windows>
 							</Windows>
@@ -63,14 +63,14 @@
 				</Window>
 				<!-- Name filter: a direct child of the root window (like the Chat Filter box) so
 				     the edit box gets clicks and keyboard focus. Anchored from Lua under the checkboxes. -->
-				<Label name="CorksNameFilterLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+				<Label name="CorksNameFilterLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
-						<AbsPoint x="220" y="20" />
+						<AbsPoint x="180" y="22" />
 					</Size>
 				</Label>
-				<EditBox name="CorksNameFilterBox" font="UO_DefaultText" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
+				<EditBox name="CorksNameFilterBox" font="UO_DefaultText_15pt" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
 					<Size>
-						<AbsPoint x="210" y="20" />
+						<AbsPoint x="160" y="24" />
 					</Size>
 					<EventHandlers>
 						<EventHandler event="OnLButtonUp" function="CorksTargeting.OnNameFilterClick" />
@@ -80,7 +80,7 @@
 				</EditBox>
 				<Window name="CorksNameFilterBoxBG" handleinput="false">
 					<Size>
-						<AbsPoint x="220" y="30" />
+						<AbsPoint x="170" y="34" />
 					</Size>
 					<Anchors>
 						<Anchor point="topleft" relativePoint="topleft" relativeTo="CorksNameFilterBox">
@@ -102,6 +102,20 @@
 						</FullResizeImage>
 					</Windows>
 				</Window>
+				<!-- Max distance: anchored from Lua under the name filter box. -->
+				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
+					<Size>
+						<AbsPoint x="180" y="22" />
+					</Size>
+				</Label>
+				<SliderBar name="CorksMaxDistanceSlider" inherits="UO_Default_Horizontal_SliderBar" layer="overlay">
+					<Size>
+						<AbsPoint x="160" y="16" />
+					</Size>
+					<EventHandlers>
+						<EventHandler event="OnSlide" function="CorksTargeting.OnMaxDistanceSlide" />
+					</EventHandlers>
+				</SliderBar>
 			</Windows>
 		</Window>
 	</Windows>

@@ -14,6 +14,11 @@ CorksTargeting.NotorietyFilter = {}
 CorksTargeting.PlayersOnly = false
 CorksTargeting.IgnoreSummons = false
 
+-- Furthest a target can be, in tiles (default 21 matches the old hardcoded limit)
+CorksTargeting.MaxDistanceMin = 1
+CorksTargeting.MaxDistanceMax = 24
+CorksTargeting.MaxDistance = 21
+
 -- Name filter: comma separated, case-insensitive partial matches (empty = no filter)
 CorksTargeting.NameFilterText = L""
 CorksTargeting.NameFilters = {}
@@ -21,12 +26,23 @@ CorksTargeting.NameFilters = {}
 CorksTargeting.NotorietyLabels = {
 	[2] = L"Innocent (Blue)",
 	[3] = L"Friend (Green)",
-	[4] = L"Can Attack (Grey)",
-	[5] = L"Criminal (Grey)",
+	[4] = L"Attackable (Grey)",
 	[6] = L"Enemy (Orange)",
 	[7] = L"Murderer (Red)",
 	[8] = L"Invulnerable (Yellow)",
 }
+
+-- Checkboxes shown, in order. Criminal (5) has no checkbox of its own: both greys
+-- look the same, so the Grey checkbox (4) controls Criminal too.
+CorksTargeting.NotorietyShown = { 2, 3, 4, 6, 7, 8 }
+
+-- Font for all text in the window (the template default is the smaller UO_DefaultText)
+CorksTargeting.Font = "UO_DefaultText_15pt"
+
+-- Layout spacing (the checkbox template is 32 tall; shrink rows so options sit closer)
+CorksTargeting.RowHeight = 24
+CorksTargeting.RowGap = 2
+CorksTargeting.SectionGap = 12
 
 ----------------------------------------------------------------
 -- Functions
@@ -41,14 +57,19 @@ function CorksTargeting.Initialize()
 	for i = 2, 8 do
 		CorksTargeting.NotorietyFilter[i] = Interface.LoadBoolean("CorksTargetingNoto" .. i, true)
 	end
+	CorksTargeting.NotorietyFilter[5] = CorksTargeting.NotorietyFilter[4]
 	CorksTargeting.PlayersOnly = Interface.LoadBoolean("CorksTargetingPlayersOnly", false)
 	CorksTargeting.IgnoreSummons = Interface.LoadBoolean("CorksTargetingIgnoreSummons", false)
+	CorksTargeting.MaxDistance = CorksTargeting.ClampDistance(Interface.LoadNumber("CorksTargetingMaxDistance", 21))
 
 	-- Create filter checkboxes
-	for i = 2, 8 do
+	local previous = nil
+	for _, i in ipairs(CorksTargeting.NotorietyShown) do
 		local templateName = "CorksNotoCheck_" .. i
 		CreateWindowFromTemplate(templateName, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
+		WindowSetDimensions(templateName, 180, CorksTargeting.RowHeight)
 		ButtonSetCheckButtonFlag(templateName .. "Button", true)
+		LabelSetFont(templateName .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 		LabelSetText(templateName .. "Label", CorksTargeting.NotorietyLabels[i])
 
 		-- Color the label to match the notoriety
@@ -56,30 +77,35 @@ function CorksTargeting.Initialize()
 
 		ButtonSetPressedFlag(templateName .. "Button", CorksTargeting.NotorietyFilter[i])
 
-		if i == 2 then
+		if previous == nil then
 			WindowAddAnchor(templateName, "topleft", "CorksTargetingWindowScrollChild", "topleft", 10, 5)
 		else
-			WindowAddAnchor(templateName, "bottomleft", "CorksNotoCheck_" .. (i - 1), "topleft", 0, 8)
+			WindowAddAnchor(templateName, "bottomleft", previous, "topleft", 0, CorksTargeting.RowGap)
 		end
+		previous = templateName
 	end
 
 	-- Create Players Only checkbox
 	local playersTemplate = "CorksPlayersOnlyCheck"
 	CreateWindowFromTemplate(playersTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
+	WindowSetDimensions(playersTemplate, 180, CorksTargeting.RowHeight)
 	ButtonSetCheckButtonFlag(playersTemplate .. "Button", true)
+	LabelSetFont(playersTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(playersTemplate .. "Label", L"Players Only")
 	LabelSetTextColor(playersTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(playersTemplate .. "Button", CorksTargeting.PlayersOnly)
-	WindowAddAnchor(playersTemplate, "bottomleft", "CorksNotoCheck_8", "topleft", 0, 20)
+	WindowAddAnchor(playersTemplate, "bottomleft", "CorksNotoCheck_8", "topleft", 0, CorksTargeting.SectionGap)
 
 	-- Create Ignore Summons checkbox
 	local summonsTemplate = "CorksIgnoreSummonsCheck"
 	CreateWindowFromTemplate(summonsTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
+	WindowSetDimensions(summonsTemplate, 180, CorksTargeting.RowHeight)
 	ButtonSetCheckButtonFlag(summonsTemplate .. "Button", true)
+	LabelSetFont(summonsTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(summonsTemplate .. "Label", L"Ignore Summons")
 	LabelSetTextColor(summonsTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(summonsTemplate .. "Button", CorksTargeting.IgnoreSummons)
-	WindowAddAnchor(summonsTemplate, "bottomleft", playersTemplate, "topleft", 0, 8)
+	WindowAddAnchor(summonsTemplate, "bottomleft", playersTemplate, "topleft", 0, CorksTargeting.RowGap)
 
 	WindowUtils.SetWindowTitle("CorksTargetingWindow", L"Corks' Targeting")
 	CorksTargeting.Initialized = true
@@ -89,15 +115,20 @@ function CorksTargeting.Initialize()
 	if not ok then
 		CorksTargeting.ReportError("init", err)
 	end
+
+	ok, err = pcall(CorksTargeting.InitMaxDistance)
+	if not ok then
+		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting max distance: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end
 end
 
 function CorksTargeting.InitNameFilter(anchorTo)
-	LabelSetText("CorksNameFilterLabel", L"Name contains (comma separated):")
+	LabelSetText("CorksNameFilterLabel", L"Target Text")
 	LabelSetTextColor("CorksNameFilterLabel", 255, 255, 255)
 	WindowClearAnchors("CorksNameFilterLabel")
-	WindowAddAnchor("CorksNameFilterLabel", "bottomleft", anchorTo, "topleft", 0, 20)
+	WindowAddAnchor("CorksNameFilterLabel", "bottomleft", anchorTo, "topleft", 0, CorksTargeting.SectionGap)
 	WindowClearAnchors("CorksNameFilterBox")
-	WindowAddAnchor("CorksNameFilterBox", "bottomleft", "CorksNameFilterLabel", "topleft", 5, 10)
+	WindowAddAnchor("CorksNameFilterBox", "bottomleft", "CorksNameFilterLabel", "topleft", 5, 8)
 
 	-- Saved value is optional; a failed load just means an empty filter
 	local ok, saved = pcall(Interface.LoadWString, "CorksTargetingNameFilter", L"")
@@ -105,6 +136,48 @@ function CorksTargeting.InitNameFilter(anchorTo)
 		CorksTargeting.SetNameFilter(saved)
 	end
 	TextEditBoxSetText("CorksNameFilterBox", CorksTargeting.NameFilterText)
+end
+
+----------------------------------------------------------------
+-- Max distance slider
+----------------------------------------------------------------
+
+function CorksTargeting.ClampDistance(value)
+	value = math.floor((tonumber(value) or 21) + 0.5)
+	if value < CorksTargeting.MaxDistanceMin then
+		return CorksTargeting.MaxDistanceMin
+	elseif value > CorksTargeting.MaxDistanceMax then
+		return CorksTargeting.MaxDistanceMax
+	end
+	return value
+end
+
+function CorksTargeting.InitMaxDistance()
+	LabelSetTextColor("CorksMaxDistanceLabel", 255, 255, 255)
+	WindowClearAnchors("CorksMaxDistanceLabel")
+	WindowAddAnchor("CorksMaxDistanceLabel", "bottomleft", "CorksNameFilterBoxBG", "topleft", 0, CorksTargeting.SectionGap)
+	WindowClearAnchors("CorksMaxDistanceSlider")
+	WindowAddAnchor("CorksMaxDistanceSlider", "bottomleft", "CorksMaxDistanceLabel", "topleft", 0, 6)
+
+	-- Slider position runs 0..1 across the min..max range
+	local range = CorksTargeting.MaxDistanceMax - CorksTargeting.MaxDistanceMin
+	SliderBarSetCurrentPosition("CorksMaxDistanceSlider", (CorksTargeting.MaxDistance - CorksTargeting.MaxDistanceMin) / range)
+	CorksTargeting.UpdateMaxDistanceLabel()
+end
+
+function CorksTargeting.UpdateMaxDistanceLabel()
+	LabelSetText("CorksMaxDistanceLabel", StringToWString("Max Distance: " .. CorksTargeting.MaxDistance .. " tiles"))
+end
+
+function CorksTargeting.OnMaxDistanceSlide(pos)
+	pos = pos or SliderBarGetCurrentPosition("CorksMaxDistanceSlider")
+	local range = CorksTargeting.MaxDistanceMax - CorksTargeting.MaxDistanceMin
+	local value = CorksTargeting.ClampDistance(CorksTargeting.MaxDistanceMin + pos * range)
+	if value ~= CorksTargeting.MaxDistance then
+		CorksTargeting.MaxDistance = value
+		Interface.SaveNumber("CorksTargetingMaxDistance", value)
+	end
+	CorksTargeting.UpdateMaxDistanceLabel()
 end
 
 function CorksTargeting.ReportError(where, err)
@@ -120,13 +193,14 @@ function CorksTargeting.SyncFromButtons()
 	if not CorksTargeting.Initialized then
 		return
 	end
-	for i = 2, 8 do
+	for _, i in ipairs(CorksTargeting.NotorietyShown) do
 		local templateName = "CorksNotoCheck_" .. i
 		if DoesWindowNameExist(templateName .. "Button") then
 			CorksTargeting.NotorietyFilter[i] = ButtonGetPressedFlag(templateName .. "Button")
 			Interface.SaveBoolean("CorksTargetingNoto" .. i, CorksTargeting.NotorietyFilter[i])
 		end
 	end
+	CorksTargeting.NotorietyFilter[5] = CorksTargeting.NotorietyFilter[4]
 	if DoesWindowNameExist("CorksPlayersOnlyCheckButton") then
 		CorksTargeting.PlayersOnly = ButtonGetPressedFlag("CorksPlayersOnlyCheckButton")
 		Interface.SaveBoolean("CorksTargetingPlayersOnly", CorksTargeting.PlayersOnly)
@@ -341,8 +415,8 @@ function CorksTargeting.TargetAllowed(mobileId)
 		return false
 	end
 
-	-- Check visibility
-	if GetDistanceFromPlayer(mobileId) >= 22 then
+	-- Check distance
+	if GetDistanceFromPlayer(mobileId) > CorksTargeting.MaxDistance then
 		return false
 	end
 
