@@ -203,7 +203,7 @@ function CorksDropAlerts.Initialize()
 
 	LabelSetText("CorksDropAlertsWindowListHeader", L"Show the artifact graphic for messages containing:")
 	LabelSetText("CorksDropAlertsWindowTextLabel", L"Add a drop message (press Enter):")
-	LabelSetText("CorksDropAlertsWindowItemLabel", L"Count backpack items named (press Enter):")
+	LabelSetText("CorksDropAlertsWindowItemLabel", L"Event Item Tag:")
 	ButtonSetText("CorksDropAlertsWindowResetButton", L"Reset Count")
 	ButtonSetText("CorksDropAlertsWindowRemoveButton", L"Remove Unchecked")
 
@@ -418,6 +418,23 @@ function CorksDropAlerts.FormatAgo(seconds)
 	return string.format("%dh %02dm ago", math.floor(seconds / 3600), math.floor(seconds / 60) % 60)
 end
 
+-- The header total: drops this session plus the event items in the backpack
+-- (when an Event Item Tag is set and the backpack was found).
+function CorksDropAlerts.UpdateTotal()
+	local items = CorksDropAlerts.ItemCount
+	local total = CorksDropAlerts.Total + (items or 0)
+	LabelSetText("CorksDropAlertsWindowTotal", towstring(total))
+	local caption
+	if items then
+		caption = L"drops + event items"
+	elseif total == 1 then
+		caption = L"drop this session"
+	else
+		caption = L"drops this session"
+	end
+	LabelSetText("CorksDropAlertsWindowTotalCaption", caption)
+end
+
 function CorksDropAlerts.UpdateLastDrop()
 	local text = "No drops yet"
 	if CorksDropAlerts.LastDropTime then
@@ -433,12 +450,7 @@ function CorksDropAlerts.Refresh()
 	end
 	local D = CorksDropAlerts
 
-	LabelSetText("CorksDropAlertsWindowTotal", towstring(D.Total))
-	if D.Total == 1 then
-		LabelSetText("CorksDropAlertsWindowTotalCaption", L"drop this session")
-	else
-		LabelSetText("CorksDropAlertsWindowTotalCaption", L"drops this session")
-	end
+	D.UpdateTotal()
 	D.UpdateLastDrop()
 
 	local classicChecks = D.CheckArt ~= nil
@@ -792,6 +804,7 @@ function CorksDropAlerts.UpdateItemCount()
 		end
 	end
 	LabelSetText("CorksDropAlertsWindowItemCount", text)
+	CorksDropAlerts.UpdateTotal()
 end
 
 -- The window only opens when the user turns it on with the Event Drops action.
