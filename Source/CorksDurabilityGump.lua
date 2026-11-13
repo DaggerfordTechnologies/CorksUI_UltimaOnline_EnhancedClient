@@ -15,6 +15,18 @@ CorksDurabilityGump.MAX_ROWS = 19  -- Max equippable slots
 -- down, so a shorter window lets it spill past the frame at the bottom.
 CorksDurabilityGump.MIN_HEIGHT = 120
 
+-- Width and starting height, as in the XML
+CorksDurabilityGump.WIDTH = 400
+CorksDurabilityGump.XML_HEIGHT = 400
+
+-- Classic UO gump background (base gump art ID), or nil for the standard EC look.
+-- Redrawn whenever the window changes height.
+CorksDurabilityGump.ClassicBackground = 2620
+-- How far below the gump's top edge the title sits (clears the classic border)
+CorksDurabilityGump.TitleOffsetY = 8
+-- Gump art loaded for the classic background, released on shutdown
+CorksDurabilityGump.GumpArt = {}
+
 CorksDurabilityGump.SlotNames = {
 	[1]  = "Head",
 	[2]  = "Neck",
@@ -55,11 +67,32 @@ function CorksDurabilityGump.Initialize()
 	CorksDurabilityGump.CreateRows()
 
 	WindowUtils.RestoreWindowPosition("CorksDurabilityGump")
+
+	-- The window starts at its XML size; Update resizes it (and redraws the art)
+	CorksDurabilityGump.CurrentHeight = 0
+	CorksDurabilityGump.ApplyClassicLook(CorksDurabilityGump.XML_HEIGHT)
 	CorksDurabilityGump.Update()
 end
 
 function CorksDurabilityGump.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksDurabilityGump")
+	CorksGumpArt.ReleaseAll(CorksDurabilityGump.GumpArt)
+end
+
+-- Draws the classic background at the window's current height (protected, so a
+-- problem with the art can never stop the durability list updating).
+function CorksDurabilityGump.ApplyClassicLook(height)
+	if not CorksDurabilityGump.ClassicBackground then
+		return
+	end
+	local ok, err = pcall(function()
+		CorksGumpArt.ApplyClassic("CorksDurabilityGump", CorksDurabilityGump.ClassicBackground,
+			CorksDurabilityGump.WIDTH, height, CorksDurabilityGump.GumpArt)
+		CorksGumpArt.FinishClassic("CorksDurabilityGump", CorksDurabilityGump.TitleOffsetY)
+	end)
+	if not ok then
+		pcall(WindowUtils.ChatPrint, StringToWString("Gear Watcher background: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end
 end
 
 function CorksDurabilityGump.CreateRows()
@@ -198,7 +231,8 @@ function CorksDurabilityGump.Update()
 	local targetHeight = math.max(rowCount * 22 + 80, CorksDurabilityGump.MIN_HEIGHT)
 	if targetHeight ~= CorksDurabilityGump.CurrentHeight then
 		CorksDurabilityGump.CurrentHeight = targetHeight
-		WindowSetDimensions(windowName, 400, targetHeight)
+		WindowSetDimensions(windowName, CorksDurabilityGump.WIDTH, targetHeight)
 		WindowSetDimensions(scrollChild, 360, rowCount * 22)
+		CorksDurabilityGump.ApplyClassicLook(targetHeight)
 	end
 end

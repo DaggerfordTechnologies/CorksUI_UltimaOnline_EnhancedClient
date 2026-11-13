@@ -6,8 +6,9 @@
 -- left, centre, right, bottom-left, bottom, bottom-right. Edges and centre
 -- are tiled like the classic client draws them.
 --
--- Every piece requested is recorded in an "owner" table; pass that table to
--- CorksGumpArt.ReleaseAll when the gump shuts down.
+-- Every piece requested is recorded in an "owner" table (and reused from it when
+-- the art is redrawn); pass that table to CorksGumpArt.ReleaseAll when the gump
+-- shuts down.
 ----------------------------------------------------------------
 
 CorksGumpArt = {}
@@ -15,15 +16,21 @@ CorksGumpArt = {}
 -- More tiles than this for one piece and it is stretched instead (keeps window count sane)
 CorksGumpArt.MaxTiles = 40
 CorksGumpArt.ImageCount = 0
+-- Images made in each parent window, so the art can be cleared and redrawn
+CorksGumpArt.ParentImages = {}
 
--- Loads one piece of gump art; nil when the ID has no art
+-- Loads one piece of gump art (once per owner); nil when the ID has no art
 function CorksGumpArt.Request(id, owner)
+	if owner[id] ~= nil then
+		return owner[id] or nil
+	end
 	local tex, w, h = RequestGumpArt(id)
-	owner[id] = true
 	if tex == nil or tex == "" or w == nil or h == nil or w <= 0 or h <= 0 then
+		owner[id] = false
 		return nil
 	end
-	return { tex = tex, w = w, h = h }
+	owner[id] = { tex = tex, w = w, h = h }
+	return owner[id]
 end
 
 function CorksGumpArt.ReleaseAll(owner)
@@ -42,7 +49,19 @@ function CorksGumpArt.Image(parent, tex, x, y, w, h, srcW, srcH)
 	DynamicImageSetTexture(name, tex, 0, 0)
 	DynamicImageSetTextureDimensions(name, srcW or w, srcH or h)
 	WindowAddAnchor(name, "topleft", parent, "topleft", x, y)
+	CorksGumpArt.ParentImages[parent] = CorksGumpArt.ParentImages[parent] or {}
+	table.insert(CorksGumpArt.ParentImages[parent], name)
 	return name
+end
+
+-- Removes the art drawn in a parent window, e.g. before redrawing it at a new size
+function CorksGumpArt.Clear(parent)
+	for _, name in ipairs(CorksGumpArt.ParentImages[parent] or {}) do
+		if DoesWindowNameExist(name) then
+			DestroyWindow(name)
+		end
+	end
+	CorksGumpArt.ParentImages[parent] = nil
 end
 
 -- Fills a rectangle by repeating a piece (cropping the last row/column),
@@ -102,10 +121,12 @@ end
 -- Swaps a standard Corks gump (UO_DefaultWindow chrome named <window>Chrome) to a
 -- classic background: hides the EC background, frame and title bar but keeps the
 -- title text, then draws the classic art into the gump's <window>ClassicBG holder.
--- w, h are the gump's size as set in its XML (unscaled).
+-- w, h are the gump's unscaled size. Call again after the gump changes size; the
+-- old art is cleared first. Follow with CorksGumpArt.FinishClassic.
 -- Returns false (and leaves the EC look) if the art couldn't be loaded.
 function CorksGumpArt.ApplyClassic(window, baseId, w, h, owner)
 	local holder = window .. "ClassicBG"
+	CorksGumpArt.Clear(holder)
 	if not CorksGumpArt.Background(holder, baseId, w, h, owner) then
 		return false
 	end
@@ -125,4 +146,19 @@ function CorksGumpArt.Rescale(window)
 	local scale = WindowGetScale(window)
 	WindowSetScale(window, scale + 0.01)
 	WindowSetScale(window, scale)
+end
+
+-- Finishing step after the classic art is (re)drawn:
+-- the art only lines up once the whole window is re-scaled (as the mouse-wheel
+-- resize does). That re-scale would enlarge the title, so its scale is put back.
+-- The title is then centred and placed titleOffsetY below the gump's top edge,
+-- anchored to the gump itself (not the hidden title bar) so it stays put while
+-- the gump is being scaled.
+function CorksGumpArt.FinishClassic(window, titleOffsetY)
+	local title = window .. "Chrome_UO_TitleBar_WindowTitle"
+	local titleScale = WindowGetScale(title)
+	CorksGumpArt.Rescale(window)
+	WindowSetScale(title, titleScale)
+	WindowClearAnchors(title)
+	WindowAddAnchor(title, "top", window, "top", 0, titleOffsetY)
 end
