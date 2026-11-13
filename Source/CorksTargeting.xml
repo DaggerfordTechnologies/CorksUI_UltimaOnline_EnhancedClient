@@ -68,25 +68,12 @@
 						<AbsPoint x="180" y="22" />
 					</Size>
 				</Label>
-				<EditBox name="CorksNameFilterBox" font="UO_DefaultText_15pt" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
-					<Size>
-						<AbsPoint x="160" y="24" />
-					</Size>
-					<EventHandlers>
-						<EventHandler event="OnLButtonUp" function="CorksTargeting.OnNameFilterClick" />
-						<EventHandler event="OnKeyEnter" function="CorksTargeting.OnNameFilterEnter" />
-						<EventHandler event="OnKeyEscape" function="CorksTargeting.OnNameFilterEnter" />
-					</EventHandlers>
-				</EditBox>
-				<Window name="CorksNameFilterBoxBG" handleinput="false">
+				<!-- Border behind the edit box. Declared before it and on the overlay layer, so it is
+				     drawn above the panel background but under the typed text. Anchored from Lua. -->
+				<Window name="CorksNameFilterBoxBG" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="170" y="34" />
 					</Size>
-					<Anchors>
-						<Anchor point="topleft" relativePoint="topleft" relativeTo="CorksNameFilterBox">
-							<AbsPoint x="-5" y="-5" />
-						</Anchor>
-					</Anchors>
 					<Windows>
 						<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
 							<Anchors>
@@ -102,6 +89,16 @@
 						</FullResizeImage>
 					</Windows>
 				</Window>
+				<EditBox name="CorksNameFilterBox" font="UO_DefaultText_15pt" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
+					<Size>
+						<AbsPoint x="160" y="24" />
+					</Size>
+					<EventHandlers>
+						<EventHandler event="OnLButtonUp" function="CorksTargeting.OnNameFilterClick" />
+						<EventHandler event="OnKeyEnter" function="CorksTargeting.OnNameFilterEnter" />
+						<EventHandler event="OnKeyEscape" function="CorksTargeting.OnNameFilterEnter" />
+					</EventHandlers>
+				</EditBox>
 				<!-- Max distance: anchored from Lua under the name filter box. -->
 				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>

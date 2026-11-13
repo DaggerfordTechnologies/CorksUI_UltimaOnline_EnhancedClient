@@ -129,6 +129,8 @@ function CorksTargeting.InitNameFilter(anchorTo)
 	WindowAddAnchor("CorksNameFilterLabel", "bottomleft", anchorTo, "topleft", 0, CorksTargeting.SectionGap)
 	WindowClearAnchors("CorksNameFilterBox")
 	WindowAddAnchor("CorksNameFilterBox", "bottomleft", "CorksNameFilterLabel", "topleft", 5, 8)
+	WindowClearAnchors("CorksNameFilterBoxBG")
+	WindowAddAnchor("CorksNameFilterBoxBG", "topleft", "CorksNameFilterBox", "topleft", -5, -5)
 
 	-- Saved value is optional; a failed load just means an empty filter
 	local ok, saved = pcall(Interface.LoadWString, "CorksTargetingNameFilter", L"")
@@ -269,16 +271,45 @@ function CorksTargeting.OnNameFilterEnter()
 	WindowAssignFocus("CorksNameFilterBox", false)
 end
 
-function CorksTargeting.NameAllowed(name)
+-- True when the text contains any of the Target Text filters.
+function CorksTargeting.TextMatches(text)
+	if text == nil then
+		return false
+	end
+	local lower = CorksTargeting.ToWString(wstring.lower(CorksTargeting.ToWString(text)))
+	for _, filter in ipairs(CorksTargeting.NameFilters) do
+		if wstring.find(lower, filter, 1, true) then
+			return true
+		end
+	end
+	return false
+end
+
+-- Checks the name first, then every line of the mobile's tooltip (where event tags
+-- and the like are shown). Tooltip data may not have arrived yet: it is requested and
+-- kept while the mobile is around, so it can match on a later key press.
+function CorksTargeting.NameAllowed(name, mobileId)
 	if table.getn(CorksTargeting.NameFilters) == 0 then
 		return true
 	end
-	if name == nil then
+	if CorksTargeting.TextMatches(name) then
+		return true
+	end
+	if mobileId == nil then
 		return false
 	end
-	local lname = CorksTargeting.ToWString(wstring.lower(CorksTargeting.ToWString(name)))
-	for _, filter in ipairs(CorksTargeting.NameFilters) do
-		if wstring.find(lname, filter, 1, true) then
+
+	local data = WindowData.ItemProperties[mobileId]
+	if not data and not CorksTargeting.RegisteredProps[mobileId] then
+		RegisterWindowData(WindowData.ItemProperties.Type, mobileId)
+		CorksTargeting.RegisteredProps[mobileId] = true
+		data = WindowData.ItemProperties[mobileId]
+	end
+	if not data or not data.PropertiesList then
+		return false
+	end
+	for _, line in ipairs(data.PropertiesList) do
+		if CorksTargeting.TextMatches(WindowUtils.translateMarkup(line)) then
 			return true
 		end
 	end
@@ -322,6 +353,8 @@ end
 
 -- Mobiles whose name data this file asked for, so it can be released when they leave.
 CorksTargeting.RegisteredNames = {}
+-- Mobiles whose tooltip data (properties) the Target Text filter asked for.
+CorksTargeting.RegisteredProps = {}
 
 -- Every mobile the client knows about, nearest first, without you, your pets or your
 -- party. Built fresh on each key press: MobilesOnScreen's list only holds mobiles
@@ -345,6 +378,12 @@ function CorksTargeting.GetMobileList()
 		if not present[mobileId] then
 			UnregisterWindowData(WindowData.MobileName.Type, mobileId)
 			CorksTargeting.RegisteredNames[mobileId] = nil
+		end
+	end
+	for mobileId in pairs(CorksTargeting.RegisteredProps) do
+		if not present[mobileId] then
+			UnregisterWindowData(WindowData.ItemProperties.Type, mobileId)
+			CorksTargeting.RegisteredProps[mobileId] = nil
 		end
 	end
 
@@ -452,7 +491,7 @@ function CorksTargeting.TargetAllowed(mobileId)
 	end
 
 	-- Check name filter
-	local ok, allowed = pcall(CorksTargeting.NameAllowed, data.MobName)
+	local ok, allowed = pcall(CorksTargeting.NameAllowed, data.MobName, mobileId)
 	if not ok then
 		CorksTargeting.ReportError("match", allowed)
 	elseif not allowed then
