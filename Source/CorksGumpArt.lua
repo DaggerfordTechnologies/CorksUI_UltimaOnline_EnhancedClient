@@ -162,3 +162,22 @@ function CorksGumpArt.FinishClassic(window, titleOffsetY)
 	WindowClearAnchors(title)
 	WindowAddAnchor(title, "top", window, "top", 0, titleOffsetY)
 end
+
+-- Switches a standard Corks gump to the EC "simple frame" look (its <window>Simple,
+-- from the CorksSimpleFrame template): hides the EC background, frame and title
+-- bar, and centres the title titleOffsetY below the top edge, anchored to the gump
+-- itself so it stays put while the gump is being scaled. With enabled false the
+-- simple frame is hidden and the EC look is kept.
+function CorksGumpArt.ApplySimple(window, enabled, titleOffsetY)
+	if not enabled then
+		WindowSetShowing(window .. "Simple", false)
+		return
+	end
+	local chrome = window .. "Chrome"
+	WindowSetShowing(chrome .. "_UO_DefaultWindowBackground", false)
+	WindowSetShowing(chrome .. "_UO_TitleBar", false)
+	WindowSetShowing(chrome .. "_UO_DefaultWindowFrame", false)
+	local title = chrome .. "_UO_TitleBar_WindowTitle"
+	WindowClearAnchors(title)
+	WindowAddAnchor(title, "top", window, "top", 0, titleOffsetY)
+end

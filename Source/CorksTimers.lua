@@ -150,6 +150,14 @@ CorksTimers.WINDOW_WIDTH = 240
 -- down, so a shorter window lets it spill past the frame at the bottom.
 CorksTimers.MIN_HEIGHT = 120
 
+-- Classic UO gump background (base gump art ID), or nil for the standard EC look.
+-- Shared with the Combat Timers window; redrawn whenever a window changes height.
+CorksTimers.ClassicBackground = 2620
+-- How far below the gump's top edge the title sits (clears the classic border)
+CorksTimers.TitleOffsetY = 8
+-- Gump art loaded for the classic background, released on shutdown
+CorksTimers.GumpArt = {}
+
 -- How long after a double-click a rejection message can still cancel the timer.
 CorksTimers.REJECT_WINDOW = 2
 
@@ -206,6 +214,23 @@ end
 
 function CorksTimers.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksTimers")
+	CorksGumpArt.ReleaseAll(CorksTimers.GumpArt)
+end
+
+-- Draws the classic background for a timers window at its new height. Used by
+-- both timer windows. Protected, so a problem with the art can never stop the
+-- timers updating.
+function CorksTimers.ApplyClassicLook(window, height, owner)
+	if not CorksTimers.ClassicBackground then
+		return
+	end
+	local ok, err = pcall(function()
+		CorksGumpArt.ApplyClassic(window, CorksTimers.ClassicBackground, CorksTimers.WINDOW_WIDTH, height, owner)
+		CorksGumpArt.FinishClassic(window, CorksTimers.TitleOffsetY)
+	end)
+	if not ok then
+		pcall(WindowUtils.ChatPrint, StringToWString(window .. " background: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end
 end
 
 -- The window only opens when the user turns it on with the Consumable Timers action.
@@ -520,6 +545,7 @@ function CorksTimers.Refresh()
 		CorksTimers.VisibleRows = rowCount
 		local height = math.max(58 + rowCount * CorksTimers.ROW_HEIGHT, CorksTimers.MIN_HEIGHT)
 		WindowSetDimensions("CorksTimers", CorksTimers.WINDOW_WIDTH, height)
+		CorksTimers.ApplyClassicLook("CorksTimers", height, CorksTimers.GumpArt)
 	end
 
 	if #active == 0 then

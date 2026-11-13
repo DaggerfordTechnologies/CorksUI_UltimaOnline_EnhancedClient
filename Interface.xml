@@ -86,12 +86,13 @@
 	<Include file="Source/WarShield.xml"/>
 	<Include file="Source/CrystalPortal.xml"/>
 	<Include file="Source/VendorSearch.xml"/>
+	<!-- Shared Corks templates; before the gumps that inherit them -->
+	<Include file="Source/CorksGumpArt.xml"/>
 	<Include file="Source/CorksTargeting.xml"/>
 	<Include file="Source/CorksDurabilityGump.xml"/>
 	<Include file="Source/CorksTimers.xml"/>
 	<Include file="Source/CorksCombatTimers.xml"/>
 	<Include file="Source/CorksDropAlerts.xml"/>
-	<Include file="Source/CorksGumpArt.xml"/>
 	<Include file="Source/CorksGumpPreview.xml"/>
 	<Include file="Source/CorksChatFilter.xml"/>
 	<Include file="Source/QuickStats.xml"/>
