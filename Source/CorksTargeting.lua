@@ -123,7 +123,7 @@ function CorksTargeting.MatchWindowScale(windowName)
 end
 
 function CorksTargeting.InitNameFilter(anchorTo)
-	LabelSetText("CorksNameFilterLabel", L"Target Text")
+	LabelSetText("CorksNameFilterLabel", L"Target Text:")
 	LabelSetTextColor("CorksNameFilterLabel", 255, 255, 255)
 	WindowClearAnchors("CorksNameFilterLabel")
 	WindowAddAnchor("CorksNameFilterLabel", "bottomleft", anchorTo, "topleft", 0, CorksTargeting.SectionGap)
