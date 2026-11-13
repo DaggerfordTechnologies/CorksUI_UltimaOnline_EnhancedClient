@@ -148,6 +148,10 @@ Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Sou
 
 ### Event Drops
 
+<p>
+  <img src="EventGump.png" alt="Corks' Chat Filter" height="300">
+</p>
+
 The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it. The **Event Drops** window lets you add those messages yourself, and counts your drops.
 
 - The total at the top right counts every matching drop since you logged in (or reloaded the UI), with how long ago the last one was. **Reset Count** sets the counts back to 0.
