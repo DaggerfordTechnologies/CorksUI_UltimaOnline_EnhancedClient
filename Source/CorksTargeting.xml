@@ -102,6 +102,20 @@
 						</FullResizeImage>
 					</Windows>
 				</Window>
+				<!-- Max distance: anchored from Lua under the name filter box. -->
+				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+					<Size>
+						<AbsPoint x="220" y="20" />
+					</Size>
+				</Label>
+				<SliderBar name="CorksMaxDistanceSlider" inherits="UO_Default_Horizontal_SliderBar">
+					<Size>
+						<AbsPoint x="210" y="16" />
+					</Size>
+					<EventHandlers>
+						<EventHandler event="OnSlide" function="CorksTargeting.OnMaxDistanceSlide" />
+					</EventHandlers>
+				</SliderBar>
 			</Windows>
 		</Window>
 	</Windows>

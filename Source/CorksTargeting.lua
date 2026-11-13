@@ -14,6 +14,11 @@ CorksTargeting.NotorietyFilter = {}
 CorksTargeting.PlayersOnly = false
 CorksTargeting.IgnoreSummons = false
 
+-- Furthest a target can be, in tiles (default 21 matches the old hardcoded limit)
+CorksTargeting.MaxDistanceMin = 1
+CorksTargeting.MaxDistanceMax = 24
+CorksTargeting.MaxDistance = 21
+
 -- Name filter: comma separated, case-insensitive partial matches (empty = no filter)
 CorksTargeting.NameFilterText = L""
 CorksTargeting.NameFilters = {}
@@ -43,6 +48,7 @@ function CorksTargeting.Initialize()
 	end
 	CorksTargeting.PlayersOnly = Interface.LoadBoolean("CorksTargetingPlayersOnly", false)
 	CorksTargeting.IgnoreSummons = Interface.LoadBoolean("CorksTargetingIgnoreSummons", false)
+	CorksTargeting.MaxDistance = CorksTargeting.ClampDistance(Interface.LoadNumber("CorksTargetingMaxDistance", 21))
 
 	-- Create filter checkboxes
 	for i = 2, 8 do
@@ -89,6 +95,11 @@ function CorksTargeting.Initialize()
 	if not ok then
 		CorksTargeting.ReportError("init", err)
 	end
+
+	ok, err = pcall(CorksTargeting.InitMaxDistance)
+	if not ok then
+		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting max distance: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end
 end
 
 function CorksTargeting.InitNameFilter(anchorTo)
@@ -105,6 +116,48 @@ function CorksTargeting.InitNameFilter(anchorTo)
 		CorksTargeting.SetNameFilter(saved)
 	end
 	TextEditBoxSetText("CorksNameFilterBox", CorksTargeting.NameFilterText)
+end
+
+----------------------------------------------------------------
+-- Max distance slider
+----------------------------------------------------------------
+
+function CorksTargeting.ClampDistance(value)
+	value = math.floor((tonumber(value) or 21) + 0.5)
+	if value < CorksTargeting.MaxDistanceMin then
+		return CorksTargeting.MaxDistanceMin
+	elseif value > CorksTargeting.MaxDistanceMax then
+		return CorksTargeting.MaxDistanceMax
+	end
+	return value
+end
+
+function CorksTargeting.InitMaxDistance()
+	LabelSetTextColor("CorksMaxDistanceLabel", 255, 255, 255)
+	WindowClearAnchors("CorksMaxDistanceLabel")
+	WindowAddAnchor("CorksMaxDistanceLabel", "bottomleft", "CorksNameFilterBoxBG", "topleft", 0, 15)
+	WindowClearAnchors("CorksMaxDistanceSlider")
+	WindowAddAnchor("CorksMaxDistanceSlider", "bottomleft", "CorksMaxDistanceLabel", "topleft", 0, 8)
+
+	-- Slider position runs 0..1 across the min..max range
+	local range = CorksTargeting.MaxDistanceMax - CorksTargeting.MaxDistanceMin
+	SliderBarSetCurrentPosition("CorksMaxDistanceSlider", (CorksTargeting.MaxDistance - CorksTargeting.MaxDistanceMin) / range)
+	CorksTargeting.UpdateMaxDistanceLabel()
+end
+
+function CorksTargeting.UpdateMaxDistanceLabel()
+	LabelSetText("CorksMaxDistanceLabel", StringToWString("Max Distance: " .. CorksTargeting.MaxDistance .. " tiles"))
+end
+
+function CorksTargeting.OnMaxDistanceSlide(pos)
+	pos = pos or SliderBarGetCurrentPosition("CorksMaxDistanceSlider")
+	local range = CorksTargeting.MaxDistanceMax - CorksTargeting.MaxDistanceMin
+	local value = CorksTargeting.ClampDistance(CorksTargeting.MaxDistanceMin + pos * range)
+	if value ~= CorksTargeting.MaxDistance then
+		CorksTargeting.MaxDistance = value
+		Interface.SaveNumber("CorksTargetingMaxDistance", value)
+	end
+	CorksTargeting.UpdateMaxDistanceLabel()
 end
 
 function CorksTargeting.ReportError(where, err)
@@ -341,8 +394,8 @@ function CorksTargeting.TargetAllowed(mobileId)
 		return false
 	end
 
-	-- Check visibility
-	if GetDistanceFromPlayer(mobileId) >= 22 then
+	-- Check distance
+	if GetDistanceFromPlayer(mobileId) > CorksTargeting.MaxDistance then
 		return false
 	end
 
