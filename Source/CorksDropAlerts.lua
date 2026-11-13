@@ -42,11 +42,11 @@ CorksDropAlerts.TitleOffsetY = 8
 CorksDropAlerts.GumpArt = {}
 
 -- Layout; must match CorksDropAlertsWindow in the XML. The window is sized to fit
--- the rows in use: ROWS_TOP + rows * ROW_HEIGHT + BOTTOM_HEIGHT (518 with 10 rows).
+-- the rows in use: ROWS_TOP + rows * ROW_HEIGHT + BOTTOM_HEIGHT (580 with 10 rows).
 CorksDropAlerts.WIDTH = 420
 CorksDropAlerts.ROWS_TOP = 138
 CorksDropAlerts.ROW_HEIGHT = 24
-CorksDropAlerts.BOTTOM_HEIGHT = 140
+CorksDropAlerts.BOTTOM_HEIGHT = 202
 CorksDropAlerts.TEXTBOX_WIDTH = 380
 CorksDropAlerts.TEXTBOX_HEIGHT = 30
 -- How dark the stripe behind every other row is
@@ -74,6 +74,19 @@ CorksDropAlerts.FlashLeft = 0
 CorksDropAlerts.LastDropTick = 0
 CorksDropAlerts.CurrentHeight = 0
 
+-- Backpack items counted by name. ItemText is what the user typed (saved);
+-- ItemPatterns is it split at commas, lower-case. Rescanned every
+-- ITEM_SCAN_SECONDS while the window is open.
+CorksDropAlerts.ITEM_SCAN_SECONDS = 3
+-- Bags inside bags are followed this deep
+CorksDropAlerts.ITEM_SCAN_DEPTH = 6
+CorksDropAlerts.ItemText = L""
+CorksDropAlerts.ItemPatterns = {}
+CorksDropAlerts.ItemCount = nil
+CorksDropAlerts.ItemScanTick = 0
+-- objectId -> lower-case name, so names are only looked up once
+CorksDropAlerts.ItemNames = {}
+
 ----------------------------------------------------------------
 -- Saved messages
 ----------------------------------------------------------------
@@ -83,6 +96,8 @@ function CorksDropAlerts.Load()
 		return
 	end
 	CorksDropAlerts.Loaded = true
+
+	CorksDropAlerts.SetItemText(Interface.LoadWString("CorksDropAlertsItemName", L""))
 
 	local count = Interface.LoadNumber("CorksDropAlertsCount", -1)
 	if count < 0 then
@@ -188,6 +203,7 @@ function CorksDropAlerts.Initialize()
 
 	LabelSetText("CorksDropAlertsWindowListHeader", L"Show the artifact graphic for messages containing:")
 	LabelSetText("CorksDropAlertsWindowTextLabel", L"Add a drop message (press Enter):")
+	LabelSetText("CorksDropAlertsWindowItemLabel", L"Count backpack items named (press Enter):")
 	ButtonSetText("CorksDropAlertsWindowResetButton", L"Reset Count")
 	ButtonSetText("CorksDropAlertsWindowRemoveButton", L"Remove Unchecked")
 
@@ -206,6 +222,8 @@ function CorksDropAlerts.Initialize()
 
 	CorksDropAlerts.Load()
 	CorksDropAlerts.Initialized = true
+	TextEditBoxSetText("CorksDropAlertsWindowItemTextBox", CorksDropAlerts.ItemText)
+	CorksDropAlerts.ScanBackpack()
 
 	-- Protected, so a problem with the art can never break the window
 	CorksDropAlerts.CheckArt = nil
@@ -261,7 +279,8 @@ function CorksDropAlerts.ApplyClassicControls()
 		CorksDropAlerts.ClassicResetButton, L"Reset Count", CorksDropAlerts.OnReset)
 	CorksDropAlerts.ApplyClassicButton("CorksDropAlertsWindowRemoveClassic", "CorksDropAlertsWindowRemoveButton",
 		CorksDropAlerts.ClassicRemoveButton, L"Remove Unchecked", CorksDropAlerts.OnRemoveUnchecked)
-	CorksDropAlerts.ApplyClassicTextBox()
+	CorksDropAlerts.ApplyClassicTextBox("CorksDropAlertsWindowTextBox")
+	CorksDropAlerts.ApplyClassicTextBox("CorksDropAlertsWindowItemTextBox")
 end
 
 function CorksDropAlerts.ApplyClassicChecks()
@@ -311,18 +330,19 @@ function CorksDropAlerts.ApplyClassicButton(holder, ecButton, ids, text, action)
 	WindowSetShowing(holder, true)
 end
 
--- Classic white entry box with black text, like Corks' Targeting
-function CorksDropAlerts.ApplyClassicTextBox()
+-- Classic white entry box with black text, like Corks' Targeting. The art goes in
+-- the box's <box>BG holder.
+function CorksDropAlerts.ApplyClassicTextBox(box)
 	if not CorksDropAlerts.ClassicTextBox then
 		return
 	end
-	local holder = "CorksDropAlertsWindowTextBoxBG"
+	local holder = box .. "BG"
 	CorksGumpArt.Clear(holder)
 	if CorksGumpArt.Background(holder, CorksDropAlerts.ClassicTextBox,
 		CorksDropAlerts.TEXTBOX_WIDTH, CorksDropAlerts.TEXTBOX_HEIGHT, CorksDropAlerts.GumpArt) then
 		WindowSetShowing(holder .. "BG", false)
 		WindowSetShowing(holder .. "Frame", false)
-		TextEditBoxSetTextColor("CorksDropAlertsWindowTextBox", 0, 0, 0)
+		TextEditBoxSetTextColor(box, 0, 0, 0)
 	end
 end
 
@@ -547,6 +567,14 @@ function CorksDropAlerts.OnUpdate(timePassed)
 			CorksDropAlerts.UpdateLastDrop()
 		end
 	end
+
+	CorksDropAlerts.ItemScanTick = CorksDropAlerts.ItemScanTick + timePassed
+	if CorksDropAlerts.ItemScanTick >= CorksDropAlerts.ITEM_SCAN_SECONDS then
+		CorksDropAlerts.ItemScanTick = 0
+		if WindowGetShowing("CorksDropAlertsWindow") then
+			CorksDropAlerts.ScanBackpack()
+		end
+	end
 end
 
 function CorksDropAlerts.OnRowButton()
@@ -611,6 +639,159 @@ end
 
 function CorksDropAlerts.OnTextEscape()
 	WindowAssignFocus("CorksDropAlertsWindowTextBox", false)
+end
+
+function CorksDropAlerts.OnItemTextClick()
+	WindowAssignFocus("CorksDropAlertsWindowItemTextBox", true)
+end
+
+-- The item name text stays in its box; an empty box stops the counting.
+function CorksDropAlerts.OnItemTextEnter()
+	CorksDropAlerts.SetItemText(TextEditBoxGetText("CorksDropAlertsWindowItemTextBox"))
+	Interface.SaveWString("CorksDropAlertsItemName", CorksDropAlerts.ItemText)
+	TextEditBoxSetText("CorksDropAlertsWindowItemTextBox", CorksDropAlerts.ItemText)
+	WindowAssignFocus("CorksDropAlertsWindowItemTextBox", false)
+	CorksDropAlerts.ItemScanTick = 0
+	CorksDropAlerts.ScanBackpack()
+end
+
+function CorksDropAlerts.OnItemTextEscape()
+	TextEditBoxSetText("CorksDropAlertsWindowItemTextBox", CorksDropAlerts.ItemText)
+	WindowAssignFocus("CorksDropAlertsWindowItemTextBox", false)
+end
+
+----------------------------------------------------------------
+-- Backpack items
+----------------------------------------------------------------
+
+-- Takes the typed text (wstring); several names can be given, split by commas.
+function CorksDropAlerts.SetItemText(text)
+	local patterns = {}
+	local parts = {}
+	for part in string.gmatch(WStringToString(text or L""), "[^,]+") do
+		part = string.gsub(part, "^%s*(.-)%s*$", "%1")
+		if part ~= "" then
+			table.insert(patterns, string.lower(part))
+			table.insert(parts, part)
+		end
+	end
+	CorksDropAlerts.ItemPatterns = patterns
+	CorksDropAlerts.ItemText = StringToWString(table.concat(parts, ", "))
+end
+
+function CorksDropAlerts.BackpackId()
+	if ContainerWindow and ContainerWindow.PlayerBackpack and ContainerWindow.PlayerBackpack ~= 0 then
+		return ContainerWindow.PlayerBackpack
+	end
+	local slot = WindowData.PlayerEquipmentSlot and WindowData.PlayerEquipmentSlot[EquipmentData.EQPOS_BACKPACK]
+	if slot and slot.objectId and slot.objectId ~= 0 then
+		return slot.objectId
+	end
+	return nil
+end
+
+-- The item's name in lower case, or nil while the client hasn't got it yet
+-- (it's looked up again on the next scan).
+function CorksDropAlerts.ItemName(objectId)
+	local name = CorksDropAlerts.ItemNames[objectId]
+	if name then
+		return name
+	end
+	local wname = ItemProperties.GetObjectProperties(objectId, 1, "CorksDropAlerts")
+	if not wname or wname == L"" then
+		return nil
+	end
+	name = string.lower(WStringToString(wname))
+	CorksDropAlerts.ItemNames[objectId] = name
+	return name
+end
+
+-- How many items a name stands for: "5 Unhallowed Shards" is a stack of 5
+function CorksDropAlerts.ItemAmount(name)
+	return tonumber(string.match(name, "^(%d+) ")) or 1
+end
+
+function CorksDropAlerts.NameMatches(name)
+	for _, pattern in ipairs(CorksDropAlerts.ItemPatterns) do
+		if string.find(name, pattern, 1, true) then
+			return true
+		end
+	end
+	return false
+end
+
+-- Adds up the matching items in a container and the bags in it. Only containers
+-- the client has contents for are seen (in practice, ones opened this session).
+function CorksDropAlerts.CountIn(containerId, depth, seen)
+	local registered = false
+	if not WindowData.ContainerWindow[containerId] then
+		RegisterWindowData(WindowData.ContainerWindow.Type, containerId)
+		registered = true
+	end
+	local total = 0
+	local data = WindowData.ContainerWindow[containerId]
+	if data and data.ContainedItems then
+		for i = 1, (data.numItems or 0) do
+			local item = data.ContainedItems[i]
+			if item and item.objectId then
+				seen[item.objectId] = true
+				local name = CorksDropAlerts.ItemName(item.objectId)
+				if name and CorksDropAlerts.NameMatches(name) then
+					total = total + CorksDropAlerts.ItemAmount(name)
+				end
+				if depth < CorksDropAlerts.ITEM_SCAN_DEPTH then
+					total = total + CorksDropAlerts.CountIn(item.objectId, depth + 1, seen)
+				end
+			end
+		end
+	end
+	if registered and not (ContainerWindow and ContainerWindow.OpenContainers and ContainerWindow.OpenContainers[containerId]) then
+		UnregisterWindowData(WindowData.ContainerWindow.Type, containerId)
+	end
+	return total
+end
+
+-- Recounts the matching backpack items and shows the total. Protected, so a
+-- problem reading the backpack can never break the window.
+function CorksDropAlerts.ScanBackpack()
+	if not CorksDropAlerts.Initialized then
+		return
+	end
+	local count = nil
+	if #CorksDropAlerts.ItemPatterns > 0 then
+		local ok, result = pcall(function()
+			local backpack = CorksDropAlerts.BackpackId()
+			if not backpack then
+				return nil
+			end
+			local seen = {}
+			local total = CorksDropAlerts.CountIn(backpack, 1, seen)
+			-- Forget the names of items that have left the backpack
+			for objectId in pairs(CorksDropAlerts.ItemNames) do
+				if not seen[objectId] then
+					CorksDropAlerts.ItemNames[objectId] = nil
+				end
+			end
+			return total
+		end)
+		if ok then
+			count = result
+		end
+	end
+	CorksDropAlerts.ItemCount = count
+	CorksDropAlerts.UpdateItemCount()
+end
+
+function CorksDropAlerts.UpdateItemCount()
+	local text = L""
+	if #CorksDropAlerts.ItemPatterns > 0 then
+		if CorksDropAlerts.ItemCount then
+			text = towstring(CorksDropAlerts.ItemCount) .. L" in backpack"
+		else
+			text = L"backpack not found"
+		end
+	end
+	LabelSetText("CorksDropAlertsWindowItemCount", text)
 end
 
 -- The window only opens when the user turns it on with the Event Drops action.

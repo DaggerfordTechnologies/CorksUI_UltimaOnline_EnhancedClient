@@ -105,7 +105,7 @@
          the rows in use (CorksDropAlerts.HeightFor). -->
     <Window name="CorksDropAlertsWindow" movable="true" layer="popup">
       <Size>
-        <AbsPoint x="420" y="518" />
+        <AbsPoint x="420" y="580" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
@@ -281,7 +281,7 @@
           </Size>
           <Anchors>
             <Anchor point="bottomleft" relativePoint="topleft">
-              <AbsPoint x="18" y="-126" />
+              <AbsPoint x="18" y="-188" />
             </Anchor>
           </Anchors>
         </HorizontalResizeImage>
@@ -289,7 +289,7 @@
         <Button name="$parentResetButton" inherits="UO_Default_Medium_Select_Button">
           <Anchors>
             <Anchor point="bottomleft" relativePoint="bottomleft">
-              <AbsPoint x="18" y="-84" />
+              <AbsPoint x="18" y="-146" />
             </Anchor>
           </Anchors>
           <EventHandlers>
@@ -299,7 +299,7 @@
         <Button name="$parentRemoveButton" inherits="UO_Default_Medium_Select_Button">
           <Anchors>
             <Anchor point="bottomright" relativePoint="bottomright">
-              <AbsPoint x="-18" y="-84" />
+              <AbsPoint x="-18" y="-146" />
             </Anchor>
           </Anchors>
           <EventHandlers>
@@ -310,16 +310,80 @@
         <Window name="$parentResetClassic" inherits="CorksDropAlertsClassicButton">
           <Anchors>
             <Anchor point="bottomleft" relativePoint="bottomleft">
-              <AbsPoint x="18" y="-88" />
+              <AbsPoint x="18" y="-150" />
             </Anchor>
           </Anchors>
         </Window>
         <Window name="$parentRemoveClassic" inherits="CorksDropAlertsClassicButton">
           <Anchors>
             <Anchor point="bottomright" relativePoint="bottomright">
-              <AbsPoint x="-18" y="-88" />
+              <AbsPoint x="-18" y="-150" />
             </Anchor>
           </Anchors>
+        </Window>
+
+        <!-- Backpack items to count by name, and how many there are -->
+        <Label name="$parentItemLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="260" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft">
+              <AbsPoint x="18" y="-138" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="$parentItemCount" font="UO_DefaultText" maxchars="32" textalign="right" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="topright">
+              <AbsPoint x="-22" y="-138" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+        <EditBox name="$parentItemTextBox" font="UO_DefaultText" taborder="2" maxchars="200" scrolling="horz" layer="overlay">
+          <Size>
+            <AbsPoint x="370" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="23" y="-87" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksDropAlerts.OnItemTextClick" />
+            <EventHandler event="OnKeyEnter" function="CorksDropAlerts.OnItemTextEnter" />
+            <EventHandler event="OnKeyEscape" function="CorksDropAlerts.OnItemTextEscape" />
+          </EventHandlers>
+        </EditBox>
+        <!-- Size must match CorksDropAlerts.TEXTBOX_WIDTH / TEXTBOX_HEIGHT -->
+        <Window name="$parentItemTextBoxBG" handleinput="false">
+          <Size>
+            <AbsPoint x="380" y="30" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" relativeTo="$parentItemTextBox">
+              <AbsPoint x="-5" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+            <FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+          </Windows>
         </Window>
 
         <!-- Add a drop message -->
