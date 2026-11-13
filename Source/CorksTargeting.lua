@@ -127,20 +127,6 @@ function CorksTargeting.Initialize()
 	if not ok then
 		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting background: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
 	end
-
-	-- Re-scale the whole window, as the mouse-wheel resize does: the classic art made
-	-- above only lines up once that happens. Setting the same value is ignored, so
-	-- nudge it and set it back. That would enlarge the title, so restore its scale.
-	local title = "CorksTargetingWindowChrome_UO_TitleBar_WindowTitle"
-	local titleScale = WindowGetScale(title)
-	CorksGumpArt.Rescale("CorksTargetingWindow")
-	WindowSetScale(title, titleScale)
-
-	-- Centre the title (the EC chrome shifts it 15 left to clear the close button).
-	-- Anchored to the gump itself, not the hidden title bar, so it stays put while
-	-- the gump is being scaled.
-	WindowClearAnchors(title)
-	WindowAddAnchor(title, "top", "CorksTargetingWindow", "top", 0, CorksTargeting.TitleOffsetY)
 end
 
 -- Draws the classic background and hides the inner black panel so it shows through.
@@ -154,6 +140,7 @@ function CorksTargeting.ApplyClassicLook()
 		WindowSetShowing("CorksTargetingWindowContentFrame", false)
 	end
 	CorksTargeting.ApplyClassicTextBox()
+	CorksGumpArt.FinishClassic("CorksTargetingWindow", CorksTargeting.TitleOffsetY)
 end
 
 -- Classic white entry box with black text, drawn in the box's border holder

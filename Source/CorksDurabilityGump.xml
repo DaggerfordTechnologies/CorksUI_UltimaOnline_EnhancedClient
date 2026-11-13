@@ -54,6 +54,13 @@
             <Anchor point="bottomright" relativePoint="bottomright" />
           </Anchors>
         </Window>
+        <!-- Holder for the classic gump art background (CorksDurabilityGump.ClassicBackground) -->
+        <Window name="$parentClassicBG" handleinput="false" layer="background">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
 
         <Label name="$parentHeaderItem" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
           <Size>
