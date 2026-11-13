@@ -121,6 +121,11 @@ Timers are defined in the `CorksTimers.Timers` table at the top of `Source/Corks
 
 ### Combat Timers
 
+<p>
+  <img src="CombatTimersGump.png" alt="Item Timers" height="200">
+</p>
+
+
 A second timer window, laid out like the potion timers, for combat abilities. A row appears when the ability's buff icon appears, and goes through three stages:
 
 1. **Active** (blue bar): counts down the time the ability has left, taken from the buff icon.
