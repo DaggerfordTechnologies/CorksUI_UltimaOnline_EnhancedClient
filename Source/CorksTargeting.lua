@@ -67,7 +67,7 @@ function CorksTargeting.Initialize()
 	for _, i in ipairs(CorksTargeting.NotorietyShown) do
 		local templateName = "CorksNotoCheck_" .. i
 		CreateWindowFromTemplate(templateName, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-		WindowSetDimensions(templateName, 200, CorksTargeting.RowHeight)
+		WindowSetDimensions(templateName, 180, CorksTargeting.RowHeight)
 		ButtonSetCheckButtonFlag(templateName .. "Button", true)
 		LabelSetFont(templateName .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 		LabelSetText(templateName .. "Label", CorksTargeting.NotorietyLabels[i])
@@ -88,7 +88,7 @@ function CorksTargeting.Initialize()
 	-- Create Players Only checkbox
 	local playersTemplate = "CorksPlayersOnlyCheck"
 	CreateWindowFromTemplate(playersTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-	WindowSetDimensions(playersTemplate, 200, CorksTargeting.RowHeight)
+	WindowSetDimensions(playersTemplate, 180, CorksTargeting.RowHeight)
 	ButtonSetCheckButtonFlag(playersTemplate .. "Button", true)
 	LabelSetFont(playersTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(playersTemplate .. "Label", L"Players Only")
@@ -99,7 +99,7 @@ function CorksTargeting.Initialize()
 	-- Create Ignore Summons checkbox
 	local summonsTemplate = "CorksIgnoreSummonsCheck"
 	CreateWindowFromTemplate(summonsTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-	WindowSetDimensions(summonsTemplate, 200, CorksTargeting.RowHeight)
+	WindowSetDimensions(summonsTemplate, 180, CorksTargeting.RowHeight)
 	ButtonSetCheckButtonFlag(summonsTemplate .. "Button", true)
 	LabelSetFont(summonsTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(summonsTemplate .. "Label", L"Ignore Summons")
