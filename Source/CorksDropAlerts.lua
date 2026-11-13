@@ -82,7 +82,6 @@ CorksDropAlerts.ITEM_SCAN_SECONDS = 3
 CorksDropAlerts.ITEM_SCAN_DEPTH = 6
 CorksDropAlerts.ItemText = L""
 CorksDropAlerts.ItemPatterns = {}
-CorksDropAlerts.ItemCount = nil
 CorksDropAlerts.ItemScanTick = 0
 -- objectId -> lower-case name, so names are only looked up once
 CorksDropAlerts.ItemNames = {}
@@ -441,21 +440,12 @@ function CorksDropAlerts.FormatAgo(seconds)
 	return string.format("%dh %02dm ago", math.floor(seconds / 3600), math.floor(seconds / 60) % 60)
 end
 
--- The header total: drops this session plus the event items in the backpack
--- (when an Event Item Tag is set and the backpack was found).
+-- The header total. Event items already in the backpack are added to it only
+-- while it's 0 (see ScanBackpack), so a drop is never counted twice.
 function CorksDropAlerts.UpdateTotal()
-	local items = CorksDropAlerts.ItemCount
-	local total = CorksDropAlerts.Total + (items or 0)
+	local total = CorksDropAlerts.Total
+	LabelSetText("CorksDropAlertsWindowTotalCaption", L"Event Item Count:")
 	LabelSetText("CorksDropAlertsWindowTotal", towstring(total))
-	local caption
-	if items then
-		caption = L"drops + event items"
-	elseif total == 1 then
-		caption = L"drop this session"
-	else
-		caption = L"drops this session"
-	end
-	LabelSetText("CorksDropAlertsWindowTotalCaption", caption)
 end
 
 function CorksDropAlerts.UpdateLastDrop()
@@ -787,10 +777,13 @@ function CorksDropAlerts.CountIn(containerId, depth, seen)
 	return total
 end
 
--- Recounts the matching backpack items and shows the total. Protected, so a
--- problem reading the backpack can never break the window.
+-- While the total is 0 (after logging in, a UI reload or Reset Count), counts
+-- the event items already in the backpack and starts the total from them, so
+-- drops that arrived before the count started aren't missed. Once the total is
+-- above 0 only drop messages add to it, and the backpack isn't checked again.
+-- Protected, so a problem reading the backpack can never break the window.
 function CorksDropAlerts.ScanBackpack()
-	if not CorksDropAlerts.Initialized then
+	if not CorksDropAlerts.Initialized or CorksDropAlerts.Total > 0 then
 		return
 	end
 	local count = nil
@@ -814,8 +807,10 @@ function CorksDropAlerts.ScanBackpack()
 			count = result
 		end
 	end
-	CorksDropAlerts.ItemCount = count
-	CorksDropAlerts.UpdateItemCount()
+	if count and count > 0 then
+		CorksDropAlerts.Total = count
+		CorksDropAlerts.Refresh()
+	end
 end
 
 ----------------------------------------------------------------
@@ -923,18 +918,6 @@ function CorksDropAlerts.UpdateRewardPoints()
 	D.SetLabel(label, StringToWString(text), D.COLOR_COUNT)
 end
 
-function CorksDropAlerts.UpdateItemCount()
-	local text = L""
-	if #CorksDropAlerts.ItemPatterns > 0 then
-		if CorksDropAlerts.ItemCount then
-			text = towstring(CorksDropAlerts.ItemCount) .. L" in backpack"
-		else
-			text = L"backpack not found"
-		end
-	end
-	LabelSetText("CorksDropAlertsWindowItemCount", text)
-	CorksDropAlerts.UpdateTotal()
-end
 
 -- The window only opens when the user turns it on with the Event Drops action.
 -- Whether it's open is saved, so it opens again at login if it was open when the

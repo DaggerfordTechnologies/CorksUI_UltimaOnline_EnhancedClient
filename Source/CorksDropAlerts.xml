@@ -146,27 +146,28 @@
             </Anchor>
           </Anchors>
         </DynamicImage>
-        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="right" handleinput="false">
-          <Size>
-            <AbsPoint x="200" y="26" />
-          </Size>
-          <Anchors>
-            <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="38" />
-            </Anchor>
-          </Anchors>
-          <Color r="255" g="200" b="50" a="255" />
-        </Label>
+        <!-- "Event Item Count:" with the total under it -->
         <Label name="$parentTotalCaption" font="UO_DefaultText" maxchars="64" textalign="right" handleinput="false">
           <Size>
             <AbsPoint x="200" y="18" />
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="64" />
+              <AbsPoint x="-22" y="38" />
             </Anchor>
           </Anchors>
           <Color r="220" g="220" b="220" a="255" />
+        </Label>
+        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="right" handleinput="false">
+          <Size>
+            <AbsPoint x="200" y="26" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="56" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
         </Label>
         <Label name="$parentLastDrop" font="UO_DefaultText" maxchars="64" textalign="right" handleinput="false">
           <Size>
@@ -335,10 +336,10 @@
           </Anchors>
         </Window>
 
-        <!-- Backpack items to count by name, and how many there are -->
+        <!-- Event Item Tag: backpack items to count by name -->
         <Label name="$parentItemLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
           <Size>
-            <AbsPoint x="260" y="20" />
+            <AbsPoint x="380" y="20" />
           </Size>
           <Anchors>
             <Anchor point="bottomleft" relativePoint="topleft">
@@ -346,17 +347,6 @@
             </Anchor>
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
-        </Label>
-        <Label name="$parentItemCount" font="UO_DefaultText" maxchars="32" textalign="right" handleinput="false">
-          <Size>
-            <AbsPoint x="120" y="20" />
-          </Size>
-          <Anchors>
-            <Anchor point="bottomright" relativePoint="topright">
-              <AbsPoint x="-22" y="-138" />
-            </Anchor>
-          </Anchors>
-          <Color r="255" g="200" b="50" a="255" />
         </Label>
         <EditBox name="$parentItemTextBox" font="UO_DefaultText" taborder="2" maxchars="200" scrolling="horz" layer="overlay">
           <Size>
