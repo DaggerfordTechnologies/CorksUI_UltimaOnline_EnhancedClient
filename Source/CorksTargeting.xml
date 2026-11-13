@@ -2,7 +2,7 @@
 	<Windows>
 		<Window name="CorksTargetingWindow" movable="true" layer="popup">
 			<Size>
-				<AbsPoint x="320" y="580" />
+				<AbsPoint x="250" y="420" />
 			</Size>
 			<Anchors>
 				<Anchor point="center" relativePoint="center">
@@ -24,7 +24,7 @@
 				</Window>
 				<Window name="CorksTargetingWindowContent">
 					<Size>
-						<AbsPoint x="290" y="520" />
+						<AbsPoint x="220" y="360" />
 					</Size>
 					<Anchors>
 						<Anchor point="top" relativePoint="top">
@@ -54,7 +54,7 @@
 						</FullResizeImage>
 						<Window name="CorksTargetingWindowScrollChild">
 							<Size>
-								<AbsPoint x="270" y="490" />
+								<AbsPoint x="200" y="330" />
 							</Size>
 							<Windows>
 							</Windows>
@@ -65,12 +65,12 @@
 				     the edit box gets clicks and keyboard focus. Anchored from Lua under the checkboxes. -->
 				<Label name="CorksNameFilterLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
-						<AbsPoint x="260" y="22" />
+						<AbsPoint x="200" y="22" />
 					</Size>
 				</Label>
 				<EditBox name="CorksNameFilterBox" font="UO_DefaultText_15pt" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
 					<Size>
-						<AbsPoint x="250" y="24" />
+						<AbsPoint x="180" y="24" />
 					</Size>
 					<EventHandlers>
 						<EventHandler event="OnLButtonUp" function="CorksTargeting.OnNameFilterClick" />
@@ -80,7 +80,7 @@
 				</EditBox>
 				<Window name="CorksNameFilterBoxBG" handleinput="false">
 					<Size>
-						<AbsPoint x="260" y="34" />
+						<AbsPoint x="190" y="34" />
 					</Size>
 					<Anchors>
 						<Anchor point="topleft" relativePoint="topleft" relativeTo="CorksNameFilterBox">
@@ -105,12 +105,12 @@
 				<!-- Max distance: anchored from Lua under the name filter box. -->
 				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
-						<AbsPoint x="260" y="22" />
+						<AbsPoint x="200" y="22" />
 					</Size>
 				</Label>
 				<SliderBar name="CorksMaxDistanceSlider" inherits="UO_Default_Horizontal_SliderBar" layer="overlay">
 					<Size>
-						<AbsPoint x="250" y="16" />
+						<AbsPoint x="180" y="16" />
 					</Size>
 					<EventHandlers>
 						<EventHandler event="OnSlide" function="CorksTargeting.OnMaxDistanceSlide" />
