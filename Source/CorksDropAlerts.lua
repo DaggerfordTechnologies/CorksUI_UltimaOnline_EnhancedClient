@@ -26,6 +26,16 @@ CorksDropAlerts.DEFAULT_UI_ARTIFACT_IDS = {
 -- Rows defined in CorksDropAlerts.xml.
 CorksDropAlerts.MAX_ROWS = 10
 
+-- Classic UO gump background (base gump art ID), or nil for the standard EC look
+CorksDropAlerts.ClassicBackground = 83
+-- Window size; must match CorksDropAlertsWindow in the XML
+CorksDropAlerts.WIDTH = 420
+CorksDropAlerts.HEIGHT = 460
+-- How far below the gump's top edge the title sits (clears the classic border)
+CorksDropAlerts.TitleOffsetY = 8
+-- Gump art loaded for the classic background, released on shutdown
+CorksDropAlerts.GumpArt = {}
+
 -- { text = wstring, lower = string, on = boolean, count = number }
 CorksDropAlerts.Entries = {}
 CorksDropAlerts.Total = 0
@@ -154,11 +164,27 @@ function CorksDropAlerts.Initialize()
 	CorksDropAlerts.Load()
 	CorksDropAlerts.Initialized = true
 	CorksDropAlerts.Refresh()
+
+	-- Protected, so a problem with the art can never break the window
+	local ok, err = pcall(CorksDropAlerts.ApplyClassicLook)
+	if not ok then
+		pcall(WindowUtils.ChatPrint, StringToWString("Event Drops background: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end
+end
+
+function CorksDropAlerts.ApplyClassicLook()
+	if not CorksDropAlerts.ClassicBackground then
+		return
+	end
+	CorksGumpArt.ApplyClassic("CorksDropAlertsWindow", CorksDropAlerts.ClassicBackground,
+		CorksDropAlerts.WIDTH, CorksDropAlerts.HEIGHT, CorksDropAlerts.GumpArt)
+	CorksGumpArt.FinishClassic("CorksDropAlertsWindow", CorksDropAlerts.TitleOffsetY)
 end
 
 function CorksDropAlerts.Shutdown()
 	CorksDropAlerts.SyncFromButtons()
 	WindowUtils.SaveWindowPosition("CorksDropAlertsWindow")
+	CorksGumpArt.ReleaseAll(CorksDropAlerts.GumpArt)
 end
 
 function CorksDropAlerts.RowName(index)

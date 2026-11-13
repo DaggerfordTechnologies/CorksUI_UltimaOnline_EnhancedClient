@@ -1923,9 +1923,16 @@ function Interface.SendChat(channel, text, ...)
 	return Interface.OriginalSendChat(channel, text, ...)
 end
 
-if SendChat and not Interface.OriginalSendChat then
-	Interface.OriginalSendChat = SendChat
+-- The Interface table survives a UI reload but SendChat may be put back to the
+-- client's own function, so don't decide from OriginalSendChat alone: wrap whatever
+-- SendChat is now, unless it's already our wrapper from the previous load (then keep
+-- the original it saved, so the wrappers don't stack up with every reload).
+if SendChat then
+	if SendChat ~= Interface.InstalledSendChat then
+		Interface.OriginalSendChat = SendChat
+	end
 	SendChat = Interface.SendChat
+	Interface.InstalledSendChat = Interface.SendChat
 end
 
 function Interface.ChatWindowOnKeyEnter()

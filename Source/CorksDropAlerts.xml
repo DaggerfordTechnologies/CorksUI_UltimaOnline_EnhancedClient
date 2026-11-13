@@ -59,6 +59,13 @@
             <Anchor point="bottomright" relativePoint="bottomright" />
           </Anchors>
         </Window>
+        <!-- Holder for the classic gump art background (CorksDropAlerts.ClassicBackground) -->
+        <Window name="$parentClassicBG" handleinput="false" layer="background">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
 
         <!-- Session total -->
         <Label name="$parentTotal" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
