@@ -89,7 +89,7 @@ A compact window that lists every equipped item that has durability, with its cu
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
-### Potion Timers
+### Consumable Timers
 
 <p>
   <img src="TimersGump.png" alt="Item Timers" height="200">
