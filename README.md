@@ -150,8 +150,10 @@ Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Sou
 
 The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it. The **Event Drops** window lets you add those messages yourself, and counts your drops.
 
-- **Drops this session** at the top counts every matching drop since you logged in (or reloaded the UI). **Reset Count** sets it back to 0.
-- Each saved message is a row showing `[count] message`. When a game message containing a checked one arrives, the artifact graphic shows and the drop is counted.
+- The total at the top right counts every matching drop since you logged in (or reloaded the UI), with how long ago the last one was. **Reset Count** sets the counts back to 0.
+- Each saved message is a row, with its own count on the right. When a game message containing a checked one arrives, the artifact graphic shows, the drop is counted, and the row and total flash for a moment.
+- The window grows and shrinks to fit the messages in it.
+- **Event Item Tag:** type text that's in your event items' names and press Enter, for example `Unhallowed`. Separate several with commas. The window shows how many matching items are in your backpack, including bags inside it, and rechecks every few seconds while it's open. A stack counts as its amount. The total at the top then adds these items to the drops (its caption reads "drops + event items"); **Reset Count** clears only the drops. Bags you haven't opened since logging in may not be counted. Clear the box and press Enter to stop counting.
 - Type part of an event's drop message in the box at the bottom and press Enter to add it (up to 10 messages). Capitals don't matter.
 - Uncheck a message to turn it off, or uncheck it and press **Remove Unchecked** to delete it.
 - The list starts with "You recover an artifact bearing the mark of the Unhallowed".
@@ -238,6 +240,7 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
 | `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksDropAlertsWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
 | `CorksDropAlertsCount`, `CorksDropAlertsText<n>`, `CorksDropAlertsOn<n>` | Event Drops messages (checked or not) |
+| `CorksDropAlertsItemName` | Event Drops backpack item name text |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
