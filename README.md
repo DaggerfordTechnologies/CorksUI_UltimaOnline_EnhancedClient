@@ -150,8 +150,9 @@ Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Sou
 
 The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it. The **Event Drops** window lets you add those messages yourself, and counts your drops.
 
-- **Drops this session** at the top counts every matching drop since you logged in (or reloaded the UI). **Reset Count** sets it back to 0.
-- Each saved message is a row showing `[count] message`. When a game message containing a checked one arrives, the artifact graphic shows and the drop is counted.
+- The total at the top right counts every matching drop since you logged in (or reloaded the UI), with how long ago the last one was. **Reset Count** sets the counts back to 0.
+- Each saved message is a row, with its own count on the right. When a game message containing a checked one arrives, the artifact graphic shows, the drop is counted, and the row and total flash for a moment.
+- The window grows and shrinks to fit the messages in it.
 - Type part of an event's drop message in the box at the bottom and press Enter to add it (up to 10 messages). Capitals don't matter.
 - Uncheck a message to turn it off, or uncheck it and press **Remove Unchecked** to delete it.
 - The list starts with "You recover an artifact bearing the mark of the Unhallowed".
