@@ -1,5 +1,35 @@
 <Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
 	<Windows>
+		<!-- Checkbox row template. The font is set here in the XML (like the Target Text
+		     label) rather than from Lua, so it shows at the same size as the other text. -->
+		<Window name="CorksTargetingCheckRow">
+			<Size>
+				<AbsPoint x="180" y="24" />
+			</Size>
+			<Windows>
+				<Button name="$parentButton" inherits="UO_Default_Check_Button">
+					<Anchors>
+						<Anchor point="left" relativePoint="left">
+							<AbsPoint x="5" y="0" />
+						</Anchor>
+					</Anchors>
+				</Button>
+				<Label name="$parentLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" wordwrap="false">
+					<Size>
+						<AbsPoint x="160" y="22" />
+					</Size>
+					<Anchors>
+						<Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+							<AbsPoint x="5" y="0" />
+						</Anchor>
+					</Anchors>
+					<Color r="255" g="255" b="255" a="255" />
+					<EventHandlers>
+						<EventHandler event="OnLButtonDown" function="CorksTargeting.OnCheckLabelClick" />
+					</EventHandlers>
+				</Label>
+			</Windows>
+		</Window>
 		<Window name="CorksTargetingWindow" movable="true" layer="popup">
 			<Size>
 				<AbsPoint x="230" y="404" />

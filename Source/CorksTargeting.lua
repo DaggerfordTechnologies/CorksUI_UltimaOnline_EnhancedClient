@@ -36,11 +36,7 @@ CorksTargeting.NotorietyLabels = {
 -- look the same, so the Grey checkbox (4) controls Criminal too.
 CorksTargeting.NotorietyShown = { 2, 3, 4, 6, 7, 8 }
 
--- Font for all text in the window (the template default is the smaller UO_DefaultText)
-CorksTargeting.Font = "UO_DefaultText_15pt"
-
--- Layout spacing (the checkbox template is 32 tall; shrink rows so options sit closer)
-CorksTargeting.RowHeight = 24
+-- Layout spacing (row height is set by the CorksTargetingCheckRow template)
 CorksTargeting.RowGap = 2
 CorksTargeting.SectionGap = 12
 
@@ -66,10 +62,9 @@ function CorksTargeting.Initialize()
 	local previous = nil
 	for _, i in ipairs(CorksTargeting.NotorietyShown) do
 		local templateName = "CorksNotoCheck_" .. i
-		CreateWindowFromTemplate(templateName, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-		WindowSetDimensions(templateName, 180, CorksTargeting.RowHeight)
+		CreateWindowFromTemplate(templateName, "CorksTargetingCheckRow", "CorksTargetingWindowScrollChild")
+		CorksTargeting.MatchWindowScale(templateName)
 		ButtonSetCheckButtonFlag(templateName .. "Button", true)
-		LabelSetFont(templateName .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 		LabelSetText(templateName .. "Label", CorksTargeting.NotorietyLabels[i])
 
 		-- Color the label to match the notoriety
@@ -87,10 +82,9 @@ function CorksTargeting.Initialize()
 
 	-- Create Players Only checkbox
 	local playersTemplate = "CorksPlayersOnlyCheck"
-	CreateWindowFromTemplate(playersTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-	WindowSetDimensions(playersTemplate, 180, CorksTargeting.RowHeight)
+	CreateWindowFromTemplate(playersTemplate, "CorksTargetingCheckRow", "CorksTargetingWindowScrollChild")
+	CorksTargeting.MatchWindowScale(playersTemplate)
 	ButtonSetCheckButtonFlag(playersTemplate .. "Button", true)
-	LabelSetFont(playersTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(playersTemplate .. "Label", L"Players Only")
 	LabelSetTextColor(playersTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(playersTemplate .. "Button", CorksTargeting.PlayersOnly)
@@ -98,10 +92,9 @@ function CorksTargeting.Initialize()
 
 	-- Create Ignore Summons checkbox
 	local summonsTemplate = "CorksIgnoreSummonsCheck"
-	CreateWindowFromTemplate(summonsTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-	WindowSetDimensions(summonsTemplate, 180, CorksTargeting.RowHeight)
+	CreateWindowFromTemplate(summonsTemplate, "CorksTargetingCheckRow", "CorksTargetingWindowScrollChild")
+	CorksTargeting.MatchWindowScale(summonsTemplate)
 	ButtonSetCheckButtonFlag(summonsTemplate .. "Button", true)
-	LabelSetFont(summonsTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(summonsTemplate .. "Label", L"Ignore Summons")
 	LabelSetTextColor(summonsTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(summonsTemplate .. "Button", CorksTargeting.IgnoreSummons)
@@ -120,6 +113,13 @@ function CorksTargeting.Initialize()
 	if not ok then
 		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting max distance: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
 	end
+
+end
+
+-- Windows created from Lua after the saved scale was applied start at normal size,
+-- so give them the gump's current scale (the mouse-wheel resize scales them too).
+function CorksTargeting.MatchWindowScale(windowName)
+	WindowSetScale(windowName, WindowGetScale("CorksTargetingWindow"))
 end
 
 function CorksTargeting.InitNameFilter(anchorTo)
@@ -259,6 +259,12 @@ function CorksTargeting.SetNameFilter(text)
 		end
 		start = comma + 1
 	end
+end
+
+-- Clicking a checkbox's label toggles the checkbox.
+function CorksTargeting.OnCheckLabelClick()
+	local button = string.gsub(SystemData.ActiveWindow.name, "Label$", "Button")
+	ButtonSetPressedFlag(button, not ButtonGetPressedFlag(button))
 end
 
 -- Clicking the box gives it keyboard focus so typing goes into it.
