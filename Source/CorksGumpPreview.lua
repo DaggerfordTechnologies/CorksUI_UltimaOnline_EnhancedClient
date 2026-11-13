@@ -51,11 +51,27 @@ CorksGumpPreview.CellCount = 0
 -- Open / close
 ----------------------------------------------------------------
 
+-- Says in chat what happened, so a failure is never silent
+function CorksGumpPreview.Say(text)
+	pcall(WindowUtils.ChatPrint, StringToWString("Gump preview: " .. text), SystemData.ChatLogFilters.SYSTEM)
+end
+
 function CorksGumpPreview.Toggle()
-	if DoesWindowNameExist(CorksGumpPreview.Window) then
-		DestroyWindow(CorksGumpPreview.Window)
-	else
-		CreateWindow(CorksGumpPreview.Window, true)
+	local ok, err = pcall(function()
+		if DoesWindowNameExist(CorksGumpPreview.Window) then
+			DestroyWindow(CorksGumpPreview.Window)
+			CorksGumpPreview.Say("closed")
+		else
+			CreateWindow(CorksGumpPreview.Window, true)
+			if DoesWindowNameExist(CorksGumpPreview.Window) then
+				CorksGumpPreview.Say("opened")
+			else
+				CorksGumpPreview.Say("the window could not be created")
+			end
+		end
+	end)
+	if not ok then
+		CorksGumpPreview.Say("error: " .. tostring(err))
 	end
 end
 
@@ -88,7 +104,7 @@ function CorksGumpPreview.Initialize()
 
 	-- Re-apply the scale to the whole window so the classic art lines up (as the
 	-- mouse-wheel resize does)
-	CorksGumpArt.Rescale(CorksGumpPreview.Window)
+	CorksGumpPreview.Protected(CorksGumpArt.Rescale, CorksGumpPreview.Window)
 end
 
 -- One bad sample must not stop the rest from showing
