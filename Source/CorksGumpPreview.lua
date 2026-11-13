@@ -9,9 +9,9 @@ CorksGumpPreview = {}
 
 CorksGumpPreview.Window = "CorksGumpPreviewWindow"
 CorksGumpPreview.Columns = 6
-CorksGumpPreview.CellWidth = 150
+CorksGumpPreview.CellWidth = 190
 CorksGumpPreview.CellHeight = 112
-CorksGumpPreview.ArtWidth = 150
+CorksGumpPreview.ArtWidth = 190
 CorksGumpPreview.ArtHeight = 90
 CorksGumpPreview.Gap = 10
 CorksGumpPreview.Top = 40
@@ -167,9 +167,11 @@ end
 
 function CorksGumpPreview.AddClassicChecks()
 	local P = CorksGumpPreview
+	-- Only the unchecked ID of each pair, left to right: the full "210/211 ..."
+	-- list is wider than the cell and spilled over the sample beside it.
 	local captionIds = {}
 	for _, pair in ipairs(P.ClassicChecks) do
-		table.insert(captionIds, pair[1] .. "/" .. pair[2])
+		table.insert(captionIds, pair[1])
 	end
 	local cell = P.NewCell(StringToWString("Checks " .. table.concat(captionIds, " ")))
 	local art = cell .. "Art"

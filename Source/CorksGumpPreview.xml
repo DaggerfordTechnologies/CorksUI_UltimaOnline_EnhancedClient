@@ -4,12 +4,12 @@
 		<!-- One sample: art area plus a caption underneath -->
 		<Window name="CorksPreviewCell" handleinput="false">
 			<Size>
-				<AbsPoint x="150" y="112" />
+				<AbsPoint x="190" y="112" />
 			</Size>
 			<Windows>
 				<Window name="$parentArt" handleinput="false">
 					<Size>
-						<AbsPoint x="150" y="90" />
+						<AbsPoint x="190" y="90" />
 					</Size>
 					<Anchors>
 						<Anchor point="topleft" relativePoint="topleft" />
@@ -17,7 +17,7 @@
 				</Window>
 				<Label name="$parentCaption" font="UO_DefaultText" maxchars="64" textalign="center" handleinput="false">
 					<Size>
-						<AbsPoint x="150" y="18" />
+						<AbsPoint x="190" y="18" />
 					</Size>
 					<Anchors>
 						<Anchor point="bottomleft" relativePoint="topleft" relativeTo="$parentArt">
@@ -32,14 +32,14 @@
 		<!-- Font sample text; font set from Lua -->
 		<Label name="CorksPreviewFontLabel" font="UO_DefaultText" maxchars="128" textalign="left" wordwrap="true" handleinput="false">
 			<Size>
-				<AbsPoint x="130" y="70" />
+				<AbsPoint x="170" y="70" />
 			</Size>
 			<Color r="255" g="255" b="255" a="255" />
 		</Label>
 
 		<!-- EC styles -->
 		<Window name="CorksPreviewEC_Current" handleinput="false">
-			<Size><AbsPoint x="150" y="90" /></Size>
+			<Size><AbsPoint x="190" y="90" /></Size>
 			<Windows>
 				<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
 					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
@@ -50,7 +50,7 @@
 			</Windows>
 		</Window>
 		<Window name="CorksPreviewEC_Simple" handleinput="false">
-			<Size><AbsPoint x="150" y="90" /></Size>
+			<Size><AbsPoint x="190" y="90" /></Size>
 			<Windows>
 				<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
 					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
@@ -61,7 +61,7 @@
 			</Windows>
 		</Window>
 		<Window name="CorksPreviewEC_MainMenu" handleinput="false">
-			<Size><AbsPoint x="150" y="90" /></Size>
+			<Size><AbsPoint x="190" y="90" /></Size>
 			<Windows>
 				<FullResizeImage name="$parentBG" inherits="UO_Default_Black_Background">
 					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
@@ -72,7 +72,7 @@
 			</Windows>
 		</Window>
 		<Window name="CorksPreviewEC_Outer" handleinput="false">
-			<Size><AbsPoint x="150" y="90" /></Size>
+			<Size><AbsPoint x="190" y="90" /></Size>
 			<Windows>
 				<FullResizeImage name="$parentBG" inherits="UO_Default_Black_Background">
 					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
@@ -83,7 +83,7 @@
 			</Windows>
 		</Window>
 		<Window name="CorksPreviewEC_Sliders" handleinput="false">
-			<Size><AbsPoint x="150" y="90" /></Size>
+			<Size><AbsPoint x="190" y="90" /></Size>
 			<Windows>
 				<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
 					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
@@ -92,11 +92,11 @@
 					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
 				</FullResizeImage>
 				<SliderBar name="$parentDefault" inherits="UO_Default_Horizontal_SliderBar">
-					<Size><AbsPoint x="130" y="16" /></Size>
+					<Size><AbsPoint x="170" y="16" /></Size>
 					<Anchors><Anchor point="topleft" relativePoint="topleft"><AbsPoint x="10" y="22" /></Anchor></Anchors>
 				</SliderBar>
 				<SliderBar name="$parentLegacy" background="UO_Legacy_Book_SliderBackground" sliderbutton="UO_Legacy_Book_SliderButton" numticks="50">
-					<Size><AbsPoint x="130" y="12" /></Size>
+					<Size><AbsPoint x="170" y="12" /></Size>
 					<Anchors><Anchor point="topleft" relativePoint="topleft"><AbsPoint x="10" y="58" /></Anchor></Anchors>
 				</SliderBar>
 			</Windows>
@@ -104,7 +104,7 @@
 
 		<Window name="CorksGumpPreviewWindow" movable="true" layer="popup">
 			<Size>
-				<AbsPoint x="970" y="782" />
+				<AbsPoint x="1210" y="782" />
 			</Size>
 			<Anchors>
 				<Anchor point="center" relativePoint="center">
