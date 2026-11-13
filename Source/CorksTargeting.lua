@@ -36,6 +36,9 @@ CorksTargeting.NotorietyLabels = {
 -- look the same, so the Grey checkbox (4) controls Criminal too.
 CorksTargeting.NotorietyShown = { 2, 3, 4, 6, 7, 8 }
 
+-- Font for all text in the window (the template default is the smaller UO_DefaultText)
+CorksTargeting.Font = "UO_DefaultText_15pt"
+
 ----------------------------------------------------------------
 -- Functions
 ----------------------------------------------------------------
@@ -60,6 +63,7 @@ function CorksTargeting.Initialize()
 		local templateName = "CorksNotoCheck_" .. i
 		CreateWindowFromTemplate(templateName, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
 		ButtonSetCheckButtonFlag(templateName .. "Button", true)
+		LabelSetFont(templateName .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 		LabelSetText(templateName .. "Label", CorksTargeting.NotorietyLabels[i])
 
 		-- Color the label to match the notoriety
@@ -79,6 +83,7 @@ function CorksTargeting.Initialize()
 	local playersTemplate = "CorksPlayersOnlyCheck"
 	CreateWindowFromTemplate(playersTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
 	ButtonSetCheckButtonFlag(playersTemplate .. "Button", true)
+	LabelSetFont(playersTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(playersTemplate .. "Label", L"Players Only")
 	LabelSetTextColor(playersTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(playersTemplate .. "Button", CorksTargeting.PlayersOnly)
@@ -88,6 +93,7 @@ function CorksTargeting.Initialize()
 	local summonsTemplate = "CorksIgnoreSummonsCheck"
 	CreateWindowFromTemplate(summonsTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
 	ButtonSetCheckButtonFlag(summonsTemplate .. "Button", true)
+	LabelSetFont(summonsTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(summonsTemplate .. "Label", L"Ignore Summons")
 	LabelSetTextColor(summonsTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(summonsTemplate .. "Button", CorksTargeting.IgnoreSummons)
