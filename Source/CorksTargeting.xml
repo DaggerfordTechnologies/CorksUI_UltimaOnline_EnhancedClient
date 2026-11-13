@@ -14,7 +14,7 @@
 						</Anchor>
 					</Anchors>
 				</Button>
-				<Label name="$parentLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" wordwrap="false">
+				<Label name="$parentLabel" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false">
 					<Size>
 						<AbsPoint x="160" y="22" />
 					</Size>
@@ -47,6 +47,13 @@
 			</EventHandlers>
 			<Windows>
 				<Window name="$parentChrome" inherits="UO_DefaultWindow">
+					<Anchors>
+						<Anchor point="topleft" relativePoint="topleft" />
+						<Anchor point="bottomright" relativePoint="bottomright" />
+					</Anchors>
+				</Window>
+				<!-- Holder for the classic gump art background (CorksTargeting.ClassicBackground) -->
+				<Window name="$parentClassicBG" handleinput="false" layer="background">
 					<Anchors>
 						<Anchor point="topleft" relativePoint="topleft" />
 						<Anchor point="bottomright" relativePoint="bottomright" />
@@ -93,7 +100,7 @@
 				</Window>
 				<!-- Name filter: a direct child of the root window (like the Chat Filter box) so
 				     the edit box gets clicks and keyboard focus. Anchored from Lua under the checkboxes. -->
-				<Label name="CorksNameFilterLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
+				<Label name="CorksNameFilterLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="180" y="22" />
 					</Size>
@@ -119,7 +126,7 @@
 						</FullResizeImage>
 					</Windows>
 				</Window>
-				<EditBox name="CorksNameFilterBox" font="UO_DefaultText_15pt" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
+				<EditBox name="CorksNameFilterBox" font="UO_DefaultText" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
 					<Size>
 						<AbsPoint x="160" y="24" />
 					</Size>
@@ -130,7 +137,7 @@
 					</EventHandlers>
 				</EditBox>
 				<!-- Max distance: anchored from Lua under the name filter box. -->
-				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
+				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="180" y="22" />
 					</Size>

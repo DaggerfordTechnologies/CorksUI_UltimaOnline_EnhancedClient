@@ -1,13 +1,6 @@
 <Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
 	<!-- Throwaway preview of gump styles. Open/close with /gumppreview in chat. -->
 	<Windows>
-		<!-- One piece of classic gump art; texture set from Lua -->
-		<DynamicImage name="CorksPreviewImage" handleinput="false" layer="default">
-			<Size>
-				<AbsPoint x="1" y="1" />
-			</Size>
-		</DynamicImage>
-
 		<!-- One sample: art area plus a caption underneath -->
 		<Window name="CorksPreviewCell" handleinput="false">
 			<Size>
@@ -35,6 +28,14 @@
 				</Label>
 			</Windows>
 		</Window>
+
+		<!-- Font sample text; font set from Lua -->
+		<Label name="CorksPreviewFontLabel" font="UO_DefaultText" maxchars="128" textalign="left" wordwrap="true" handleinput="false">
+			<Size>
+				<AbsPoint x="130" y="70" />
+			</Size>
+			<Color r="255" g="255" b="255" a="255" />
+		</Label>
 
 		<!-- EC styles -->
 		<Window name="CorksPreviewEC_Current" handleinput="false">
@@ -103,7 +104,7 @@
 
 		<Window name="CorksGumpPreviewWindow" movable="true" layer="popup">
 			<Size>
-				<AbsPoint x="810" y="660" />
+				<AbsPoint x="970" y="782" />
 			</Size>
 			<Anchors>
 				<Anchor point="center" relativePoint="center">

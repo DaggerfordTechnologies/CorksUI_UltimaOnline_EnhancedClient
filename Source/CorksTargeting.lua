@@ -36,6 +36,13 @@ CorksTargeting.NotorietyLabels = {
 -- look the same, so the Grey checkbox (4) controls Criminal too.
 CorksTargeting.NotorietyShown = { 2, 3, 4, 6, 7, 8 }
 
+-- Classic UO gump background (base gump art ID), or nil for the standard EC look
+CorksTargeting.ClassicBackground = 2620
+-- Classic background for the Target Text box (base gump art ID), or nil for the EC box
+CorksTargeting.ClassicTextBox = 3000
+-- Gump art loaded for the classic background, released on shutdown
+CorksTargeting.GumpArt = {}
+
 -- Layout spacing (row height is set by the CorksTargetingCheckRow template)
 CorksTargeting.RowGap = 2
 CorksTargeting.SectionGap = 12
@@ -114,6 +121,43 @@ function CorksTargeting.Initialize()
 		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting max distance: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
 	end
 
+	ok, err = pcall(CorksTargeting.ApplyClassicLook)
+	if not ok then
+		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting background: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end
+
+	-- Re-apply the gump's current scale to the whole window, as the mouse-wheel
+	-- resize does: the classic art made above only lines up once that happens.
+	-- Same value as already set, so the title (fitted at this scale) is unchanged.
+	WindowSetScale("CorksTargetingWindow", WindowGetScale("CorksTargetingWindow"))
+end
+
+-- Draws the classic background and hides the inner black panel so it shows through.
+-- The size must match CorksTargetingWindow in the XML.
+function CorksTargeting.ApplyClassicLook()
+	if not CorksTargeting.ClassicBackground then
+		return
+	end
+	if CorksGumpArt.ApplyClassic("CorksTargetingWindow", CorksTargeting.ClassicBackground, 230, 404, CorksTargeting.GumpArt) then
+		WindowSetShowing("CorksTargetingWindowContentBackground", false)
+		WindowSetShowing("CorksTargetingWindowContentFrame", false)
+	end
+	CorksTargeting.ApplyClassicTextBox()
+end
+
+-- Classic white entry box with black text, drawn in the box's border holder
+-- (size must match CorksNameFilterBoxBG in the XML).
+function CorksTargeting.ApplyClassicTextBox()
+	if not CorksTargeting.ClassicTextBox then
+		return
+	end
+	local holder = "CorksNameFilterBoxBG"
+	if CorksGumpArt.Background(holder, CorksTargeting.ClassicTextBox, 170, 34, CorksTargeting.GumpArt) then
+		WindowSetShowing(holder .. "BG", false)
+		WindowSetShowing(holder .. "Frame", false)
+		TextEditBoxSetTextColor("CorksNameFilterBox", 0, 0, 0)
+		WindowSetScale(holder, WindowGetScale("CorksTargetingWindow"))
+	end
 end
 
 -- Windows created from Lua after the saved scale was applied start at normal size,
@@ -189,6 +233,7 @@ end
 function CorksTargeting.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksTargetingWindow")
 	CorksTargeting.SyncFromButtons()
+	CorksGumpArt.ReleaseAll(CorksTargeting.GumpArt)
 end
 
 function CorksTargeting.SyncFromButtons()
