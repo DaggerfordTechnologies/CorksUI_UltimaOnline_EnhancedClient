@@ -163,6 +163,7 @@
 		<Script file="Source/CorksDropAlerts.lua"/>
 		<Script file="Source/CorksGumpArt.lua"/>
 		<Script file="Source/CorksGumpPreview.lua"/>
+		<Script file="Source/CorksGumpDump.lua"/>
 		<Script file="Source/CorksChatFilter.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>

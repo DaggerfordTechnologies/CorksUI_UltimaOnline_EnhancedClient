@@ -1903,6 +1903,7 @@ end
 Interface.ChatAliases = {
 	["/reloadui"] = function() InterfaceCore.ReloadUI() end,
 	["/gumppreview"] = function() CorksGumpPreview.Toggle() end,
+	["/gumpdump"] = function() CorksGumpDump.Run() end,
 }
 
 -- Every line typed in chat is sent with SendChat, whichever Enter handler the chat
