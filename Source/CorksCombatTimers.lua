@@ -51,6 +51,8 @@ CorksCombatTimers.COOLDOWN_BAR = { r = 255, g = 60, b = 60 }
 CorksCombatTimers.READY_BAR = { r = 0, g = 200, b = 0 }
 
 CorksCombatTimers.VisibleRows = 0
+-- Gump art loaded for the classic background (see CorksTimers.ClassicBackground)
+CorksCombatTimers.GumpArt = {}
 
 ----------------------------------------------------------------
 -- Functions
@@ -87,6 +89,7 @@ end
 
 function CorksCombatTimers.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksCombatTimers")
+	CorksGumpArt.ReleaseAll(CorksCombatTimers.GumpArt)
 end
 
 -- The window only opens when the user turns it on with the Combat Timers action.
@@ -255,6 +258,7 @@ function CorksCombatTimers.Refresh()
 		CorksCombatTimers.VisibleRows = rowCount
 		local height = math.max(58 + rowCount * CorksTimers.ROW_HEIGHT, CorksTimers.MIN_HEIGHT)
 		WindowSetDimensions("CorksCombatTimers", CorksTimers.WINDOW_WIDTH, height)
+		CorksTimers.ApplyClassicLook("CorksCombatTimers", height, CorksCombatTimers.GumpArt)
 	end
 
 	if #active == 0 then

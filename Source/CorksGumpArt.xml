@@ -7,5 +7,25 @@
 				<AbsPoint x="1" y="1" />
 			</Size>
 		</DynamicImage>
+
+		<!-- EC "simple frame" look: thin frame over a plain black background. Both are
+		     resizable images, so they follow the gump's size on their own. Add as
+		     <window>Simple after the chrome and call CorksGumpArt.ApplySimple. -->
+		<Window name="CorksSimpleFrame" handleinput="false" layer="background">
+			<Windows>
+				<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+					<Anchors>
+						<Anchor point="topleft" relativePoint="topleft" />
+						<Anchor point="bottomright" relativePoint="bottomright" />
+					</Anchors>
+				</FullResizeImage>
+				<FullResizeImage name="$parentFrame" inherits="UO_Simple_Frame">
+					<Anchors>
+						<Anchor point="topleft" relativePoint="topleft" />
+						<Anchor point="bottomright" relativePoint="bottomright" />
+					</Anchors>
+				</FullResizeImage>
+			</Windows>
+		</Window>
 	</Windows>
 </Interface>
