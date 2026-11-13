@@ -2,7 +2,7 @@
 	<Windows>
 		<Window name="CorksTargetingWindow" movable="true" layer="popup">
 			<Size>
-				<AbsPoint x="250" y="420" />
+				<AbsPoint x="250" y="404" />
 			</Size>
 			<Anchors>
 				<Anchor point="center" relativePoint="center">
@@ -24,11 +24,11 @@
 				</Window>
 				<Window name="CorksTargetingWindowContent">
 					<Size>
-						<AbsPoint x="220" y="360" />
+						<AbsPoint x="220" y="354" />
 					</Size>
 					<Anchors>
 						<Anchor point="top" relativePoint="top">
-							<AbsPoint x="0" y="40" />
+							<AbsPoint x="0" y="36" />
 						</Anchor>
 					</Anchors>
 					<Windows>
@@ -54,7 +54,7 @@
 						</FullResizeImage>
 						<Window name="CorksTargetingWindowScrollChild">
 							<Size>
-								<AbsPoint x="200" y="330" />
+								<AbsPoint x="200" y="324" />
 							</Size>
 							<Windows>
 							</Windows>
