@@ -18,6 +18,44 @@ CorksBuffRestore.DELAY = 2
 CorksBuffRestore.MAX_AGE = 120
 CorksBuffRestore.Wait = 0
 
+-- What was saved and what happened to each buff, written to the game's logs
+-- folder (the log is emptied by each save, so it covers the latest reload)
+CorksBuffRestore.LOG = "CorksBuffRestore"
+CorksBuffRestore.LOG_FILE = "logs/CorksBuffRestore.log"
+CorksBuffRestore.LogReady = false
+CorksBuffRestore.CheckedAfterLoad = false
+
+function CorksBuffRestore.Log(text, clear)
+	pcall(function()
+		local log = CorksBuffRestore.LOG
+		if not CorksBuffRestore.LogReady then
+			pcall(TextLogCreate, log, 500)
+			TextLogSetEnabled(log, true)
+			TextLogSetIncrementalSaving(log, true, CorksBuffRestore.LOG_FILE)
+			pcall(TextLogAddFilterType, log, 1, L"")
+			CorksBuffRestore.LogReady = true
+		end
+		if clear then
+			TextLogClear(log)
+			TextLogSetIncrementalSaving(log, true, CorksBuffRestore.LOG_FILE)
+		end
+		TextLogAddEntry(log, 1, StringToWString(tostring(text)))
+	end)
+end
+
+function CorksBuffRestore.Describe(id, data, timeLeft)
+	local name = ""
+	if type(data.NameWStringVector) == "table" and data.NameWStringVector[1] then
+		local ok, text = pcall(WStringToString, data.NameWStringVector[1])
+		if ok and text then
+			name = " \"" .. text .. "\""
+		end
+	end
+	return "buff " .. tostring(id) .. name .. " good=" .. tostring(data.good)
+		.. " HasTimer=" .. tostring(data.HasTimer) .. " TimerSeconds=" .. tostring(data.TimerSeconds)
+		.. " timeLeft=" .. tostring(timeLeft)
+end
+
 -- Seconds since some fixed point, or nil if the client can't say
 function CorksBuffRestore.Now()
 	local ok, timestamp = pcall(GetCurrentDateTime)
@@ -42,13 +80,23 @@ end
 -- that isn't set anywhere else, so it survives the reload.
 function CorksBuffRestore.Save()
 	if not BuffDebuff or type(BuffDebuff.TableOrder) ~= "table" then
+		CorksBuffRestore.Log("Save: no buff list", true)
 		return
+	end
+	CorksBuffRestore.Log("Save: " .. #BuffDebuff.TableOrder .. " buff(s) in TableOrder", true)
+	-- Every buff the default UI knows about, saved or not, to see what's missed
+	for buffId, data in pairs(BuffDebuff.BuffData) do
+		if type(data) == "table" then
+			CorksBuffRestore.Log("  known " .. CorksBuffRestore.Describe(buffId, data, BuffDebuff.Timers[buffId])
+				.. " window=" .. tostring(BuffDebuff.BuffWindowId[buffId]))
+		end
 	end
 	local buffs = {}
 	local done = {}
 	for _, buffId in ipairs(BuffDebuff.TableOrder) do
 		local data = BuffDebuff.BuffData[buffId]
 		if not done[buffId] and BuffDebuff.BuffWindowId[buffId] == true and type(data) == "table" then
+			CorksBuffRestore.Log("  saved " .. CorksBuffRestore.Describe(buffId, data, BuffDebuff.Timers[buffId]))
 			done[buffId] = true
 			local timeLeft = BuffDebuff.Timers[buffId]
 			if type(timeLeft) ~= "number" then
@@ -75,6 +123,10 @@ end
 
 -- Called every frame from Interface.Update; does nothing unless a snapshot is waiting
 function CorksBuffRestore.Update(timePassed)
+	if not CorksBuffRestore.CheckedAfterLoad then
+		CorksBuffRestore.CheckedAfterLoad = true
+		CorksBuffRestore.Log("After load: snapshot " .. (CorksBuffSnapshot and "found" or "not found"))
+	end
 	if not CorksBuffSnapshot then
 		return
 	end
@@ -101,7 +153,9 @@ function CorksBuffRestore.Restore(snapshot)
 	if now and snapshot.time then
 		elapsed = math.max(0, now - snapshot.time)
 	end
+	CorksBuffRestore.Log("Restore: " .. #snapshot.buffs .. " saved, reload took " .. elapsed .. "s")
 	if elapsed > CorksBuffRestore.MAX_AGE then
+		CorksBuffRestore.Log("  snapshot too old, skipped")
 		return
 	end
 
@@ -111,6 +165,7 @@ function CorksBuffRestore.Restore(snapshot)
 	system.CurrentBuffId = -1
 	if system.CurrentBuffId ~= -1 then
 		system.CurrentBuffId = originalId
+		CorksBuffRestore.Log("  CurrentBuffId can't be set")
 		CorksBuffRestore.Say("Buff icons could not be restored after the UI reload.")
 		return
 	end
@@ -130,7 +185,12 @@ function CorksBuffRestore.Restore(snapshot)
 			end
 			local expired = data.HasTimer and (type(timeLeft) ~= "number" or timeLeft <= 0)
 			-- Skip buffs that ran out during the reload, and ones the server already re-sent
-			if not expired and BuffDebuff.BuffWindowId[id] ~= true then
+			if expired then
+				CorksBuffRestore.Log("  skipped (expired) " .. CorksBuffRestore.Describe(id, data, timeLeft))
+			elseif BuffDebuff.BuffWindowId[id] == true then
+				CorksBuffRestore.Log("  skipped (already shown) " .. CorksBuffRestore.Describe(id, data, timeLeft))
+			else
+				CorksBuffRestore.Log("  restoring " .. CorksBuffRestore.Describe(id, data, timeLeft))
 				data.TimerSeconds = timeLeft
 				BuffDebuff.BuffData[id] = data
 				-- Marks it as already active, so the "new buff" circle doesn't flash
@@ -142,6 +202,7 @@ function CorksBuffRestore.Restore(snapshot)
 				else
 					BuffDebuff.BuffData[id] = nil
 					BuffDebuff.ActiveBuffs[id] = nil
+					CorksBuffRestore.Log("    failed: " .. tostring(problem))
 					CorksBuffRestore.Say("Buff icon " .. tostring(id) .. " could not be restored: " .. tostring(problem))
 				end
 			end
@@ -150,6 +211,7 @@ function CorksBuffRestore.Restore(snapshot)
 
 	system.CurrentBuffId = originalId
 	CenterScreenText.SendCenterScreenTexture = originalSplash
+	CorksBuffRestore.Log("Restore done: " .. restored .. " restored" .. (ok and "" or (", error: " .. tostring(err))))
 	if not ok then
 		CorksBuffRestore.Say("Restoring buff icons failed: " .. tostring(err))
 	elseif restored > 0 then
