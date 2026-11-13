@@ -117,3 +117,12 @@ function CorksGumpArt.ApplyClassic(window, baseId, w, h, owner)
 	WindowSetScale(holder, WindowGetScale(window))
 	return true
 end
+
+-- Re-applies a window's scale to everything in it, the way the mouse-wheel resize
+-- does, so classic art created after the scale was set lines up. The client ignores
+-- setting the scale it already has, so nudge it first.
+function CorksGumpArt.Rescale(window)
+	local scale = WindowGetScale(window)
+	WindowSetScale(window, scale + 0.01)
+	WindowSetScale(window, scale)
+end

@@ -40,6 +40,8 @@ CorksTargeting.NotorietyShown = { 2, 3, 4, 6, 7, 8 }
 CorksTargeting.ClassicBackground = 2620
 -- Classic background for the Target Text box (base gump art ID), or nil for the EC box
 CorksTargeting.ClassicTextBox = 3000
+-- How far below the gump's top edge the title sits (clears the classic border)
+CorksTargeting.TitleOffsetY = 8
 -- Gump art loaded for the classic background, released on shutdown
 CorksTargeting.GumpArt = {}
 
@@ -107,7 +109,7 @@ function CorksTargeting.Initialize()
 	ButtonSetPressedFlag(summonsTemplate .. "Button", CorksTargeting.IgnoreSummons)
 	WindowAddAnchor(summonsTemplate, "bottomleft", playersTemplate, "topleft", 0, CorksTargeting.RowGap)
 
-	WindowUtils.SetWindowTitle("CorksTargetingWindow", L"Corks' Targeting")
+	WindowUtils.SetWindowTitle("CorksTargetingWindow", L"Targeting")
 	CorksTargeting.Initialized = true
 
 	-- Name filter last, and protected, so it can never break the rest of the window
@@ -126,10 +128,19 @@ function CorksTargeting.Initialize()
 		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting background: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
 	end
 
-	-- Re-apply the gump's current scale to the whole window, as the mouse-wheel
-	-- resize does: the classic art made above only lines up once that happens.
-	-- Same value as already set, so the title (fitted at this scale) is unchanged.
-	WindowSetScale("CorksTargetingWindow", WindowGetScale("CorksTargetingWindow"))
+	-- Re-scale the whole window, as the mouse-wheel resize does: the classic art made
+	-- above only lines up once that happens. Setting the same value is ignored, so
+	-- nudge it and set it back. That would enlarge the title, so restore its scale.
+	local title = "CorksTargetingWindowChrome_UO_TitleBar_WindowTitle"
+	local titleScale = WindowGetScale(title)
+	CorksGumpArt.Rescale("CorksTargetingWindow")
+	WindowSetScale(title, titleScale)
+
+	-- Centre the title (the EC chrome shifts it 15 left to clear the close button).
+	-- Anchored to the gump itself, not the hidden title bar, so it stays put while
+	-- the gump is being scaled.
+	WindowClearAnchors(title)
+	WindowAddAnchor(title, "top", "CorksTargetingWindow", "top", 0, CorksTargeting.TitleOffsetY)
 end
 
 -- Draws the classic background and hides the inner black panel so it shows through.

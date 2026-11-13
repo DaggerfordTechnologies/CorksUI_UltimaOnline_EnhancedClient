@@ -88,7 +88,7 @@ function CorksGumpPreview.Initialize()
 
 	-- Re-apply the scale to the whole window so the classic art lines up (as the
 	-- mouse-wheel resize does)
-	WindowSetScale(CorksGumpPreview.Window, WindowGetScale(CorksGumpPreview.Window))
+	CorksGumpArt.Rescale(CorksGumpPreview.Window)
 end
 
 -- One bad sample must not stop the rest from showing
