@@ -1064,6 +1064,9 @@ function Interface.Update( timePassed )
 	ok, err = pcall(CorksDropAlerts.CheckRewardGump, timePassed)
 	Interface.ErrorTracker(ok, err)
 
+	ok, err = pcall(CorksBuffRestore.Update, timePassed)
+	Interface.ErrorTracker(ok, err)
+
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 	
@@ -1904,7 +1907,12 @@ end
 
 -- Chat-line commands the server doesn't know, handled here instead of being sent.
 Interface.ChatAliases = {
-	["/reloadui"] = function() InterfaceCore.ReloadUI() end,
+	["/reloadui"] = function()
+		-- Keep the buff icons through the reload (CorksBuffRestore)
+		local ok, err = pcall(CorksBuffRestore.Save)
+		Interface.ErrorTracker(ok, err)
+		InterfaceCore.ReloadUI()
+	end,
 	["/gumppreview"] = function() CorksGumpPreview.Toggle() end,
 	["/gumpdump"] = function() CorksGumpDump.Run() end,
 }

@@ -228,7 +228,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
-Type `/reloadui` on the chat line to reload the UI (the same as `/script InterfaceCore.ReloadUI()`).
+Type `/reloadui` on the chat line to reload the UI (the same as `/script InterfaceCore.ReloadUI()`). Unlike a plain reload, it keeps your buff and debuff icons: the server only sends them when they start or at login, so CorksUI saves them before reloading and puts them back afterwards, with their timers adjusted.
 
 ## Saved Settings
 
