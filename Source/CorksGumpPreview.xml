@@ -1,0 +1,129 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+	<!-- Throwaway preview of gump styles. Open/close with /gumppreview in chat. -->
+	<Windows>
+		<!-- One sample: art area plus a caption underneath -->
+		<Window name="CorksPreviewCell" handleinput="false">
+			<Size>
+				<AbsPoint x="150" y="112" />
+			</Size>
+			<Windows>
+				<Window name="$parentArt" handleinput="false">
+					<Size>
+						<AbsPoint x="150" y="90" />
+					</Size>
+					<Anchors>
+						<Anchor point="topleft" relativePoint="topleft" />
+					</Anchors>
+				</Window>
+				<Label name="$parentCaption" font="UO_DefaultText" maxchars="64" textalign="center" handleinput="false">
+					<Size>
+						<AbsPoint x="150" y="18" />
+					</Size>
+					<Anchors>
+						<Anchor point="bottomleft" relativePoint="topleft" relativeTo="$parentArt">
+							<AbsPoint x="0" y="3" />
+						</Anchor>
+					</Anchors>
+					<Color r="255" g="255" b="255" a="255" />
+				</Label>
+			</Windows>
+		</Window>
+
+		<!-- Font sample text; font set from Lua -->
+		<Label name="CorksPreviewFontLabel" font="UO_DefaultText" maxchars="128" textalign="left" wordwrap="true" handleinput="false">
+			<Size>
+				<AbsPoint x="130" y="70" />
+			</Size>
+			<Color r="255" g="255" b="255" a="255" />
+		</Label>
+
+		<!-- EC styles -->
+		<Window name="CorksPreviewEC_Current" handleinput="false">
+			<Size><AbsPoint x="150" y="90" /></Size>
+			<Windows>
+				<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+				<FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+			</Windows>
+		</Window>
+		<Window name="CorksPreviewEC_Simple" handleinput="false">
+			<Size><AbsPoint x="150" y="90" /></Size>
+			<Windows>
+				<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+				<FullResizeImage name="$parentFrame" inherits="UO_Simple_Frame">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+			</Windows>
+		</Window>
+		<Window name="CorksPreviewEC_MainMenu" handleinput="false">
+			<Size><AbsPoint x="150" y="90" /></Size>
+			<Windows>
+				<FullResizeImage name="$parentBG" inherits="UO_Default_Black_Background">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+				<FullResizeImage name="$parentFrame" inherits="UO_Default_Main_Menu_Window_Frame">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+			</Windows>
+		</Window>
+		<Window name="CorksPreviewEC_Outer" handleinput="false">
+			<Size><AbsPoint x="150" y="90" /></Size>
+			<Windows>
+				<FullResizeImage name="$parentBG" inherits="UO_Default_Black_Background">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+				<FullResizeImage name="$parentFrame" inherits="UO_Default_Outer_Window_Frame">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+			</Windows>
+		</Window>
+		<Window name="CorksPreviewEC_Sliders" handleinput="false">
+			<Size><AbsPoint x="150" y="90" /></Size>
+			<Windows>
+				<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+				<FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+					<Anchors><Anchor point="topleft" relativePoint="topleft" /><Anchor point="bottomright" relativePoint="bottomright" /></Anchors>
+				</FullResizeImage>
+				<SliderBar name="$parentDefault" inherits="UO_Default_Horizontal_SliderBar">
+					<Size><AbsPoint x="130" y="16" /></Size>
+					<Anchors><Anchor point="topleft" relativePoint="topleft"><AbsPoint x="10" y="22" /></Anchor></Anchors>
+				</SliderBar>
+				<SliderBar name="$parentLegacy" background="UO_Legacy_Book_SliderBackground" sliderbutton="UO_Legacy_Book_SliderButton" numticks="50">
+					<Size><AbsPoint x="130" y="12" /></Size>
+					<Anchors><Anchor point="topleft" relativePoint="topleft"><AbsPoint x="10" y="58" /></Anchor></Anchors>
+				</SliderBar>
+			</Windows>
+		</Window>
+
+		<Window name="CorksGumpPreviewWindow" movable="true" layer="popup">
+			<Size>
+				<AbsPoint x="970" y="782" />
+			</Size>
+			<Anchors>
+				<Anchor point="center" relativePoint="center">
+					<AbsPoint x="0" y="0" />
+				</Anchor>
+			</Anchors>
+			<EventHandlers>
+				<EventHandler event="OnInitialize" function="CorksGumpPreview.Initialize" />
+				<EventHandler event="OnShutdown" function="CorksGumpPreview.Shutdown" />
+				<EventHandler event="OnRButtonUp" function="CorksGumpPreview.Close" />
+			</EventHandlers>
+			<Windows>
+				<Window name="$parentChrome" inherits="UO_DefaultWindow">
+					<Anchors>
+						<Anchor point="topleft" relativePoint="topleft" />
+						<Anchor point="bottomright" relativePoint="bottomright" />
+					</Anchors>
+				</Window>
+			</Windows>
+		</Window>
+	</Windows>
+</Interface>

@@ -1,0 +1,11 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+	<Windows>
+		<!-- One piece of classic gump art; texture set from Lua (CorksGumpArt.Image).
+		     Background layer so it sits under a gump's text and controls. -->
+		<DynamicImage name="CorksGumpArtImage" handleinput="false" layer="background">
+			<Size>
+				<AbsPoint x="1" y="1" />
+			</Size>
+		</DynamicImage>
+	</Windows>
+</Interface>

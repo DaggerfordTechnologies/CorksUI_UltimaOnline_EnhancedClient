@@ -1902,6 +1902,7 @@ end
 -- Chat-line commands the server doesn't know, handled here instead of being sent.
 Interface.ChatAliases = {
 	["/reloadui"] = function() InterfaceCore.ReloadUI() end,
+	["/gumppreview"] = function() CorksGumpPreview.Toggle() end,
 }
 
 -- Every line typed in chat is sent with SendChat, whichever Enter handler the chat

@@ -36,11 +36,16 @@ CorksTargeting.NotorietyLabels = {
 -- look the same, so the Grey checkbox (4) controls Criminal too.
 CorksTargeting.NotorietyShown = { 2, 3, 4, 6, 7, 8 }
 
--- Font for all text in the window (the template default is the smaller UO_DefaultText)
-CorksTargeting.Font = "UO_DefaultText_15pt"
+-- Classic UO gump background (base gump art ID), or nil for the standard EC look
+CorksTargeting.ClassicBackground = 2620
+-- Classic background for the Target Text box (base gump art ID), or nil for the EC box
+CorksTargeting.ClassicTextBox = 3000
+-- How far below the gump's top edge the title sits (clears the classic border)
+CorksTargeting.TitleOffsetY = 8
+-- Gump art loaded for the classic background, released on shutdown
+CorksTargeting.GumpArt = {}
 
--- Layout spacing (the checkbox template is 32 tall; shrink rows so options sit closer)
-CorksTargeting.RowHeight = 24
+-- Layout spacing (row height is set by the CorksTargetingCheckRow template)
 CorksTargeting.RowGap = 2
 CorksTargeting.SectionGap = 12
 
@@ -66,10 +71,9 @@ function CorksTargeting.Initialize()
 	local previous = nil
 	for _, i in ipairs(CorksTargeting.NotorietyShown) do
 		local templateName = "CorksNotoCheck_" .. i
-		CreateWindowFromTemplate(templateName, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-		WindowSetDimensions(templateName, 180, CorksTargeting.RowHeight)
+		CreateWindowFromTemplate(templateName, "CorksTargetingCheckRow", "CorksTargetingWindowScrollChild")
+		CorksTargeting.MatchWindowScale(templateName)
 		ButtonSetCheckButtonFlag(templateName .. "Button", true)
-		LabelSetFont(templateName .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 		LabelSetText(templateName .. "Label", CorksTargeting.NotorietyLabels[i])
 
 		-- Color the label to match the notoriety
@@ -87,10 +91,9 @@ function CorksTargeting.Initialize()
 
 	-- Create Players Only checkbox
 	local playersTemplate = "CorksPlayersOnlyCheck"
-	CreateWindowFromTemplate(playersTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-	WindowSetDimensions(playersTemplate, 180, CorksTargeting.RowHeight)
+	CreateWindowFromTemplate(playersTemplate, "CorksTargetingCheckRow", "CorksTargetingWindowScrollChild")
+	CorksTargeting.MatchWindowScale(playersTemplate)
 	ButtonSetCheckButtonFlag(playersTemplate .. "Button", true)
-	LabelSetFont(playersTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(playersTemplate .. "Label", L"Players Only")
 	LabelSetTextColor(playersTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(playersTemplate .. "Button", CorksTargeting.PlayersOnly)
@@ -98,16 +101,15 @@ function CorksTargeting.Initialize()
 
 	-- Create Ignore Summons checkbox
 	local summonsTemplate = "CorksIgnoreSummonsCheck"
-	CreateWindowFromTemplate(summonsTemplate, "Settings_LabelCheckButton", "CorksTargetingWindowScrollChild")
-	WindowSetDimensions(summonsTemplate, 180, CorksTargeting.RowHeight)
+	CreateWindowFromTemplate(summonsTemplate, "CorksTargetingCheckRow", "CorksTargetingWindowScrollChild")
+	CorksTargeting.MatchWindowScale(summonsTemplate)
 	ButtonSetCheckButtonFlag(summonsTemplate .. "Button", true)
-	LabelSetFont(summonsTemplate .. "Label", CorksTargeting.Font, WindowUtils.FONT_DEFAULT_TEXT_LINESPACING)
 	LabelSetText(summonsTemplate .. "Label", L"Ignore Summons")
 	LabelSetTextColor(summonsTemplate .. "Label", 255, 255, 255)
 	ButtonSetPressedFlag(summonsTemplate .. "Button", CorksTargeting.IgnoreSummons)
 	WindowAddAnchor(summonsTemplate, "bottomleft", playersTemplate, "topleft", 0, CorksTargeting.RowGap)
 
-	WindowUtils.SetWindowTitle("CorksTargetingWindow", L"Corks' Targeting")
+	WindowUtils.SetWindowTitle("CorksTargetingWindow", L"Targeting")
 	CorksTargeting.Initialized = true
 
 	-- Name filter last, and protected, so it can never break the rest of the window
@@ -120,15 +122,70 @@ function CorksTargeting.Initialize()
 	if not ok then
 		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting max distance: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
 	end
+
+	ok, err = pcall(CorksTargeting.ApplyClassicLook)
+	if not ok then
+		pcall(WindowUtils.ChatPrint, StringToWString("Corks' Targeting background: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end
+
+	-- Re-scale the whole window, as the mouse-wheel resize does: the classic art made
+	-- above only lines up once that happens. Setting the same value is ignored, so
+	-- nudge it and set it back. That would enlarge the title, so restore its scale.
+	local title = "CorksTargetingWindowChrome_UO_TitleBar_WindowTitle"
+	local titleScale = WindowGetScale(title)
+	CorksGumpArt.Rescale("CorksTargetingWindow")
+	WindowSetScale(title, titleScale)
+
+	-- Centre the title (the EC chrome shifts it 15 left to clear the close button).
+	-- Anchored to the gump itself, not the hidden title bar, so it stays put while
+	-- the gump is being scaled.
+	WindowClearAnchors(title)
+	WindowAddAnchor(title, "top", "CorksTargetingWindow", "top", 0, CorksTargeting.TitleOffsetY)
+end
+
+-- Draws the classic background and hides the inner black panel so it shows through.
+-- The size must match CorksTargetingWindow in the XML.
+function CorksTargeting.ApplyClassicLook()
+	if not CorksTargeting.ClassicBackground then
+		return
+	end
+	if CorksGumpArt.ApplyClassic("CorksTargetingWindow", CorksTargeting.ClassicBackground, 230, 404, CorksTargeting.GumpArt) then
+		WindowSetShowing("CorksTargetingWindowContentBackground", false)
+		WindowSetShowing("CorksTargetingWindowContentFrame", false)
+	end
+	CorksTargeting.ApplyClassicTextBox()
+end
+
+-- Classic white entry box with black text, drawn in the box's border holder
+-- (size must match CorksNameFilterBoxBG in the XML).
+function CorksTargeting.ApplyClassicTextBox()
+	if not CorksTargeting.ClassicTextBox then
+		return
+	end
+	local holder = "CorksNameFilterBoxBG"
+	if CorksGumpArt.Background(holder, CorksTargeting.ClassicTextBox, 170, 34, CorksTargeting.GumpArt) then
+		WindowSetShowing(holder .. "BG", false)
+		WindowSetShowing(holder .. "Frame", false)
+		TextEditBoxSetTextColor("CorksNameFilterBox", 0, 0, 0)
+		WindowSetScale(holder, WindowGetScale("CorksTargetingWindow"))
+	end
+end
+
+-- Windows created from Lua after the saved scale was applied start at normal size,
+-- so give them the gump's current scale (the mouse-wheel resize scales them too).
+function CorksTargeting.MatchWindowScale(windowName)
+	WindowSetScale(windowName, WindowGetScale("CorksTargetingWindow"))
 end
 
 function CorksTargeting.InitNameFilter(anchorTo)
-	LabelSetText("CorksNameFilterLabel", L"Target Text")
+	LabelSetText("CorksNameFilterLabel", L"Target Text:")
 	LabelSetTextColor("CorksNameFilterLabel", 255, 255, 255)
 	WindowClearAnchors("CorksNameFilterLabel")
 	WindowAddAnchor("CorksNameFilterLabel", "bottomleft", anchorTo, "topleft", 0, CorksTargeting.SectionGap)
 	WindowClearAnchors("CorksNameFilterBox")
 	WindowAddAnchor("CorksNameFilterBox", "bottomleft", "CorksNameFilterLabel", "topleft", 5, 8)
+	WindowClearAnchors("CorksNameFilterBoxBG")
+	WindowAddAnchor("CorksNameFilterBoxBG", "topleft", "CorksNameFilterBox", "topleft", -5, -5)
 
 	-- Saved value is optional; a failed load just means an empty filter
 	local ok, saved = pcall(Interface.LoadWString, "CorksTargetingNameFilter", L"")
@@ -187,6 +244,7 @@ end
 function CorksTargeting.Shutdown()
 	WindowUtils.SaveWindowPosition("CorksTargetingWindow")
 	CorksTargeting.SyncFromButtons()
+	CorksGumpArt.ReleaseAll(CorksTargeting.GumpArt)
 end
 
 function CorksTargeting.SyncFromButtons()
@@ -259,6 +317,12 @@ function CorksTargeting.SetNameFilter(text)
 	end
 end
 
+-- Clicking a checkbox's label toggles the checkbox.
+function CorksTargeting.OnCheckLabelClick()
+	local button = string.gsub(SystemData.ActiveWindow.name, "Label$", "Button")
+	ButtonSetPressedFlag(button, not ButtonGetPressedFlag(button))
+end
+
 -- Clicking the box gives it keyboard focus so typing goes into it.
 function CorksTargeting.OnNameFilterClick()
 	WindowAssignFocus("CorksNameFilterBox", true)
@@ -269,16 +333,45 @@ function CorksTargeting.OnNameFilterEnter()
 	WindowAssignFocus("CorksNameFilterBox", false)
 end
 
-function CorksTargeting.NameAllowed(name)
+-- True when the text contains any of the Target Text filters.
+function CorksTargeting.TextMatches(text)
+	if text == nil then
+		return false
+	end
+	local lower = CorksTargeting.ToWString(wstring.lower(CorksTargeting.ToWString(text)))
+	for _, filter in ipairs(CorksTargeting.NameFilters) do
+		if wstring.find(lower, filter, 1, true) then
+			return true
+		end
+	end
+	return false
+end
+
+-- Checks the name first, then every line of the mobile's tooltip (where event tags
+-- and the like are shown). Tooltip data may not have arrived yet: it is requested and
+-- kept while the mobile is around, so it can match on a later key press.
+function CorksTargeting.NameAllowed(name, mobileId)
 	if table.getn(CorksTargeting.NameFilters) == 0 then
 		return true
 	end
-	if name == nil then
+	if CorksTargeting.TextMatches(name) then
+		return true
+	end
+	if mobileId == nil then
 		return false
 	end
-	local lname = CorksTargeting.ToWString(wstring.lower(CorksTargeting.ToWString(name)))
-	for _, filter in ipairs(CorksTargeting.NameFilters) do
-		if wstring.find(lname, filter, 1, true) then
+
+	local data = WindowData.ItemProperties[mobileId]
+	if not data and not CorksTargeting.RegisteredProps[mobileId] then
+		RegisterWindowData(WindowData.ItemProperties.Type, mobileId)
+		CorksTargeting.RegisteredProps[mobileId] = true
+		data = WindowData.ItemProperties[mobileId]
+	end
+	if not data or not data.PropertiesList then
+		return false
+	end
+	for _, line in ipairs(data.PropertiesList) do
+		if CorksTargeting.TextMatches(WindowUtils.translateMarkup(line)) then
 			return true
 		end
 	end
@@ -322,6 +415,8 @@ end
 
 -- Mobiles whose name data this file asked for, so it can be released when they leave.
 CorksTargeting.RegisteredNames = {}
+-- Mobiles whose tooltip data (properties) the Target Text filter asked for.
+CorksTargeting.RegisteredProps = {}
 
 -- Every mobile the client knows about, nearest first, without you, your pets or your
 -- party. Built fresh on each key press: MobilesOnScreen's list only holds mobiles
@@ -345,6 +440,12 @@ function CorksTargeting.GetMobileList()
 		if not present[mobileId] then
 			UnregisterWindowData(WindowData.MobileName.Type, mobileId)
 			CorksTargeting.RegisteredNames[mobileId] = nil
+		end
+	end
+	for mobileId in pairs(CorksTargeting.RegisteredProps) do
+		if not present[mobileId] then
+			UnregisterWindowData(WindowData.ItemProperties.Type, mobileId)
+			CorksTargeting.RegisteredProps[mobileId] = nil
 		end
 	end
 
@@ -452,7 +553,7 @@ function CorksTargeting.TargetAllowed(mobileId)
 	end
 
 	-- Check name filter
-	local ok, allowed = pcall(CorksTargeting.NameAllowed, data.MobName)
+	local ok, allowed = pcall(CorksTargeting.NameAllowed, data.MobName, mobileId)
 	if not ok then
 		CorksTargeting.ReportError("match", allowed)
 	elseif not allowed then

@@ -1,5 +1,35 @@
 <Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
 	<Windows>
+		<!-- Checkbox row template. The font is set here in the XML (like the Target Text
+		     label) rather than from Lua, so it shows at the same size as the other text. -->
+		<Window name="CorksTargetingCheckRow">
+			<Size>
+				<AbsPoint x="180" y="24" />
+			</Size>
+			<Windows>
+				<Button name="$parentButton" inherits="UO_Default_Check_Button">
+					<Anchors>
+						<Anchor point="left" relativePoint="left">
+							<AbsPoint x="5" y="0" />
+						</Anchor>
+					</Anchors>
+				</Button>
+				<Label name="$parentLabel" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false">
+					<Size>
+						<AbsPoint x="160" y="22" />
+					</Size>
+					<Anchors>
+						<Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+							<AbsPoint x="5" y="0" />
+						</Anchor>
+					</Anchors>
+					<Color r="255" g="255" b="255" a="255" />
+					<EventHandlers>
+						<EventHandler event="OnLButtonDown" function="CorksTargeting.OnCheckLabelClick" />
+					</EventHandlers>
+				</Label>
+			</Windows>
+		</Window>
 		<Window name="CorksTargetingWindow" movable="true" layer="popup">
 			<Size>
 				<AbsPoint x="230" y="404" />
@@ -17,6 +47,13 @@
 			</EventHandlers>
 			<Windows>
 				<Window name="$parentChrome" inherits="UO_DefaultWindow">
+					<Anchors>
+						<Anchor point="topleft" relativePoint="topleft" />
+						<Anchor point="bottomright" relativePoint="bottomright" />
+					</Anchors>
+				</Window>
+				<!-- Holder for the classic gump art background (CorksTargeting.ClassicBackground) -->
+				<Window name="$parentClassicBG" handleinput="false" layer="background">
 					<Anchors>
 						<Anchor point="topleft" relativePoint="topleft" />
 						<Anchor point="bottomright" relativePoint="bottomright" />
@@ -63,30 +100,17 @@
 				</Window>
 				<!-- Name filter: a direct child of the root window (like the Chat Filter box) so
 				     the edit box gets clicks and keyboard focus. Anchored from Lua under the checkboxes. -->
-				<Label name="CorksNameFilterLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
+				<Label name="CorksNameFilterLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="180" y="22" />
 					</Size>
 				</Label>
-				<EditBox name="CorksNameFilterBox" font="UO_DefaultText_15pt" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
-					<Size>
-						<AbsPoint x="160" y="24" />
-					</Size>
-					<EventHandlers>
-						<EventHandler event="OnLButtonUp" function="CorksTargeting.OnNameFilterClick" />
-						<EventHandler event="OnKeyEnter" function="CorksTargeting.OnNameFilterEnter" />
-						<EventHandler event="OnKeyEscape" function="CorksTargeting.OnNameFilterEnter" />
-					</EventHandlers>
-				</EditBox>
-				<Window name="CorksNameFilterBoxBG" handleinput="false">
+				<!-- Border behind the edit box. Declared before it and on the overlay layer, so it is
+				     drawn above the panel background but under the typed text. Anchored from Lua. -->
+				<Window name="CorksNameFilterBoxBG" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="170" y="34" />
 					</Size>
-					<Anchors>
-						<Anchor point="topleft" relativePoint="topleft" relativeTo="CorksNameFilterBox">
-							<AbsPoint x="-5" y="-5" />
-						</Anchor>
-					</Anchors>
 					<Windows>
 						<FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
 							<Anchors>
@@ -102,8 +126,18 @@
 						</FullResizeImage>
 					</Windows>
 				</Window>
+				<EditBox name="CorksNameFilterBox" font="UO_DefaultText" taborder="1" maxchars="100" scrolling="horz" layer="overlay">
+					<Size>
+						<AbsPoint x="160" y="24" />
+					</Size>
+					<EventHandlers>
+						<EventHandler event="OnLButtonUp" function="CorksTargeting.OnNameFilterClick" />
+						<EventHandler event="OnKeyEnter" function="CorksTargeting.OnNameFilterEnter" />
+						<EventHandler event="OnKeyEscape" function="CorksTargeting.OnNameFilterEnter" />
+					</EventHandlers>
+				</EditBox>
 				<!-- Max distance: anchored from Lua under the name filter box. -->
-				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText_15pt" maxchars="64" textalign="left" handleinput="false" layer="overlay">
+				<Label name="CorksMaxDistanceLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false" layer="overlay">
 					<Size>
 						<AbsPoint x="180" y="22" />
 					</Size>
