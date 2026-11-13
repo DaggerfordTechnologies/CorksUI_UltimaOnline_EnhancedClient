@@ -1061,6 +1061,9 @@ function Interface.Update( timePassed )
 	ok, err = pcall(CorksCombatTimers.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
+	ok, err = pcall(CorksDropAlerts.CheckRewardGump, timePassed)
+	Interface.ErrorTracker(ok, err)
+
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 	

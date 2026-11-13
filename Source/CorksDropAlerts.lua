@@ -42,9 +42,9 @@ CorksDropAlerts.TitleOffsetY = 8
 CorksDropAlerts.GumpArt = {}
 
 -- Layout; must match CorksDropAlertsWindow in the XML. The window is sized to fit
--- the rows in use: ROWS_TOP + rows * ROW_HEIGHT + BOTTOM_HEIGHT (580 with 10 rows).
+-- the rows in use: ROWS_TOP + rows * ROW_HEIGHT + BOTTOM_HEIGHT (602 with 10 rows).
 CorksDropAlerts.WIDTH = 420
-CorksDropAlerts.ROWS_TOP = 138
+CorksDropAlerts.ROWS_TOP = 160
 CorksDropAlerts.ROW_HEIGHT = 24
 CorksDropAlerts.BOTTOM_HEIGHT = 202
 CorksDropAlerts.TEXTBOX_WIDTH = 380
@@ -87,6 +87,22 @@ CorksDropAlerts.ItemScanTick = 0
 -- objectId -> lower-case name, so names are only looked up once
 CorksDropAlerts.ItemNames = {}
 
+-- Event reward points, read from the event vendor's gump whenever it's open
+-- (e.g. Treasures of the Unhallowed, gump 9313). Found by the cliloc of the
+-- "Your Reward Points" line, whose parameter is the points, so any event
+-- vendor using the same gump works.
+CorksDropAlerts.REWARD_POINTS_TID = 1159535
+-- "Points from this event will expire: <date>"
+CorksDropAlerts.REWARD_EXPIRE_TID = 1159536
+CorksDropAlerts.REWARD_CHECK_SECONDS = 0.5
+CorksDropAlerts.RewardTick = 0
+-- Saved: the last points seen, which event, and when they expire (nil until seen)
+CorksDropAlerts.RewardPoints = nil
+CorksDropAlerts.RewardEvent = ""
+CorksDropAlerts.RewardExpires = ""
+-- Points at the first reading this session, for "+10 this session"
+CorksDropAlerts.RewardStart = nil
+
 ----------------------------------------------------------------
 -- Saved messages
 ----------------------------------------------------------------
@@ -98,6 +114,13 @@ function CorksDropAlerts.Load()
 	CorksDropAlerts.Loaded = true
 
 	CorksDropAlerts.SetItemText(Interface.LoadWString("CorksDropAlertsItemName", L""))
+
+	local points = Interface.LoadNumber("CorksDropAlertsRewardPoints", -1)
+	if points >= 0 then
+		CorksDropAlerts.RewardPoints = points
+	end
+	CorksDropAlerts.RewardEvent = WStringToString(Interface.LoadWString("CorksDropAlertsRewardEvent", L""))
+	CorksDropAlerts.RewardExpires = WStringToString(Interface.LoadWString("CorksDropAlertsRewardExpires", L""))
 
 	local count = Interface.LoadNumber("CorksDropAlertsCount", -1)
 	if count < 0 then
@@ -452,6 +475,7 @@ function CorksDropAlerts.Refresh()
 
 	D.UpdateTotal()
 	D.UpdateLastDrop()
+	D.UpdateRewardPoints()
 
 	local classicChecks = D.CheckArt ~= nil
 	for i = 1, D.MAX_ROWS do
@@ -792,6 +816,111 @@ function CorksDropAlerts.ScanBackpack()
 	end
 	CorksDropAlerts.ItemCount = count
 	CorksDropAlerts.UpdateItemCount()
+end
+
+----------------------------------------------------------------
+-- Event reward points
+----------------------------------------------------------------
+
+-- A gump label parameter (wstring or string) as a plain string
+function CorksDropAlerts.ParamText(value)
+	if type(value) == "string" then
+		return value
+	end
+	local ok, text = pcall(WStringToString, value)
+	if ok and type(text) == "string" then
+		return text
+	end
+	return nil
+end
+
+-- Called every frame from Interface's update loop, so the points are read even
+-- while the Event Drops window is closed. Looks through the open server gumps
+-- for the "Your Reward Points" line.
+function CorksDropAlerts.CheckRewardGump(timePassed)
+	local D = CorksDropAlerts
+	D.RewardTick = D.RewardTick + (timePassed or 0)
+	if D.RewardTick < D.REWARD_CHECK_SECONDS then
+		return
+	end
+	D.RewardTick = 0
+	if not GumpData or type(GumpData.Gumps) ~= "table" then
+		return
+	end
+	for _, gump in pairs(GumpData.Gumps) do
+		if type(gump) == "table" and type(gump.Labels) == "table" then
+			local points, expires
+			for _, label in pairs(gump.Labels) do
+				if type(label) == "table" and type(label.tidParms) == "table" then
+					local param = D.ParamText(label.tidParms[1])
+					if label.tid == D.REWARD_POINTS_TID and param then
+						-- "1,250" -> 1250
+						points = tonumber((string.gsub(param, "[^%d]", "")))
+					elseif label.tid == D.REWARD_EXPIRE_TID and param then
+						-- "2027-02-01 04:00:00 EST" -> "2027-02-01"
+						expires = string.match(param, "^(%S+)") or param
+					end
+				end
+			end
+			if points then
+				-- The gump's title line is the event's name
+				local title = gump.Labels[1]
+				local eventName = title and type(title.tidParms) == "table" and D.ParamText(title.tidParms[1]) or ""
+				D.RecordRewardPoints(points, eventName, expires or "")
+				return
+			end
+		end
+	end
+end
+
+function CorksDropAlerts.RecordRewardPoints(points, eventName, expires)
+	local D = CorksDropAlerts
+	D.Load()
+	-- The first reading this session (or from a different event) is the start
+	-- the session's gain is measured from
+	if D.RewardStart == nil or eventName ~= D.RewardEvent then
+		D.RewardStart = points
+	end
+	if points == D.RewardPoints and eventName == D.RewardEvent and expires == D.RewardExpires then
+		D.RewardSeen = true
+		return
+	end
+	D.RewardPoints = points
+	D.RewardEvent = eventName
+	D.RewardExpires = expires
+	D.RewardSeen = true
+	Interface.SaveNumber("CorksDropAlertsRewardPoints", points)
+	Interface.SaveWString("CorksDropAlertsRewardEvent", StringToWString(eventName))
+	Interface.SaveWString("CorksDropAlertsRewardExpires", StringToWString(expires))
+	D.UpdateRewardPoints()
+end
+
+-- "Reward points: 55 (+10 this session), expire 2027-02-01"
+function CorksDropAlerts.UpdateRewardPoints()
+	local D = CorksDropAlerts
+	if not D.Initialized or not DoesWindowNameExist("CorksDropAlertsWindow") then
+		return
+	end
+	local label = "CorksDropAlertsWindowRewardPoints"
+	if not D.RewardPoints then
+		D.SetLabel(label, L"Reward points: open the event vendor to read them", D.COLOR_OFF)
+		return
+	end
+	local text = "Reward points: " .. D.RewardPoints
+	if not D.RewardSeen then
+		text = text .. " (at last visit)"
+	elseif D.RewardStart and D.RewardPoints ~= D.RewardStart then
+		local gain = D.RewardPoints - D.RewardStart
+		local sign = ""
+		if gain > 0 then
+			sign = "+"
+		end
+		text = text .. " (" .. sign .. gain .. " this session)"
+	end
+	if D.RewardExpires ~= "" then
+		text = text .. ", expire " .. D.RewardExpires
+	end
+	D.SetLabel(label, StringToWString(text), D.COLOR_COUNT)
 end
 
 function CorksDropAlerts.UpdateItemCount()

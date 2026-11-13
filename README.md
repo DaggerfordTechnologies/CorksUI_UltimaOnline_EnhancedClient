@@ -158,6 +158,7 @@ The default UI shows the artifact graphic over your head when certain game messa
 - Each saved message is a row, with its own count on the right. When a game message containing a checked one arrives, the artifact graphic shows, the drop is counted, and the row and total flash for a moment.
 - The window grows and shrinks to fit the messages in it.
 - **Event Item Tag:** type text that's in your event items' names and press Enter, for example `Unhallowed`. Separate several with commas. The window shows how many matching items are in your backpack, including bags inside it, and rechecks every few seconds while it's open. A stack counts as its amount. The total at the top then adds these items to the drops (its caption reads "drops + event items"); **Reset Count** clears only the drops. Bags you haven't opened since logging in may not be counted. Clear the box and press Enter to stop counting.
+- **Reward points:** open the event vendor (for example the Treasures of the Unhallowed vendor) and the line under the header shows your reward points, how much they've changed this session, and when they expire. The points are read from the vendor's "Your Reward Points" line, so they only update while that gump is open, even if the Event Drops window is closed. The last value is saved and shown as "(at last visit)" until you open the vendor again.
 - Type part of an event's drop message in the box at the bottom and press Enter to add it (up to 10 messages). Capitals don't matter.
 - Uncheck a message to turn it off, or uncheck it and press **Remove Unchecked** to delete it.
 - The list starts with "You recover an artifact bearing the mark of the Unhallowed".
@@ -245,6 +246,7 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksDropAlertsWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
 | `CorksDropAlertsCount`, `CorksDropAlertsText<n>`, `CorksDropAlertsOn<n>` | Event Drops messages (checked or not) |
 | `CorksDropAlertsItemName` | Event Drops backpack item name text |
+| `CorksDropAlertsRewardPoints`, `CorksDropAlertsRewardEvent`, `CorksDropAlertsRewardExpires` | Event Drops reward points last read from the event vendor |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
