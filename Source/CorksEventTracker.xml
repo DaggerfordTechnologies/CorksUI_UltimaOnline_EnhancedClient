@@ -2,15 +2,15 @@
   <Windows>
 
     <!-- Classic art button: art drawn into $parentArt from Lua, text beside it -->
-    <Window name="CorksEventDropsClassicButton">
+    <Window name="CorksEventTrackerClassicButton">
       <Size>
         <AbsPoint x="170" y="26" />
       </Size>
       <EventHandlers>
-        <EventHandler event="OnLButtonDown" function="CorksEventDrops.OnClassicButtonDown" />
-        <EventHandler event="OnLButtonUp" function="CorksEventDrops.OnClassicButtonUp" />
-        <EventHandler event="OnMouseOver" function="CorksEventDrops.OnClassicButtonOver" />
-        <EventHandler event="OnMouseOverEnd" function="CorksEventDrops.OnClassicButtonOverEnd" />
+        <EventHandler event="OnLButtonDown" function="CorksEventTracker.OnClassicButtonDown" />
+        <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnClassicButtonUp" />
+        <EventHandler event="OnMouseOver" function="CorksEventTracker.OnClassicButtonOver" />
+        <EventHandler event="OnMouseOverEnd" function="CorksEventTracker.OnClassicButtonOverEnd" />
       </EventHandlers>
       <Windows>
         <Window name="$parentArt" handleinput="false">
@@ -35,10 +35,10 @@
       </Windows>
     </Window>
 
-    <!-- Size must match CorksEventDrops.WIDTH / HEIGHT -->
-    <Window name="CorksEventDropsWindow" movable="true" layer="popup">
+    <!-- Size must match CorksEventTracker.WIDTH / HEIGHT -->
+    <Window name="CorksEventTrackerWindow" movable="true" layer="popup">
       <Size>
-        <AbsPoint x="420" y="284" />
+        <AbsPoint x="420" y="304" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
@@ -46,10 +46,10 @@
         </Anchor>
       </Anchors>
       <EventHandlers>
-        <EventHandler event="OnInitialize" function="CorksEventDrops.Initialize" />
-        <EventHandler event="OnShutdown" function="CorksEventDrops.Shutdown" />
-        <EventHandler event="OnUpdate" function="CorksEventDrops.OnUpdate" />
-        <EventHandler event="OnRButtonUp" function="CorksEventDrops.OnClose" />
+        <EventHandler event="OnInitialize" function="CorksEventTracker.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksEventTracker.Shutdown" />
+        <EventHandler event="OnUpdate" function="CorksEventTracker.OnUpdate" />
+        <EventHandler event="OnRButtonUp" function="CorksEventTracker.OnClose" />
         <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
       </EventHandlers>
       <Windows>
@@ -59,7 +59,7 @@
             <Anchor point="bottomright" relativePoint="bottomright" />
           </Anchors>
         </Window>
-        <!-- Holder for the classic gump art background (CorksEventDrops.ClassicBackground) -->
+        <!-- Holder for the classic gump art background (CorksEventTracker.ClassicBackground) -->
         <Window name="$parentClassicBG" handleinput="false" layer="background">
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft" />
@@ -67,15 +67,29 @@
           </Anchors>
         </Window>
 
+        <!-- Event name subtitle under the title, from the event vendor's gump
+             (blank until the vendor has been visited) -->
+        <Label name="$parentEventName" font="UO_DefaultText" maxchars="64" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="384" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="top" relativePoint="top">
+              <AbsPoint x="0" y="34" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+
         <!-- Header: artifact banner on the left, session total on the right -->
-        <!-- Texture set from Lua (CorksEventDrops.Initialize), as CenterScreenText does -->
+        <!-- Texture set from Lua (CorksEventTracker.Initialize), as CenterScreenText does -->
         <DynamicImage name="$parentBanner" handleinput="false">
           <Size>
             <AbsPoint x="154" y="56" />
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="18" y="38" />
+              <AbsPoint x="18" y="58" />
             </Anchor>
           </Anchors>
         </DynamicImage>
@@ -87,7 +101,7 @@
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="44" />
+              <AbsPoint x="-22" y="64" />
             </Anchor>
           </Anchors>
           <Color r="220" g="220" b="220" a="255" />
@@ -98,7 +112,7 @@
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="62" />
+              <AbsPoint x="-22" y="82" />
             </Anchor>
           </Anchors>
           <Color r="255" g="200" b="50" a="255" />
@@ -110,7 +124,7 @@
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="18" y="106" />
+              <AbsPoint x="18" y="126" />
             </Anchor>
           </Anchors>
         </HorizontalResizeImage>
@@ -122,7 +136,7 @@
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="18" y="114" />
+              <AbsPoint x="18" y="134" />
             </Anchor>
           </Anchors>
           <Color r="255" g="200" b="50" a="255" />
@@ -134,7 +148,7 @@
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="18" y="134" />
+              <AbsPoint x="18" y="154" />
             </Anchor>
           </Anchors>
           <Color r="160" g="160" b="160" a="255" />
@@ -146,7 +160,7 @@
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="114" />
+              <AbsPoint x="-22" y="134" />
             </Anchor>
           </Anchors>
           <Color r="160" g="160" b="160" a="255" />
@@ -158,7 +172,7 @@
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="134" />
+              <AbsPoint x="-22" y="154" />
             </Anchor>
           </Anchors>
           <Color r="160" g="160" b="160" a="255" />
@@ -183,14 +197,34 @@
             </Anchor>
           </Anchors>
           <EventHandlers>
-            <EventHandler event="OnLButtonUp" function="CorksEventDrops.OnReset" />
+            <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnReset" />
           </EventHandlers>
         </Button>
-        <!-- Classic version of the button (CorksEventDrops.ClassicResetButton) -->
-        <Window name="$parentResetClassic" inherits="CorksEventDropsClassicButton">
+        <!-- Classic version of the button (CorksEventTracker.ClassicResetButton) -->
+        <Window name="$parentResetClassic" inherits="CorksEventTrackerClassicButton">
           <Anchors>
             <Anchor point="bottomleft" relativePoint="bottomleft">
               <AbsPoint x="18" y="-88" />
+            </Anchor>
+          </Anchors>
+        </Window>
+
+        <!-- Reset Event: clears the tag, event name, reward points and count -->
+        <Button name="$parentResetEventButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-84" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnResetEvent" />
+          </EventHandlers>
+        </Button>
+        <!-- Classic version of the button (CorksEventTracker.ClassicResetEventButton) -->
+        <Window name="$parentResetEventClassic" inherits="CorksEventTrackerClassicButton">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-88" />
             </Anchor>
           </Anchors>
         </Window>
@@ -217,12 +251,12 @@
             </Anchor>
           </Anchors>
           <EventHandlers>
-            <EventHandler event="OnLButtonUp" function="CorksEventDrops.OnItemTextClick" />
-            <EventHandler event="OnKeyEnter" function="CorksEventDrops.OnItemTextEnter" />
-            <EventHandler event="OnKeyEscape" function="CorksEventDrops.OnItemTextEscape" />
+            <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnItemTextClick" />
+            <EventHandler event="OnKeyEnter" function="CorksEventTracker.OnItemTextEnter" />
+            <EventHandler event="OnKeyEscape" function="CorksEventTracker.OnItemTextEscape" />
           </EventHandlers>
         </EditBox>
-        <!-- Size must match CorksEventDrops.TEXTBOX_WIDTH / TEXTBOX_HEIGHT -->
+        <!-- Size must match CorksEventTracker.TEXTBOX_WIDTH / TEXTBOX_HEIGHT -->
         <Window name="$parentItemTextBoxBG" handleinput="false">
           <Size>
             <AbsPoint x="380" y="30" />

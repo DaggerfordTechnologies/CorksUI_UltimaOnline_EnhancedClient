@@ -157,7 +157,8 @@ The default UI shows the artifact graphic over your head when certain game messa
 - **Event Item Tag:** type text that appears in the event's drop messages and in its items' names, for example `Unhallowed`, and press Enter. Separate several with commas. Capitals don't matter. Clear the box and press Enter to stop counting.
 - **Artifact Count:** when a game message containing a tag arrives, the artifact graphic shows, the drop is counted, and the count flashes for a moment. How long ago the last drop was shows at the right of the reward points' expiry line, and your drops per hour at the right of the reward points line. The rate counts drops since you logged in or reloaded the UI (or pressed **Reset Count**, so press it when you start a farming run), not items found in the backpack, and shows "--" for the first 5 minutes. The count is for this session (it starts again after logging in or reloading the UI); **Reset Count** sets it back to 0.
 - While the count is 0, the window checks your backpack every few seconds, including bags inside it, and starts the count from the items with a tag in their name, so drops from before the count started aren't missed. A stack counts as its amount. Once the count is above 0, only drop messages add to it. Bags you haven't opened since logging in may not be counted.
-- **Reward points:** open the event vendor (for example the Treasures of the Unhallowed vendor) and the lines under the header show your reward points, how much they've changed this session, and when they expire. The points are read from the vendor's "Your Reward Points" line, so they only update while that gump is open, even if the Event Tracker window is closed. The last value is saved and shown as "(last visit)" until you open the vendor again.
+- **Reward points:** open the event vendor (for example the Treasures of the Unhallowed vendor) and the lines under the header show your reward points, how much they've changed this session, and when they expire. The points are read from the vendor's "Your Reward Points" line, so they only update while that gump is open, even if the Event Tracker window is closed. The last value is saved and shown as "(last visit)" until you open the vendor again. The event's name, read from the same gump, shows under the window's title (blank until you've visited the vendor).
+- **Reset Event:** starts over for a new event. It clears the Event Item Tag, the event name, the saved reward points and the Artifact Count (with the drops per hour and last drop).
 
 Only game messages count, so a player typing the tag won't show the graphic. Any game message containing the tag counts as a drop, so pick text that only appears in drop messages and item names. Drops that use one of the default UI's own artifact messages are counted, but the graphic isn't shown a second time.
 
@@ -220,7 +221,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6105 | Chat Filter | Corks Addons | `CorksChatFilter.Toggle()` |
 | 6106 | Consumable Timers | Corks Addons | `CorksTimers.Toggle()` |
 | 6107 | Combat Timers | Corks Addons | `CorksCombatTimers.Toggle()` |
-| 6108 | Event Tracker | Corks Addons | `CorksEventDrops.Toggle()` |
+| 6108 | Event Tracker | Corks Addons | `CorksEventTracker.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
@@ -239,9 +240,9 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksChatFilterEnabled` | Chat Filter on/off |
 | `CorksChatFilterPreset<cliloc>` | Chat Filter starting rows (checked or not) |
 | `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
-| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksEventDropsWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
-| `CorksEventDropsItemName` | Event Tracker Event Item Tag |
-| `CorksEventDropsRewardPoints`, `CorksEventDropsRewardEvent`, `CorksEventDropsRewardExpires` | Event Tracker reward points last read from the event vendor |
+| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksEventTrackerWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
+| `CorksEventTrackerItemName` | Event Tracker Event Item Tag |
+| `CorksEventTrackerRewardPoints`, `CorksEventTrackerRewardEvent`, `CorksEventTrackerRewardExpires` | Event Tracker reward points last read from the event vendor |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
@@ -262,8 +263,8 @@ CorksUI/
     ├── CorksTimers.xml        Item Timers window (9 rows defined up front)
     ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
     ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
-    ├── CorksEventDrops.lua    Event Tracker: artifact graphic and session count for an Event Item Tag, reward points
-    ├── CorksEventDrops.xml    Event Tracker window
+    ├── CorksEventTracker.lua  Event Tracker: artifact graphic and session count for an Event Item Tag, reward points
+    ├── CorksEventTracker.xml  Event Tracker window
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
     └── MapWindow.lua          Map Window changes
