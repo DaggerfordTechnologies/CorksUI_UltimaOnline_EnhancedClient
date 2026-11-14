@@ -4,7 +4,7 @@
 
 CorksEventDrops = {}
 
--- The Event Drops window. One setting drives it: the Event Item Tag, text that's
+-- The Event Tracker window. One setting drives it: the Event Item Tag, text that's
 -- in the event's drop messages and in its items' names (e.g. "Unhallowed";
 -- several can be given, separated by commas). When a game message containing a
 -- tag arrives, the artifact graphic shows over your head and the drop is
@@ -50,11 +50,18 @@ CorksEventDrops.Total = 0
 CorksEventDrops.Loaded = false
 -- Interface.TimeSinceLogin when the last drop arrived, nil before the first one
 CorksEventDrops.LastDropTime = nil
+-- Time since the "Last drop" and drops-per-hour text was redrawn
+CorksEventDrops.LastDropTick = 0
+-- Drops per hour: drops that came from game messages (not the backpack check)
+-- since SessionStart, the Interface.TimeSinceLogin when counting started (UI
+-- load, i.e. login or a reload, or Reset Count). Shown once counting has run
+-- RATE_MIN_SECONDS, so one early drop doesn't read as a huge rate.
+CorksEventDrops.SessionDrops = 0
+CorksEventDrops.SessionStart = 0
+CorksEventDrops.RATE_MIN_SECONDS = 300
 -- Whether the count and banner are pulsing, and for how much longer
 CorksEventDrops.Flashing = false
 CorksEventDrops.FlashLeft = 0
--- Time since the "Last drop" line was redrawn
-CorksEventDrops.LastDropTick = 0
 
 -- The Event Item Tag. ItemText is what the user typed (saved); ItemPatterns is
 -- it split at commas, lower-case. The backpack is rechecked every
@@ -108,7 +115,7 @@ function CorksEventDrops.Load()
 
 end
 
--- Event Drops used to be called CorksDropAlerts. Renames its saved settings
+-- Event Tracker used to be called CorksDropAlerts. Renames its saved settings
 -- (tag, reward points, open state, scale, transparency) and saved window
 -- position to the CorksEventDrops names, so nothing is lost. Settings of the
 -- old drop message list (CorksDropAlertsCount, ...Text<n>, ...On<n>), which the
@@ -190,6 +197,7 @@ function CorksEventDrops.OnChatText()
 	if CorksEventDrops.NameMatches(text) then
 		CorksEventDrops.Total = CorksEventDrops.Total + 1
 		CorksEventDrops.LastDropTime = Interface.TimeSinceLogin
+		CorksEventDrops.SessionDrops = CorksEventDrops.SessionDrops + 1
 		if not CorksEventDrops.DEFAULT_UI_ARTIFACT_IDS[SystemData.TextID] then
 			CenterScreenText.SendCenterScreenTexture("artifact")
 		end
@@ -206,7 +214,7 @@ function CorksEventDrops.Initialize()
 	SnapUtils.SnappableWindows["CorksEventDropsWindow"] = true
 	WindowUtils.RestoreWindowPosition("CorksEventDropsWindow", false)
 	WindowUtils.LoadScale("CorksEventDropsWindow")
-	WindowUtils.SetWindowTitle("CorksEventDropsWindow", L"Event Drops")
+	WindowUtils.SetWindowTitle("CorksEventDropsWindow", L"Event Tracker")
 
 	LabelSetText("CorksEventDropsWindowItemLabel", L"Event Item Tag:")
 	ButtonSetText("CorksEventDropsWindowResetButton", L"Reset Count")
@@ -239,7 +247,7 @@ function CorksEventDrops.Shutdown()
 end
 
 function CorksEventDrops.ReportArtError(err)
-	pcall(WindowUtils.ChatPrint, StringToWString("Event Drops art: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	pcall(WindowUtils.ChatPrint, StringToWString("Event Tracker art: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
 end
 
 ----------------------------------------------------------------
@@ -370,6 +378,13 @@ function CorksEventDrops.SetLabel(label, text, color)
 	LabelSetText(label, text)
 end
 
+-- The header count. Event items already in the backpack are added to it only
+-- while it's 0 (see ScanBackpack), so a drop is never counted twice.
+function CorksEventDrops.UpdateTotal()
+	LabelSetText("CorksEventDropsWindowTotalCaption", L"Artifact Count:")
+	LabelSetText("CorksEventDropsWindowTotal", towstring(CorksEventDrops.Total))
+end
+
 function CorksEventDrops.FormatAgo(seconds)
 	seconds = math.max(0, math.floor(seconds))
 	if seconds < 60 then
@@ -380,28 +395,30 @@ function CorksEventDrops.FormatAgo(seconds)
 	return string.format("%dh %02dm ago", math.floor(seconds / 3600), math.floor(seconds / 60) % 60)
 end
 
--- The header count. Event items already in the backpack are added to it only
--- while it's 0 (see ScanBackpack), so a drop is never counted twice.
-function CorksEventDrops.UpdateTotal()
-	local total = "CorksEventDropsWindowTotal"
-	LabelSetText("CorksEventDropsWindowTotalCaption", L"Event Item Count:")
-	LabelSetText(total, towstring(CorksEventDrops.Total))
-	-- Fit the count's width to its digits, so the caption (anchored to its left
-	-- edge) sits right next to it. Keeps the XML width if it can't be measured.
-	local ok, width = pcall(LabelGetTextDimensions, total)
-	if ok and type(width) == "number" and width > 0 then
-		WindowSetDimensions(total, math.ceil(width) + 2, 26)
+-- "Last drop: 4m ago" at the right of the expires line; "No drops yet" before the first drop
+-- "4.2 / hr" at the right of the reward points line
+function CorksEventDrops.UpdateDropRate()
+	local D = CorksEventDrops
+	local elapsed = (Interface.TimeSinceLogin or 0) - D.SessionStart
+	local text = "-- / hr"
+	if elapsed >= D.RATE_MIN_SECONDS then
+		local rate = D.SessionDrops * 3600 / elapsed
+		if rate < 10 then
+			text = string.format("%.1f / hr", rate)
+		else
+			text = string.format("%d / hr", math.floor(rate + 0.5))
+		end
 	end
+	LabelSetText("CorksEventDropsWindowDropRate", StringToWString(text))
 end
 
 function CorksEventDrops.UpdateLastDrop()
-	local text = "No drops yet"
-	if #CorksEventDrops.ItemPatterns == 0 then
-		text = "Set an Event Item Tag below"
-	elseif CorksEventDrops.LastDropTime then
-		text = "Last drop: " .. CorksEventDrops.FormatAgo(Interface.TimeSinceLogin - CorksEventDrops.LastDropTime)
+	local text = L"No drops yet"
+	if CorksEventDrops.LastDropTime then
+		text = StringToWString("Last drop: "
+			.. CorksEventDrops.FormatAgo(Interface.TimeSinceLogin - CorksEventDrops.LastDropTime))
 	end
-	LabelSetText("CorksEventDropsWindowLastDrop", StringToWString(text))
+	LabelSetText("CorksEventDropsWindowLastDrop", text)
 end
 
 function CorksEventDrops.Refresh()
@@ -410,6 +427,7 @@ function CorksEventDrops.Refresh()
 	end
 	CorksEventDrops.UpdateTotal()
 	CorksEventDrops.UpdateLastDrop()
+	CorksEventDrops.UpdateDropRate()
 	CorksEventDrops.UpdateRewardPoints()
 end
 
@@ -466,6 +484,7 @@ function CorksEventDrops.OnUpdate(timePassed)
 		CorksEventDrops.LastDropTick = 0
 		if CorksEventDrops.Initialized then
 			CorksEventDrops.UpdateLastDrop()
+			CorksEventDrops.UpdateDropRate()
 		end
 	end
 
@@ -480,6 +499,9 @@ end
 
 function CorksEventDrops.OnReset()
 	CorksEventDrops.Total = 0
+	-- Starts the drops-per-hour over too, e.g. at the start of a farming run
+	CorksEventDrops.SessionDrops = 0
+	CorksEventDrops.SessionStart = Interface.TimeSinceLogin or 0
 	CorksEventDrops.Refresh()
 end
 
@@ -647,7 +669,7 @@ function CorksEventDrops.ParamText(value)
 end
 
 -- Called every frame from Interface's update loop, so the points are read even
--- while the Event Drops window is closed. Looks through the open server gumps
+-- while the Event Tracker window is closed. Looks through the open server gumps
 -- for the "Your Reward Points" line.
 function CorksEventDrops.CheckRewardGump(timePassed)
 	local D = CorksEventDrops
@@ -722,7 +744,7 @@ function CorksEventDrops.UpdateRewardPoints()
 	end
 	LabelSetText(expiresLabel, expires)
 	if not D.RewardPoints then
-		D.SetLabel(label, L"Reward points: open the event vendor to read them", D.COLOR_OFF)
+		D.SetLabel(label, L"Reward points: visit the event vendor", D.COLOR_OFF)
 		return
 	end
 	local text = "Reward points: " .. D.RewardPoints
@@ -739,7 +761,7 @@ function CorksEventDrops.UpdateRewardPoints()
 	D.SetLabel(label, StringToWString(text), D.COLOR_COUNT)
 end
 
--- The window only opens when the user turns it on with the Event Drops action.
+-- The window only opens when the user turns it on with the Event Tracker action.
 -- Whether it's open is saved, so it opens again at login if it was open when the
 -- client closed (Interface.lua reads the setting when it creates the window).
 -- Drops are matched and counted while it's closed.
@@ -769,7 +791,7 @@ function CorksEventDrops.SetOpen(open)
 	end
 end
 
--- Event Drops used to be called CorksDropAlerts. Hotbar buttons copy the action's
+-- Event Tracker used to be called CorksDropAlerts. Hotbar buttons copy the action's
 -- text when they're placed, so a button made before the rename still runs
 -- "script CorksDropAlerts.Toggle()"; this keeps those working. Once every Event
 -- Drops hotbar button has been dragged on again from the Actions window, this

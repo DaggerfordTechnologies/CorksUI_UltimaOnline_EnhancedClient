@@ -710,7 +710,7 @@ function Interface.CreateWindows()
 	CreateWindow( "CorksDurabilityGump", Interface.LoadBoolean("CorksDurabilityGumpOpen", false))
 	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
 	CreateWindow( "CorksCombatTimers", Interface.LoadBoolean("CorksCombatTimersOpen", false))
-	-- Event Drops was renamed from CorksDropAlerts; carry its saved settings over first
+	-- Event Tracker was renamed from CorksDropAlerts; carry its saved settings over first
 	local migrated, migrateErr = pcall(CorksEventDrops.MigrateSettings)
 	Interface.ErrorTracker(migrated, migrateErr)
 	CreateWindow( "CorksEventDropsWindow", Interface.LoadBoolean("CorksEventDropsWindowOpen", false))

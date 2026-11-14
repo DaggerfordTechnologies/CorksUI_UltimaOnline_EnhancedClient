@@ -79,41 +79,29 @@
             </Anchor>
           </Anchors>
         </DynamicImage>
-        <!-- "Event Item Count: 12" on one line: the count sits at the right edge and
-             is sized to its digits from Lua (CorksEventDrops.UpdateTotal), and the
-             caption is placed just left of it -->
-        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="right" wordwrap="false" handleinput="false">
-          <Size>
-            <AbsPoint x="60" y="26" />
-          </Size>
-          <Anchors>
-            <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="50" />
-            </Anchor>
-          </Anchors>
-          <Color r="255" g="200" b="50" a="255" />
-        </Label>
-        <Label name="$parentTotalCaption" font="UO_DefaultText" maxchars="64" textalign="right" wordwrap="false" handleinput="false">
-          <Size>
-            <AbsPoint x="190" y="18" />
-          </Size>
-          <Anchors>
-            <Anchor point="left" relativePoint="right" relativeTo="$parentTotal">
-              <AbsPoint x="-6" y="0" />
-            </Anchor>
-          </Anchors>
-          <Color r="220" g="220" b="220" a="255" />
-        </Label>
-        <Label name="$parentLastDrop" font="UO_DefaultText" maxchars="64" textalign="right" handleinput="false">
+        <!-- Right column, centered beside the banner: "Artifact Count:" with the
+             count under it -->
+        <Label name="$parentTotalCaption" font="UO_DefaultText" maxchars="64" textalign="center" wordwrap="false" handleinput="false">
           <Size>
             <AbsPoint x="200" y="18" />
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="82" />
+              <AbsPoint x="-22" y="44" />
             </Anchor>
           </Anchors>
-          <Color r="160" g="160" b="160" a="255" />
+          <Color r="220" g="220" b="220" a="255" />
+        </Label>
+        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="200" y="26" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="62" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
         </Label>
 
         <HorizontalResizeImage name="$parentTopRule" inherits="UO_Default_Horizontal_Rule" handleinput="false">
@@ -147,6 +135,30 @@
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
               <AbsPoint x="18" y="134" />
+            </Anchor>
+          </Anchors>
+          <Color r="160" g="160" b="160" a="255" />
+        </Label>
+        <!-- "4.2 / hr", on the reward points line at the right -->
+        <Label name="$parentDropRate" font="UO_DefaultText" maxchars="32" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="100" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="114" />
+            </Anchor>
+          </Anchors>
+          <Color r="160" g="160" b="160" a="255" />
+        </Label>
+        <!-- "Last drop: 4m ago", on the expires line at the right -->
+        <Label name="$parentLastDrop" font="UO_DefaultText" maxchars="64" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="190" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="134" />
             </Anchor>
           </Anchors>
           <Color r="160" g="160" b="160" a="255" />
