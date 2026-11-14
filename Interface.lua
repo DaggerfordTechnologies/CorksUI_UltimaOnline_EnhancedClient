@@ -710,7 +710,10 @@ function Interface.CreateWindows()
 	CreateWindow( "CorksDurabilityGump", Interface.LoadBoolean("CorksDurabilityGumpOpen", false))
 	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
 	CreateWindow( "CorksCombatTimers", Interface.LoadBoolean("CorksCombatTimersOpen", false))
-	CreateWindow( "CorksDropAlertsWindow", Interface.LoadBoolean("CorksDropAlertsWindowOpen", false))
+	-- Event Tracker was renamed (from CorksDropAlerts, then CorksEventDrops); carry its saved settings over first
+	local migrated, migrateErr = pcall(CorksEventTracker.MigrateSettings)
+	Interface.ErrorTracker(migrated, migrateErr)
+	CreateWindow( "CorksEventTrackerWindow", Interface.LoadBoolean("CorksEventTrackerWindowOpen", false))
 	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
 	Interface.CreateTCTools()
 	
@@ -1059,6 +1062,12 @@ function Interface.Update( timePassed )
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksCombatTimers.OnUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksEventTracker.CheckRewardGump, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksBuffRestore.Update, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
@@ -1796,7 +1805,7 @@ function Interface.NewChatText()
 	ok, err = pcall(CorksCombatTimers.OnChatText)
 	Interface.ErrorTracker(ok, err)
 
-	ok, err = pcall(CorksDropAlerts.OnChatText)
+	ok, err = pcall(CorksEventTracker.OnChatText)
 	Interface.ErrorTracker(ok, err)
 
 	-- A filtered message still goes through every parser here (timers, buffs, spells);
@@ -1901,8 +1910,14 @@ end
 
 -- Chat-line commands the server doesn't know, handled here instead of being sent.
 Interface.ChatAliases = {
-	["/reloadui"] = function() InterfaceCore.ReloadUI() end,
+	["/reloadui"] = function()
+		-- Keep the buff icons through the reload (CorksBuffRestore)
+		local ok, err = pcall(CorksBuffRestore.Save)
+		Interface.ErrorTracker(ok, err)
+		InterfaceCore.ReloadUI()
+	end,
 	["/gumppreview"] = function() CorksGumpPreview.Toggle() end,
+	["/gumpdump"] = function() CorksGumpDump.Run() end,
 }
 
 -- Every line typed in chat is sent with SendChat, whichever Enter handler the chat

@@ -1,0 +1,288 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- Classic art button: art drawn into $parentArt from Lua, text beside it -->
+    <Window name="CorksEventTrackerClassicButton">
+      <Size>
+        <AbsPoint x="170" y="26" />
+      </Size>
+      <EventHandlers>
+        <EventHandler event="OnLButtonDown" function="CorksEventTracker.OnClassicButtonDown" />
+        <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnClassicButtonUp" />
+        <EventHandler event="OnMouseOver" function="CorksEventTracker.OnClassicButtonOver" />
+        <EventHandler event="OnMouseOverEnd" function="CorksEventTracker.OnClassicButtonOverEnd" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentArt" handleinput="false">
+          <Size>
+            <AbsPoint x="32" y="26" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left" />
+          </Anchors>
+        </Window>
+        <Label name="$parentText" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="134" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="36" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+      </Windows>
+    </Window>
+
+    <!-- Size must match CorksEventTracker.WIDTH / HEIGHT -->
+    <Window name="CorksEventTrackerWindow" movable="true" layer="popup">
+      <Size>
+        <AbsPoint x="420" y="304" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="0" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksEventTracker.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksEventTracker.Shutdown" />
+        <EventHandler event="OnUpdate" function="CorksEventTracker.OnUpdate" />
+        <EventHandler event="OnRButtonUp" function="CorksEventTracker.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+        <!-- Holder for the classic gump art background (CorksEventTracker.ClassicBackground) -->
+        <Window name="$parentClassicBG" handleinput="false" layer="background">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <!-- Event name subtitle under the title, from the event vendor's gump
+             (blank until the vendor has been visited) -->
+        <Label name="$parentEventName" font="UO_DefaultText" maxchars="64" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="384" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="top" relativePoint="top">
+              <AbsPoint x="0" y="34" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+
+        <!-- Header: artifact banner on the left, session total on the right -->
+        <!-- Texture set from Lua (CorksEventTracker.Initialize), as CenterScreenText does -->
+        <DynamicImage name="$parentBanner" handleinput="false">
+          <Size>
+            <AbsPoint x="154" y="56" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="58" />
+            </Anchor>
+          </Anchors>
+        </DynamicImage>
+        <!-- Right column, centered beside the banner: "Artifact Count:" with the
+             count under it -->
+        <Label name="$parentTotalCaption" font="UO_DefaultText" maxchars="64" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="200" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="64" />
+            </Anchor>
+          </Anchors>
+          <Color r="220" g="220" b="220" a="255" />
+        </Label>
+        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="200" y="26" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="82" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+
+        <HorizontalResizeImage name="$parentTopRule" inherits="UO_Default_Horizontal_Rule" handleinput="false">
+          <Size>
+            <AbsPoint x="384" y="4" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="126" />
+            </Anchor>
+          </Anchors>
+        </HorizontalResizeImage>
+
+        <!-- Event reward points, read from the event vendor's gump -->
+        <Label name="$parentRewardPoints" font="UO_DefaultText" maxchars="128" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="384" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="134" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
+        <!-- When the reward points expire, on its own line so long values fit -->
+        <Label name="$parentRewardExpires" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="384" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="154" />
+            </Anchor>
+          </Anchors>
+          <Color r="160" g="160" b="160" a="255" />
+        </Label>
+        <!-- "4.2 / hr", on the reward points line at the right -->
+        <Label name="$parentDropRate" font="UO_DefaultText" maxchars="32" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="100" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="134" />
+            </Anchor>
+          </Anchors>
+          <Color r="160" g="160" b="160" a="255" />
+        </Label>
+        <!-- "Last drop: 4m ago", on the expires line at the right -->
+        <Label name="$parentLastDrop" font="UO_DefaultText" maxchars="64" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="190" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-22" y="154" />
+            </Anchor>
+          </Anchors>
+          <Color r="160" g="160" b="160" a="255" />
+        </Label>
+
+        <!-- Bottom section, anchored to the bottom of the window -->
+        <HorizontalResizeImage name="$parentBottomRule" inherits="UO_Default_Horizontal_Rule" handleinput="false">
+          <Size>
+            <AbsPoint x="384" y="4" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft">
+              <AbsPoint x="18" y="-126" />
+            </Anchor>
+          </Anchors>
+        </HorizontalResizeImage>
+
+        <Button name="$parentResetButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="18" y="-84" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnReset" />
+          </EventHandlers>
+        </Button>
+        <!-- Classic version of the button (CorksEventTracker.ClassicResetButton) -->
+        <Window name="$parentResetClassic" inherits="CorksEventTrackerClassicButton">
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="18" y="-88" />
+            </Anchor>
+          </Anchors>
+        </Window>
+
+        <!-- Reset Event: clears the tag, event name, reward points and count -->
+        <Button name="$parentResetEventButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-84" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnResetEvent" />
+          </EventHandlers>
+        </Button>
+        <!-- Classic version of the button (CorksEventTracker.ClassicResetEventButton) -->
+        <Window name="$parentResetEventClassic" inherits="CorksEventTrackerClassicButton">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-88" />
+            </Anchor>
+          </Anchors>
+        </Window>
+
+        <!-- Event Item Tag: text in the event's drop messages and item names -->
+        <Label name="$parentItemLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="380" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft">
+              <AbsPoint x="18" y="-76" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <EditBox name="$parentItemTextBox" font="UO_DefaultText" taborder="1" maxchars="200" scrolling="horz" layer="overlay">
+          <Size>
+            <AbsPoint x="370" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="23" y="-25" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksEventTracker.OnItemTextClick" />
+            <EventHandler event="OnKeyEnter" function="CorksEventTracker.OnItemTextEnter" />
+            <EventHandler event="OnKeyEscape" function="CorksEventTracker.OnItemTextEscape" />
+          </EventHandlers>
+        </EditBox>
+        <!-- Size must match CorksEventTracker.TEXTBOX_WIDTH / TEXTBOX_HEIGHT -->
+        <Window name="$parentItemTextBoxBG" handleinput="false">
+          <Size>
+            <AbsPoint x="380" y="30" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" relativeTo="$parentItemTextBox">
+              <AbsPoint x="-5" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+            <FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+          </Windows>
+        </Window>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>

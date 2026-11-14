@@ -92,7 +92,7 @@
 	<Include file="Source/CorksDurabilityGump.xml"/>
 	<Include file="Source/CorksTimers.xml"/>
 	<Include file="Source/CorksCombatTimers.xml"/>
-	<Include file="Source/CorksDropAlerts.xml"/>
+	<Include file="Source/CorksEventTracker.xml"/>
 	<Include file="Source/CorksGumpPreview.xml"/>
 	<Include file="Source/CorksChatFilter.xml"/>
 	<Include file="Source/QuickStats.xml"/>
@@ -160,9 +160,11 @@
 		<Script file="Source/CorksDurabilityGump.lua"/>
 		<Script file="Source/CorksTimers.lua"/>
 		<Script file="Source/CorksCombatTimers.lua"/>
-		<Script file="Source/CorksDropAlerts.lua"/>
+		<Script file="Source/CorksEventTracker.lua"/>
 		<Script file="Source/CorksGumpArt.lua"/>
 		<Script file="Source/CorksGumpPreview.lua"/>
+		<Script file="Source/CorksGumpDump.lua"/>
+		<Script file="Source/CorksBuffRestore.lua"/>
 		<Script file="Source/CorksChatFilter.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>
