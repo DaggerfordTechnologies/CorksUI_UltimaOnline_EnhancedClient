@@ -177,7 +177,6 @@
           </Anchors>
           <Color r="160" g="160" b="160" a="255" />
         </Label>
-
         <!-- Bottom section, anchored to the bottom of the window -->
         <HorizontalResizeImage name="$parentBottomRule" inherits="UO_Default_Horizontal_Rule" handleinput="false">
           <Size>
@@ -230,6 +229,19 @@
         </Window>
 
         <!-- Event Item Tag: text in the event's drop messages and item names -->
+        <!-- "Luck: 1,234" under the Reset Event button, lined up with the button's
+             text (the 170-wide button at -18 puts its text 36 in, after the art) -->
+        <Label name="$parentLuck" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="134" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="topright">
+              <AbsPoint x="-18" y="-76" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="200" b="50" a="255" />
+        </Label>
         <Label name="$parentItemLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
           <Size>
             <AbsPoint x="380" y="20" />
