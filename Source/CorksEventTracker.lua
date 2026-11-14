@@ -251,11 +251,15 @@ function CorksEventTracker.Initialize()
 	WindowSetDimensions("CorksEventTrackerWindow", CorksEventTracker.WIDTH, CorksEventTracker.HEIGHT)
 	CorksEventTracker.ApplyClassicBackground(CorksEventTracker.HEIGHT)
 
+	-- Player status carries Luck; registration is per window, so ours keeps it live
+	RegisterWindowData(WindowData.PlayerStatus.Type, 0)
+
 	CorksEventTracker.ScanBackpack()
 	CorksEventTracker.Refresh()
 end
 
 function CorksEventTracker.Shutdown()
+	UnregisterWindowData(WindowData.PlayerStatus.Type, 0)
 	WindowUtils.SaveWindowPosition("CorksEventTrackerWindow")
 	CorksGumpArt.ReleaseAll(CorksEventTracker.GumpArt)
 end
@@ -437,6 +441,19 @@ function CorksEventTracker.UpdateLastDrop()
 	LabelSetText("CorksEventTrackerWindowLastDrop", text)
 end
 
+-- "Luck: 1,234" from the player's status; "Luck: --" until the server sends it
+function CorksEventTracker.UpdateLuck()
+	local status = WindowData.PlayerStatus
+	local luck = status and tonumber(status.Luck)
+	local text = "Luck: --"
+	if luck then
+		local digits = tostring(math.floor(math.abs(luck)))
+		digits = digits:reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
+		text = "Luck: " .. (luck < 0 and "-" or "") .. digits
+	end
+	LabelSetText("CorksEventTrackerWindowLuck", StringToWString(text))
+end
+
 function CorksEventTracker.Refresh()
 	if not CorksEventTracker.Initialized or not DoesWindowNameExist("CorksEventTrackerWindow") then
 		return
@@ -444,6 +461,7 @@ function CorksEventTracker.Refresh()
 	CorksEventTracker.UpdateTotal()
 	CorksEventTracker.UpdateLastDrop()
 	CorksEventTracker.UpdateDropRate()
+	CorksEventTracker.UpdateLuck()
 	CorksEventTracker.UpdateRewardPoints()
 end
 
@@ -501,6 +519,7 @@ function CorksEventTracker.OnUpdate(timePassed)
 		if CorksEventTracker.Initialized then
 			CorksEventTracker.UpdateLastDrop()
 			CorksEventTracker.UpdateDropRate()
+			CorksEventTracker.UpdateLuck()
 		end
 	end
 
