@@ -22,12 +22,6 @@ CorksBuffRestore.DELAY = 2
 -- A snapshot older than this is ignored (seconds)
 CorksBuffRestore.MAX_AGE = 120
 CorksBuffRestore.Wait = 0
-
--- What was saved and what happened to each buff, written to the game's logs
--- folder (the log is emptied by each save, so it covers the latest reload)
-CorksBuffRestore.LOG = "CorksBuffRestore"
-CorksBuffRestore.LOG_FILE = "logs/CorksBuffRestore.log"
-CorksBuffRestore.LogReady = false
 CorksBuffRestore.CheckedAfterLoad = false
 
 -- Where the snapshot is kept through the reload
@@ -35,37 +29,6 @@ CorksBuffRestore.STORE_LOG = "CorksBuffSnapshot"
 CorksBuffRestore.STORE_SETTING = "CorksBuffSnapshot"
 -- The snapshot read back after the reload, waiting to be restored
 CorksBuffRestore.Pending = nil
-
-function CorksBuffRestore.Log(text, clear)
-	pcall(function()
-		local log = CorksBuffRestore.LOG
-		if not CorksBuffRestore.LogReady then
-			pcall(TextLogCreate, log, 500)
-			TextLogSetEnabled(log, true)
-			TextLogSetIncrementalSaving(log, true, CorksBuffRestore.LOG_FILE)
-			pcall(TextLogAddFilterType, log, 1, L"")
-			CorksBuffRestore.LogReady = true
-		end
-		if clear then
-			TextLogClear(log)
-			TextLogSetIncrementalSaving(log, true, CorksBuffRestore.LOG_FILE)
-		end
-		TextLogAddEntry(log, 1, StringToWString(tostring(text)))
-	end)
-end
-
-function CorksBuffRestore.Describe(id, data, timeLeft)
-	local name = ""
-	if type(data.NameWStringVector) == "table" and data.NameWStringVector[1] then
-		local ok, text = pcall(WStringToString, data.NameWStringVector[1])
-		if ok and text then
-			name = " \"" .. text .. "\""
-		end
-	end
-	return "buff " .. tostring(id) .. name .. " good=" .. tostring(data.good)
-		.. " HasTimer=" .. tostring(data.HasTimer) .. " TimerSeconds=" .. tostring(data.TimerSeconds)
-		.. " timeLeft=" .. tostring(timeLeft)
-end
 
 -- Seconds since some fixed point, or nil if the client can't say
 function CorksBuffRestore.Now()
@@ -76,37 +39,20 @@ function CorksBuffRestore.Now()
 	return nil
 end
 
-function CorksBuffRestore.CopyList(list)
-	if type(list) ~= "table" then
-		return list
-	end
-	local copy = {}
-	for k, v in pairs(list) do
-		copy[k] = v
-	end
-	return copy
+function CorksBuffRestore.Say(text)
+	pcall(WindowUtils.ChatPrint, StringToWString(text), SystemData.ChatLogFilters.SYSTEM)
 end
 
 -- Called by /reloadui just before the reload.
 function CorksBuffRestore.Save()
 	if not BuffDebuff or type(BuffDebuff.TableOrder) ~= "table" then
-		CorksBuffRestore.Log("Save: no buff list", true)
 		return
-	end
-	CorksBuffRestore.Log("Save: " .. #BuffDebuff.TableOrder .. " buff(s) in TableOrder", true)
-	-- Every buff the default UI knows about, saved or not, to see what's missed
-	for buffId, data in pairs(BuffDebuff.BuffData) do
-		if type(data) == "table" then
-			CorksBuffRestore.Log("  known " .. CorksBuffRestore.Describe(buffId, data, BuffDebuff.Timers[buffId])
-				.. " window=" .. tostring(BuffDebuff.BuffWindowId[buffId]))
-		end
 	end
 	local buffs = {}
 	local done = {}
 	for _, buffId in ipairs(BuffDebuff.TableOrder) do
 		local data = BuffDebuff.BuffData[buffId]
 		if not done[buffId] and BuffDebuff.BuffWindowId[buffId] == true and type(data) == "table" then
-			CorksBuffRestore.Log("  saved " .. CorksBuffRestore.Describe(buffId, data, BuffDebuff.Timers[buffId]))
 			done[buffId] = true
 			local timeLeft = BuffDebuff.Timers[buffId]
 			if type(timeLeft) ~= "number" then
@@ -118,12 +64,9 @@ function CorksBuffRestore.Save()
 					abilityId = data.abilityId,
 					TimerSeconds = timeLeft,
 					HasTimer = data.HasTimer,
-					NameVectorSize = data.NameVectorSize,
-					ToolTipVectorSize = data.ToolTipVectorSize,
-					IsBeingRemoved = false,
-					NameWStringVector = CorksBuffRestore.CopyList(data.NameWStringVector),
-					ToolTipWStringVector = CorksBuffRestore.CopyList(data.ToolTipWStringVector),
 					good = data.good,
+					NameWStringVector = data.NameWStringVector,
+					ToolTipWStringVector = data.ToolTipWStringVector,
 				},
 			})
 		end
@@ -205,10 +148,11 @@ function CorksBuffRestore.FromLines(lines)
 end
 
 -- Writes the lines to the text log and to the settings, then hands the
--- settings to the client so they're kept through the reload.
+-- settings to the client so they're kept through the reload. Each is
+-- protected, so one failing still leaves the other.
 function CorksBuffRestore.WriteLines(lines)
 	local log = CorksBuffRestore.STORE_LOG
-	local ok, err = pcall(function()
+	pcall(function()
 		pcall(TextLogCreate, log, 500)
 		TextLogSetEnabled(log, true)
 		TextLogClear(log)
@@ -217,11 +161,8 @@ function CorksBuffRestore.WriteLines(lines)
 			TextLogAddEntry(log, 1, line)
 		end
 	end)
-	if not ok then
-		CorksBuffRestore.Log("Save: text log failed: " .. tostring(err))
-	end
 
-	ok, err = pcall(function()
+	pcall(function()
 		local key = CorksBuffRestore.STORE_SETTING
 		CorksBuffRestore.ClearSettings()
 		for i, line in ipairs(lines) do
@@ -230,9 +171,6 @@ function CorksBuffRestore.WriteLines(lines)
 		Interface.SaveNumber(key .. "Count", #lines)
 		UserSettingsChanged()
 	end)
-	if not ok then
-		CorksBuffRestore.Log("Save: settings failed: " .. tostring(err))
-	end
 end
 
 function CorksBuffRestore.ClearSettings()
@@ -299,39 +237,25 @@ end
 -- Reads the snapshot once after the reload and removes it from both places,
 -- so it's never used twice.
 function CorksBuffRestore.ReadSnapshot()
-	local lines, source = CorksBuffRestore.ReadLog(), "text log"
+	local lines = CorksBuffRestore.ReadLog()
 	local fromSettings = CorksBuffRestore.ReadSettings()
-	if not lines then
-		lines, source = fromSettings, "settings"
-	end
 	if fromSettings then
 		CorksBuffRestore.ClearSettings()
 	end
+	lines = lines or fromSettings
 	if not lines then
-		return nil, "nowhere"
+		return nil
 	end
-	return CorksBuffRestore.FromLines(lines), source
+	return CorksBuffRestore.FromLines(lines)
 end
 
 -- Called every frame from Interface.Update; does nothing unless a snapshot is waiting
 function CorksBuffRestore.Update(timePassed)
 	if not CorksBuffRestore.CheckedAfterLoad then
 		CorksBuffRestore.CheckedAfterLoad = true
-		local ok, snapshot, source = pcall(CorksBuffRestore.ReadSnapshot)
-		if not ok then
-			CorksBuffRestore.Log("After load: reading the snapshot failed: " .. tostring(snapshot))
-		elseif snapshot then
-			local ids = {}
-			for _, buff in ipairs(snapshot.buffs) do
-				table.insert(ids, CorksBuffRestore.Describe(buff.id, buff.data, buff.data.TimerSeconds))
-			end
-			CorksBuffRestore.Log("After load: snapshot found in " .. source .. ", " .. #snapshot.buffs .. " buff(s)")
-			for _, text in ipairs(ids) do
-				CorksBuffRestore.Log("  " .. text)
-			end
+		local ok, snapshot = pcall(CorksBuffRestore.ReadSnapshot)
+		if ok then
 			CorksBuffRestore.Pending = snapshot
-		else
-			CorksBuffRestore.Log("After load: no snapshot (nothing saved by /reloadui)")
 		end
 	end
 	if not CorksBuffRestore.Pending then
@@ -350,19 +274,13 @@ function CorksBuffRestore.Update(timePassed)
 	CorksBuffRestore.Restore(snapshot)
 end
 
-function CorksBuffRestore.Say(text)
-	pcall(WindowUtils.ChatPrint, StringToWString(text), SystemData.ChatLogFilters.SYSTEM)
-end
-
 function CorksBuffRestore.Restore(snapshot)
 	local elapsed = 0
 	local now = CorksBuffRestore.Now()
 	if now and snapshot.time then
 		elapsed = math.max(0, now - snapshot.time)
 	end
-	CorksBuffRestore.Log("Restore: " .. #snapshot.buffs .. " saved, reload took " .. elapsed .. "s")
 	if elapsed > CorksBuffRestore.MAX_AGE then
-		CorksBuffRestore.Log("  snapshot too old, skipped")
 		return
 	end
 
@@ -372,7 +290,6 @@ function CorksBuffRestore.Restore(snapshot)
 	system.CurrentBuffId = -1
 	if system.CurrentBuffId ~= -1 then
 		system.CurrentBuffId = originalId
-		CorksBuffRestore.Log("  CurrentBuffId can't be set")
 		CorksBuffRestore.Say("Buff icons could not be restored after the UI reload.")
 		return
 	end
@@ -392,12 +309,7 @@ function CorksBuffRestore.Restore(snapshot)
 			end
 			local expired = data.HasTimer and (type(timeLeft) ~= "number" or timeLeft <= 0)
 			-- Skip buffs that ran out during the reload, and ones the server already re-sent
-			if expired then
-				CorksBuffRestore.Log("  skipped (expired) " .. CorksBuffRestore.Describe(id, data, timeLeft))
-			elseif BuffDebuff.BuffWindowId[id] == true then
-				CorksBuffRestore.Log("  skipped (already shown) " .. CorksBuffRestore.Describe(id, data, timeLeft))
-			else
-				CorksBuffRestore.Log("  restoring " .. CorksBuffRestore.Describe(id, data, timeLeft))
+			if not expired and BuffDebuff.BuffWindowId[id] ~= true then
 				data.TimerSeconds = timeLeft
 				BuffDebuff.BuffData[id] = data
 				-- Marks it as already active, so the "new buff" circle doesn't flash
@@ -409,7 +321,6 @@ function CorksBuffRestore.Restore(snapshot)
 				else
 					BuffDebuff.BuffData[id] = nil
 					BuffDebuff.ActiveBuffs[id] = nil
-					CorksBuffRestore.Log("    failed: " .. tostring(problem))
 					CorksBuffRestore.Say("Buff icon " .. tostring(id) .. " could not be restored: " .. tostring(problem))
 				end
 			end
@@ -418,7 +329,6 @@ function CorksBuffRestore.Restore(snapshot)
 
 	system.CurrentBuffId = originalId
 	CenterScreenText.SendCenterScreenTexture = originalSplash
-	CorksBuffRestore.Log("Restore done: " .. restored .. " restored" .. (ok and "" or (", error: " .. tostring(err))))
 	if not ok then
 		CorksBuffRestore.Say("Restoring buff icons failed: " .. tostring(err))
 	elseif restored > 0 then
