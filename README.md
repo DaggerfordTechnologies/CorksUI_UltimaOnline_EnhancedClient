@@ -149,21 +149,17 @@ Abilities are defined in the `CorksCombatTimers.Timers` table at the top of `Sou
 ### Event Drops
 
 <p>
-  <img src="EventGump.png" alt="Corks' Chat Filter" height="300">
+  <img src="EventGump.png" alt="Event Drops" height="300">
 </p>
 
-The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it. The **Event Drops** window lets you add those messages yourself, and counts your drops.
+The default UI shows the artifact graphic over your head when certain game messages arrive, such as "A special gift has been placed in your backpack." Event drops that use a different message don't trigger it. The **Event Drops** window shows the graphic for your event's drops too, and counts them.
 
-- The total at the top right counts every matching drop since you logged in (or reloaded the UI), with how long ago the last one was. **Reset Count** sets the counts back to 0.
-- Each saved message is a row, with its own count on the right. When a game message containing a checked one arrives, the artifact graphic shows, the drop is counted, and the row and total flash for a moment.
-- The window grows and shrinks to fit the messages in it.
-- **Event Item Tag:** type text that's in your event items' names and press Enter, for example `Unhallowed`. Separate several with commas. While the drop total is 0 (after logging in, a UI reload or **Reset Count**), the window checks your backpack every few seconds, including bags inside it, and starts the total from the matching items it finds, so drops from before the count started aren't missed. A stack counts as its amount. Once the total is above 0, only drop messages add to it and the backpack isn't checked again. Bags you haven't opened since logging in may not be counted. Clear the box and press Enter to stop counting.
+- **Event Item Tag:** type text that appears in the event's drop messages and in its items' names, for example `Unhallowed`, and press Enter. Separate several with commas. Capitals don't matter. Clear the box and press Enter to stop counting.
+- **Event Item Count:** when a game message containing a tag arrives, the artifact graphic shows, the drop is counted, and the count flashes for a moment. Below it is how long ago the last drop was. The count is for this session (it starts again after logging in or reloading the UI); **Reset Count** sets it back to 0.
+- While the count is 0, the window checks your backpack every few seconds, including bags inside it, and starts the count from the items with a tag in their name, so drops from before the count started aren't missed. A stack counts as its amount. Once the count is above 0, only drop messages add to it. Bags you haven't opened since logging in may not be counted.
 - **Reward points:** open the event vendor (for example the Treasures of the Unhallowed vendor) and the line under the header shows your reward points, how much they've changed this session, and when they expire. The points are read from the vendor's "Your Reward Points" line, so they only update while that gump is open, even if the Event Drops window is closed. The last value is saved and shown as "(at last visit)" until you open the vendor again.
-- Type part of an event's drop message in the box at the bottom and press Enter to add it (up to 10 messages). Capitals don't matter.
-- Uncheck a message to turn it off, or uncheck it and press **Remove Unchecked** to delete it.
-- The list starts with "You recover an artifact bearing the mark of the Unhallowed".
 
-Only game messages count, so a player typing the phrase won't show the graphic. You can also add one of the default UI's own artifact messages to count those drops: it is counted, but the graphic isn't shown a second time.
+Only game messages count, so a player typing the tag won't show the graphic. Any game message containing the tag counts as a drop, so pick text that only appears in drop messages and item names. Drops that use one of the default UI's own artifact messages are counted, but the graphic isn't shown a second time.
 
 **Opening the window:** Actions → **Corks Addons** → **Event Drops**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Drops are counted while it is closed.
 
@@ -224,7 +220,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6105 | Chat Filter | Corks Addons | `CorksChatFilter.Toggle()` |
 | 6106 | Consumable Timers | Corks Addons | `CorksTimers.Toggle()` |
 | 6107 | Combat Timers | Corks Addons | `CorksCombatTimers.Toggle()` |
-| 6108 | Event Drops | Corks Addons | `CorksDropAlerts.Toggle()` |
+| 6108 | Event Drops | Corks Addons | `CorksEventDrops.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
@@ -243,10 +239,9 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksChatFilterEnabled` | Chat Filter on/off |
 | `CorksChatFilterPreset<cliloc>` | Chat Filter starting rows (checked or not) |
 | `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
-| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksDropAlertsWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
-| `CorksDropAlertsCount`, `CorksDropAlertsText<n>`, `CorksDropAlertsOn<n>` | Event Drops messages (checked or not) |
-| `CorksDropAlertsItemName` | Event Drops backpack item name text |
-| `CorksDropAlertsRewardPoints`, `CorksDropAlertsRewardEvent`, `CorksDropAlertsRewardExpires` | Event Drops reward points last read from the event vendor |
+| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksEventDropsWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
+| `CorksEventDropsItemName` | Event Drops Event Item Tag |
+| `CorksEventDropsRewardPoints`, `CorksEventDropsRewardEvent`, `CorksEventDropsRewardExpires` | Event Drops reward points last read from the event vendor |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
 
 Window positions and scales are saved through the standard `WindowUtils` helpers.
@@ -267,8 +262,8 @@ CorksUI/
     ├── CorksTimers.xml        Item Timers window (9 rows defined up front)
     ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
     ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
-    ├── CorksDropAlerts.lua    Event Drops: artifact graphic for drop messages you add, session drop count
-    ├── CorksDropAlerts.xml    Event Drops window (10 rows defined up front)
+    ├── CorksEventDrops.lua    Event Drops: artifact graphic and session count for an Event Item Tag, reward points
+    ├── CorksEventDrops.xml    Event Drops window
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
     └── MapWindow.lua          Map Window changes

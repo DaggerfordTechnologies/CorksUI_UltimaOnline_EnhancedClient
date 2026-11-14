@@ -710,7 +710,10 @@ function Interface.CreateWindows()
 	CreateWindow( "CorksDurabilityGump", Interface.LoadBoolean("CorksDurabilityGumpOpen", false))
 	CreateWindow( "CorksTimers", Interface.LoadBoolean("CorksTimersOpen", false))
 	CreateWindow( "CorksCombatTimers", Interface.LoadBoolean("CorksCombatTimersOpen", false))
-	CreateWindow( "CorksDropAlertsWindow", Interface.LoadBoolean("CorksDropAlertsWindowOpen", false))
+	-- Event Drops was renamed from CorksDropAlerts; carry its saved settings over first
+	local migrated, migrateErr = pcall(CorksEventDrops.MigrateSettings)
+	Interface.ErrorTracker(migrated, migrateErr)
+	CreateWindow( "CorksEventDropsWindow", Interface.LoadBoolean("CorksEventDropsWindowOpen", false))
 	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
 	Interface.CreateTCTools()
 	
@@ -1061,7 +1064,7 @@ function Interface.Update( timePassed )
 	ok, err = pcall(CorksCombatTimers.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
-	ok, err = pcall(CorksDropAlerts.CheckRewardGump, timePassed)
+	ok, err = pcall(CorksEventDrops.CheckRewardGump, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksBuffRestore.Update, timePassed)
@@ -1802,7 +1805,7 @@ function Interface.NewChatText()
 	ok, err = pcall(CorksCombatTimers.OnChatText)
 	Interface.ErrorTracker(ok, err)
 
-	ok, err = pcall(CorksDropAlerts.OnChatText)
+	ok, err = pcall(CorksEventDrops.OnChatText)
 	Interface.ErrorTracker(ok, err)
 
 	-- A filtered message still goes through every parser here (timers, buffs, spells);

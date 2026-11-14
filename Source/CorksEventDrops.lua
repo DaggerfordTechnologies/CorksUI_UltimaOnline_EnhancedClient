@@ -2,180 +2,169 @@
 -- Global Variables
 ----------------------------------------------------------------
 
-CorksDropAlerts = {}
+CorksEventDrops = {}
 
--- The Event Drops window. It keeps a list of drop messages: when a game message
--- containing one of the checked ones arrives, the artifact graphic shows over your
--- head and the drop is counted. Counts are for this session only (they start at 0
--- after logging in or reloading the UI); the messages themselves are saved.
-
--- Messages added the first time the window loads, before any are saved.
-CorksDropAlerts.DEFAULT_MESSAGES = {
-	L"You recover an artifact bearing the mark of the Unhallowed",
-}
+-- The Event Drops window. One setting drives it: the Event Item Tag, text that's
+-- in the event's drop messages and in its items' names (e.g. "Unhallowed";
+-- several can be given, separated by commas). When a game message containing a
+-- tag arrives, the artifact graphic shows over your head and the drop is
+-- counted; while the count is 0 the backpack is checked for items with a tag in
+-- their name, so drops from before the count started aren't missed. The count
+-- is for this session only (it starts at 0 after logging in or reloading the
+-- UI); the tag is saved.
 
 -- The default UI already shows the artifact graphic for these (TextParsing.lua), so
 -- they're counted here but don't show it a second time.
-CorksDropAlerts.DEFAULT_UI_ARTIFACT_IDS = {
+CorksEventDrops.DEFAULT_UI_ARTIFACT_IDS = {
 	[1062317] = true,  -- "For your valor in combating the fallen beast, a special artifact has been bestowed on you."
 	[502088]  = true,  -- "A special gift has been placed in your backpack."
 	[1154530] = true,  -- "You notice the crest of Minax on your fallen foe's equipment..."
 	[1154554] = true,  -- "You recover an artifact bearing the crest of Minax from the rubble."
 }
 
--- Rows defined in CorksDropAlerts.xml.
-CorksDropAlerts.MAX_ROWS = 10
-
 -- Classic UO gump background (base gump art ID), or nil for the standard EC look.
 -- The classic controls below are only used along with it.
-CorksDropAlerts.ClassicBackground = 83
--- Classic check box art { unchecked, checked }, or nil for the EC check boxes
-CorksDropAlerts.ClassicCheck = { 210, 211 }
+CorksEventDrops.ClassicBackground = 83
 -- Classic background for the entry box (base gump art ID), or nil for the EC box
-CorksDropAlerts.ClassicTextBox = 3000
--- Classic button art { normal, mouse over, pressed }, or nil for the EC buttons
-CorksDropAlerts.ClassicResetButton = { 4005, 4006, 4007 }
-CorksDropAlerts.ClassicRemoveButton = { 4017, 4018, 4019 }
+CorksEventDrops.ClassicTextBox = 3000
+-- Classic button art { normal, mouse over, pressed }, or nil for the EC button
+CorksEventDrops.ClassicResetButton = { 4005, 4006, 4007 }
 -- How far below the gump's top edge the title sits (clears the classic border)
-CorksDropAlerts.TitleOffsetY = 8
+CorksEventDrops.TitleOffsetY = 8
 -- Gump art loaded for the classic look, released on shutdown
-CorksDropAlerts.GumpArt = {}
+CorksEventDrops.GumpArt = {}
 
--- Layout; must match CorksDropAlertsWindow in the XML. The window is sized to fit
--- the rows in use: ROWS_TOP + rows * ROW_HEIGHT + BOTTOM_HEIGHT (602 with 10 rows).
-CorksDropAlerts.WIDTH = 420
-CorksDropAlerts.ROWS_TOP = 160
-CorksDropAlerts.ROW_HEIGHT = 24
-CorksDropAlerts.BOTTOM_HEIGHT = 202
-CorksDropAlerts.TEXTBOX_WIDTH = 380
-CorksDropAlerts.TEXTBOX_HEIGHT = 30
--- How dark the stripe behind every other row is
-CorksDropAlerts.STRIPE_ALPHA = 0.3
--- How long a row lights up after its message arrives (seconds)
-CorksDropAlerts.FLASH_SECONDS = 2.5
+-- Size; must match CorksEventDropsWindow in the XML
+CorksEventDrops.WIDTH = 420
+CorksEventDrops.HEIGHT = 266
+CorksEventDrops.TEXTBOX_WIDTH = 380
+CorksEventDrops.TEXTBOX_HEIGHT = 30
+-- How long the count and banner pulse after a drop (seconds)
+CorksEventDrops.FLASH_SECONDS = 2.5
 
 -- Text colors
-CorksDropAlerts.COLOR_ON = { 255, 255, 255 }
-CorksDropAlerts.COLOR_OFF = { 130, 130, 130 }
-CorksDropAlerts.COLOR_FLASH = { 255, 215, 90 }
-CorksDropAlerts.COLOR_COUNT = { 255, 200, 50 }
+CorksEventDrops.COLOR_OFF = { 130, 130, 130 }
+CorksEventDrops.COLOR_COUNT = { 255, 200, 50 }
 
--- { text = wstring, lower = string, on = boolean, count = number }
-CorksDropAlerts.Entries = {}
-CorksDropAlerts.Total = 0
-CorksDropAlerts.SavedCount = 0
-CorksDropAlerts.Loaded = false
+CorksEventDrops.Total = 0
+CorksEventDrops.Loaded = false
 -- Interface.TimeSinceLogin when the last drop arrived, nil before the first one
-CorksDropAlerts.LastDropTime = nil
--- Row lit up by the latest drop and how long it stays lit
-CorksDropAlerts.FlashRow = nil
-CorksDropAlerts.FlashLeft = 0
+CorksEventDrops.LastDropTime = nil
+-- Whether the count and banner are pulsing, and for how much longer
+CorksEventDrops.Flashing = false
+CorksEventDrops.FlashLeft = 0
 -- Time since the "Last drop" line was redrawn
-CorksDropAlerts.LastDropTick = 0
-CorksDropAlerts.CurrentHeight = 0
+CorksEventDrops.LastDropTick = 0
 
--- Backpack items counted by name. ItemText is what the user typed (saved);
--- ItemPatterns is it split at commas, lower-case. Rescanned every
--- ITEM_SCAN_SECONDS while the window is open.
-CorksDropAlerts.ITEM_SCAN_SECONDS = 3
+-- The Event Item Tag. ItemText is what the user typed (saved); ItemPatterns is
+-- it split at commas, lower-case. The backpack is rechecked every
+-- ITEM_SCAN_SECONDS while the window is open and the count is 0.
+CorksEventDrops.ITEM_SCAN_SECONDS = 3
 -- Bags inside bags are followed this deep
-CorksDropAlerts.ITEM_SCAN_DEPTH = 6
-CorksDropAlerts.ItemText = L""
-CorksDropAlerts.ItemPatterns = {}
-CorksDropAlerts.ItemScanTick = 0
+CorksEventDrops.ITEM_SCAN_DEPTH = 6
+CorksEventDrops.ItemText = L""
+CorksEventDrops.ItemPatterns = {}
+CorksEventDrops.ItemScanTick = 0
 -- objectId -> lower-case name, so names are only looked up once
-CorksDropAlerts.ItemNames = {}
+CorksEventDrops.ItemNames = {}
 
 -- Event reward points, read from the event vendor's gump whenever it's open
 -- (e.g. Treasures of the Unhallowed, gump 9313). Found by the cliloc of the
 -- "Your Reward Points" line, whose parameter is the points, so any event
 -- vendor using the same gump works.
-CorksDropAlerts.REWARD_POINTS_TID = 1159535
+CorksEventDrops.REWARD_POINTS_TID = 1159535
 -- "Points from this event will expire: <date>"
-CorksDropAlerts.REWARD_EXPIRE_TID = 1159536
-CorksDropAlerts.REWARD_CHECK_SECONDS = 0.5
-CorksDropAlerts.RewardTick = 0
+CorksEventDrops.REWARD_EXPIRE_TID = 1159536
+CorksEventDrops.REWARD_CHECK_SECONDS = 0.5
+CorksEventDrops.RewardTick = 0
 -- Saved: the last points seen, which event, and when they expire (nil until seen)
-CorksDropAlerts.RewardPoints = nil
-CorksDropAlerts.RewardEvent = ""
-CorksDropAlerts.RewardExpires = ""
+CorksEventDrops.RewardPoints = nil
+CorksEventDrops.RewardEvent = ""
+CorksEventDrops.RewardExpires = ""
 -- Points at the first reading this session, for "+10 this session"
-CorksDropAlerts.RewardStart = nil
+CorksEventDrops.RewardStart = nil
 
 ----------------------------------------------------------------
--- Saved messages
+-- Saved settings
 ----------------------------------------------------------------
 
-function CorksDropAlerts.Load()
-	if CorksDropAlerts.Loaded then
+function CorksEventDrops.Load()
+	if CorksEventDrops.Loaded then
 		return
 	end
-	CorksDropAlerts.Loaded = true
+	CorksEventDrops.Loaded = true
 
-	CorksDropAlerts.SetItemText(Interface.LoadWString("CorksDropAlertsItemName", L""))
+	-- In case this runs before Interface.lua's own call (it's safe to repeat)
+	pcall(CorksEventDrops.MigrateSettings)
 
-	local points = Interface.LoadNumber("CorksDropAlertsRewardPoints", -1)
+	CorksEventDrops.SetItemText(Interface.LoadWString("CorksEventDropsItemName", L""))
+
+	local points = Interface.LoadNumber("CorksEventDropsRewardPoints", -1)
 	if points >= 0 then
-		CorksDropAlerts.RewardPoints = points
+		CorksEventDrops.RewardPoints = points
 	end
-	CorksDropAlerts.RewardEvent = WStringToString(Interface.LoadWString("CorksDropAlertsRewardEvent", L""))
-	CorksDropAlerts.RewardExpires = WStringToString(Interface.LoadWString("CorksDropAlertsRewardExpires", L""))
+	CorksEventDrops.RewardEvent = WStringToString(Interface.LoadWString("CorksEventDropsRewardEvent", L""))
+	CorksEventDrops.RewardExpires = WStringToString(Interface.LoadWString("CorksEventDropsRewardExpires", L""))
 
-	local count = Interface.LoadNumber("CorksDropAlertsCount", -1)
-	if count < 0 then
-		-- Never saved: start with the defaults.
-		for _, text in ipairs(CorksDropAlerts.DEFAULT_MESSAGES) do
-			CorksDropAlerts.AddEntry(text)
-		end
-		CorksDropAlerts.Save()
-		return
-	end
-
-	for i = 1, math.min(count, CorksDropAlerts.MAX_ROWS) do
-		local text = Interface.LoadWString("CorksDropAlertsText" .. i, L"")
-		if text ~= L"" then
-			table.insert(CorksDropAlerts.Entries, {
-				text  = text,
-				lower = string.lower(WStringToString(text)),
-				on    = Interface.LoadBoolean("CorksDropAlertsOn" .. i, true),
-				count = 0,
-			})
-		end
-	end
-	CorksDropAlerts.SavedCount = count
 end
 
-function CorksDropAlerts.Save()
-	local count = 0
-	for _, entry in ipairs(CorksDropAlerts.Entries) do
-		count = count + 1
-		Interface.SaveWString("CorksDropAlertsText" .. count, entry.text)
-		Interface.SaveBoolean("CorksDropAlertsOn" .. count, entry.on)
-	end
-	-- Drop settings left over from messages that were removed.
-	for i = count + 1, CorksDropAlerts.SavedCount do
-		Interface.DeleteSetting("CorksDropAlertsText" .. i)
-		Interface.DeleteSetting("CorksDropAlertsOn" .. i)
-	end
-	Interface.SaveNumber("CorksDropAlertsCount", count)
-	CorksDropAlerts.SavedCount = count
-end
+-- Event Drops used to be called CorksDropAlerts. Renames its saved settings
+-- (tag, reward points, open state, scale, transparency) and saved window
+-- position to the CorksEventDrops names, so nothing is lost. Settings of the
+-- old drop message list (CorksDropAlertsCount, ...Text<n>, ...On<n>), which the
+-- Event Item Tag replaced, are deleted. Called by Interface.lua before the
+-- window is created; does nothing once there's nothing left to rename.
+CorksEventDrops.OLD_PREFIX = "CorksDropAlerts"
+CorksEventDrops.NEW_PREFIX = "CorksEventDrops"
 
--- Adds a message, or turns an existing one back on. Returns false when the list is full.
-function CorksDropAlerts.AddEntry(text)
-	local lower = string.lower(WStringToString(text))
-	for _, entry in ipairs(CorksDropAlerts.Entries) do
-		if entry.lower == lower then
-			entry.on = true
-			return true
+function CorksEventDrops.MigrateSettings()
+	local old, new = CorksEventDrops.OLD_PREFIX, CorksEventDrops.NEW_PREFIX
+	local function isOldMessageSetting(name)
+		local rest = string.sub(name, string.len(old) + 1)
+		return rest == "Count" or string.match(rest, "^Text%d+$") or string.match(rest, "^On%d+$")
+	end
+	-- Renames matching entries of one list of names in place (each value stays
+	-- at the same index); returns the old names to delete instead
+	local function renameIn(names)
+		local remove = {}
+		if type(names) ~= "table" then
+			return remove
+		end
+		local present = {}
+		for _, name in pairs(names) do
+			present[name] = true
+		end
+		for i, name in pairs(names) do
+			if type(name) == "string" and string.sub(name, 1, string.len(old)) == old then
+				local newName = new .. string.sub(name, string.len(old) + 1)
+				if isOldMessageSetting(name) or present[newName] then
+					table.insert(remove, name)
+				else
+					names[i] = newName
+					present[newName] = true
+				end
+			end
+		end
+		return remove
+	end
+
+	local vars = SystemData.Settings.Interface.UIVariables
+	local remove = {}
+	for _, list in ipairs({ "BoolNames", "NumberNames", "StringNames", "WStringNames", "ColorNames" }) do
+		for _, name in ipairs(renameIn(vars[list])) do
+			table.insert(remove, name)
 		end
 	end
-	if table.getn(CorksDropAlerts.Entries) >= CorksDropAlerts.MAX_ROWS then
-		WindowUtils.ChatPrint(L"Event Drops: the list is full. Uncheck some messages and press Remove Unchecked.", SystemData.ChatLogFilters.SYSTEM)
-		return false
+	for _, name in ipairs(remove) do
+		Interface.DeleteSetting(name)
 	end
-	table.insert(CorksDropAlerts.Entries, { text = text, lower = lower, on = true, count = 0 })
-	return true
+
+	-- The saved window position is kept by window name; a leftover old entry
+	-- (when the new one already exists) is harmless and just stays unused
+	local positions = SystemData.Settings.Interface.WindowPositions
+	if positions then
+		renameIn(positions.Names)
+	end
 end
 
 ----------------------------------------------------------------
@@ -183,10 +172,10 @@ end
 ----------------------------------------------------------------
 
 -- Called for every journal line from Interface.NewChatText.
--- Only game messages count, so a player saying the phrase won't show the graphic.
+-- Only game messages count, so a player saying the tag won't show the graphic.
 -- Some game messages arrive on other channels than SYSTEM, but they all carry a
 -- TextID; text players type never does.
-function CorksDropAlerts.OnChatText()
+function CorksEventDrops.OnChatText()
 	if not SystemData.Text then
 		return
 	end
@@ -196,20 +185,16 @@ function CorksDropAlerts.OnChatText()
 		return
 	end
 
-	CorksDropAlerts.Load()
+	CorksEventDrops.Load()
 	local text = string.lower(WStringToString(SystemData.Text))
-	for index, entry in ipairs(CorksDropAlerts.Entries) do
-		if entry.on and string.find(text, entry.lower, 1, true) then
-			entry.count = entry.count + 1
-			CorksDropAlerts.Total = CorksDropAlerts.Total + 1
-			CorksDropAlerts.LastDropTime = Interface.TimeSinceLogin
-			if not CorksDropAlerts.DEFAULT_UI_ARTIFACT_IDS[SystemData.TextID] then
-				CenterScreenText.SendCenterScreenTexture("artifact")
-			end
-			CorksDropAlerts.StartFlash(index)
-			CorksDropAlerts.Refresh()
-			return
+	if CorksEventDrops.NameMatches(text) then
+		CorksEventDrops.Total = CorksEventDrops.Total + 1
+		CorksEventDrops.LastDropTime = Interface.TimeSinceLogin
+		if not CorksEventDrops.DEFAULT_UI_ARTIFACT_IDS[SystemData.TextID] then
+			CenterScreenText.SendCenterScreenTexture("artifact")
 		end
+		CorksEventDrops.StartFlash()
+		CorksEventDrops.Refresh()
 	end
 end
 
@@ -217,66 +202,44 @@ end
 -- Window
 ----------------------------------------------------------------
 
-function CorksDropAlerts.Initialize()
-	SnapUtils.SnappableWindows["CorksDropAlertsWindow"] = true
-	WindowUtils.RestoreWindowPosition("CorksDropAlertsWindow", false)
-	WindowUtils.LoadScale("CorksDropAlertsWindow")
-	WindowUtils.SetWindowTitle("CorksDropAlertsWindow", L"Event Drops")
+function CorksEventDrops.Initialize()
+	SnapUtils.SnappableWindows["CorksEventDropsWindow"] = true
+	WindowUtils.RestoreWindowPosition("CorksEventDropsWindow", false)
+	WindowUtils.LoadScale("CorksEventDropsWindow")
+	WindowUtils.SetWindowTitle("CorksEventDropsWindow", L"Event Drops")
 
-	LabelSetText("CorksDropAlertsWindowListHeader", L"Show the artifact graphic for messages containing:")
-	LabelSetText("CorksDropAlertsWindowTextLabel", L"Add a drop message (press Enter):")
-	LabelSetText("CorksDropAlertsWindowItemLabel", L"Event Item Tag:")
-	ButtonSetText("CorksDropAlertsWindowResetButton", L"Reset Count")
-	ButtonSetText("CorksDropAlertsWindowRemoveButton", L"Remove Unchecked")
-
-	for i = 1, CorksDropAlerts.MAX_ROWS do
-		local rowName = CorksDropAlerts.RowName(i)
-		ButtonSetCheckButtonFlag(rowName .. "Button", true)
-		WindowSetAlpha(rowName .. "Stripe", CorksDropAlerts.STRIPE_ALPHA)
-		WindowSetShowing(rowName .. "Check", false)
-	end
-	WindowSetShowing("CorksDropAlertsWindowResetClassic", false)
-	WindowSetShowing("CorksDropAlertsWindowRemoveClassic", false)
+	LabelSetText("CorksEventDropsWindowItemLabel", L"Event Item Tag:")
+	ButtonSetText("CorksEventDropsWindowResetButton", L"Reset Count")
+	WindowSetShowing("CorksEventDropsWindowResetClassic", false)
 
 	-- The artifact banner: the same art the default UI shows over your head
-	DynamicImageSetTexture("CorksDropAlertsWindowBanner", "CST_Artifact", 0, 0)
-	DynamicImageSetTextureDimensions("CorksDropAlertsWindowBanner", 220, 80)
+	DynamicImageSetTexture("CorksEventDropsWindowBanner", "CST_Artifact", 0, 0)
+	DynamicImageSetTextureDimensions("CorksEventDropsWindowBanner", 220, 80)
 
-	CorksDropAlerts.Load()
-	CorksDropAlerts.Initialized = true
-	TextEditBoxSetText("CorksDropAlertsWindowItemTextBox", CorksDropAlerts.ItemText)
-	CorksDropAlerts.ScanBackpack()
+	CorksEventDrops.Load()
+	CorksEventDrops.Initialized = true
+	TextEditBoxSetText("CorksEventDropsWindowItemTextBox", CorksEventDrops.ItemText)
 
 	-- Protected, so a problem with the art can never break the window
-	CorksDropAlerts.CheckArt = nil
-	CorksDropAlerts.CheckImages = {}
-	CorksDropAlerts.ButtonArt = {}
-	local ok, err = pcall(CorksDropAlerts.ApplyClassicControls)
+	CorksEventDrops.ButtonArt = {}
+	local ok, err = pcall(CorksEventDrops.ApplyClassicControls)
 	if not ok then
-		CorksDropAlerts.ReportArtError(err)
+		CorksEventDrops.ReportArtError(err)
 	end
+	WindowSetDimensions("CorksEventDropsWindow", CorksEventDrops.WIDTH, CorksEventDrops.HEIGHT)
+	CorksEventDrops.ApplyClassicBackground(CorksEventDrops.HEIGHT)
 
-	-- Sizes the window to its rows, which also draws the classic background
-	CorksDropAlerts.CurrentHeight = 0
-	CorksDropAlerts.Refresh()
+	CorksEventDrops.ScanBackpack()
+	CorksEventDrops.Refresh()
 end
 
-function CorksDropAlerts.Shutdown()
-	CorksDropAlerts.SyncFromButtons()
-	WindowUtils.SaveWindowPosition("CorksDropAlertsWindow")
-	CorksGumpArt.ReleaseAll(CorksDropAlerts.GumpArt)
+function CorksEventDrops.Shutdown()
+	WindowUtils.SaveWindowPosition("CorksEventDropsWindow")
+	CorksGumpArt.ReleaseAll(CorksEventDrops.GumpArt)
 end
 
-function CorksDropAlerts.RowName(index)
-	return "CorksDropAlertsWindowRow" .. index
-end
-
-function CorksDropAlerts.ReportArtError(err)
+function CorksEventDrops.ReportArtError(err)
 	pcall(WindowUtils.ChatPrint, StringToWString("Event Drops art: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
-end
-
-function CorksDropAlerts.HeightFor(rows)
-	return CorksDropAlerts.ROWS_TOP + rows * CorksDropAlerts.ROW_HEIGHT + CorksDropAlerts.BOTTOM_HEIGHT
 end
 
 ----------------------------------------------------------------
@@ -284,53 +247,30 @@ end
 ----------------------------------------------------------------
 
 -- Shows one piece of art in an image made by CorksGumpArt.Image
-function CorksDropAlerts.SetArt(image, piece)
+function CorksEventDrops.SetArt(image, piece)
 	DynamicImageSetTexture(image, piece.tex, 0, 0)
 	DynamicImageSetTextureDimensions(image, piece.w, piece.h)
 	WindowSetDimensions(image, piece.w, piece.h)
 end
 
--- Check boxes, buttons and entry box, drawn once when the window opens. Each one
--- keeps its EC version when its art can't be loaded.
-function CorksDropAlerts.ApplyClassicControls()
-	if not CorksDropAlerts.ClassicBackground then
+-- The button and entry box, drawn once when the window opens. Each one keeps
+-- its EC version when its art can't be loaded.
+function CorksEventDrops.ApplyClassicControls()
+	if not CorksEventDrops.ClassicBackground then
 		return
 	end
-	CorksDropAlerts.ApplyClassicChecks()
-	CorksDropAlerts.ApplyClassicButton("CorksDropAlertsWindowResetClassic", "CorksDropAlertsWindowResetButton",
-		CorksDropAlerts.ClassicResetButton, L"Reset Count", CorksDropAlerts.OnReset)
-	CorksDropAlerts.ApplyClassicButton("CorksDropAlertsWindowRemoveClassic", "CorksDropAlertsWindowRemoveButton",
-		CorksDropAlerts.ClassicRemoveButton, L"Remove Unchecked", CorksDropAlerts.OnRemoveUnchecked)
-	CorksDropAlerts.ApplyClassicTextBox("CorksDropAlertsWindowTextBox")
-	CorksDropAlerts.ApplyClassicTextBox("CorksDropAlertsWindowItemTextBox")
-end
-
-function CorksDropAlerts.ApplyClassicChecks()
-	local ids = CorksDropAlerts.ClassicCheck
-	if not ids then
-		return
-	end
-	local off = CorksGumpArt.Request(ids[1], CorksDropAlerts.GumpArt)
-	local on = CorksGumpArt.Request(ids[2], CorksDropAlerts.GumpArt)
-	if not off or not on then
-		return
-	end
-	CorksDropAlerts.CheckArt = { [false] = off, [true] = on }
-	for i = 1, CorksDropAlerts.MAX_ROWS do
-		local holder = CorksDropAlerts.RowName(i) .. "Check"
-		CorksGumpArt.Clear(holder)
-		WindowSetDimensions(holder, off.w, off.h)
-		CorksDropAlerts.CheckImages[i] = CorksGumpArt.Image(holder, off.tex, 0, 0, off.w, off.h)
-	end
+	CorksEventDrops.ApplyClassicButton("CorksEventDropsWindowResetClassic", "CorksEventDropsWindowResetButton",
+		CorksEventDrops.ClassicResetButton, L"Reset Count", CorksEventDrops.OnReset)
+	CorksEventDrops.ApplyClassicTextBox("CorksEventDropsWindowItemTextBox")
 end
 
 -- holder is the classic button window, ecButton the EC button it replaces;
 -- ids are { normal, mouse over, pressed } (the last two fall back to normal).
-function CorksDropAlerts.ApplyClassicButton(holder, ecButton, ids, text, action)
+function CorksEventDrops.ApplyClassicButton(holder, ecButton, ids, text, action)
 	if not ids then
 		return
 	end
-	local owner = CorksDropAlerts.GumpArt
+	local owner = CorksEventDrops.GumpArt
 	local normal = CorksGumpArt.Request(ids[1], owner)
 	if not normal then
 		return
@@ -345,7 +285,7 @@ function CorksDropAlerts.ApplyClassicButton(holder, ecButton, ids, text, action)
 	local image = CorksGumpArt.Image(art, normal.tex, 0, y, normal.w, normal.h)
 	LabelSetText(holder .. "Text", text)
 
-	CorksDropAlerts.ButtonArt[holder] = {
+	CorksEventDrops.ButtonArt[holder] = {
 		image = image, normal = normal, over = over, pressed = pressed, action = action,
 	}
 	WindowSetShowing(ecButton, false)
@@ -354,50 +294,50 @@ end
 
 -- Classic white entry box with black text, like Corks' Targeting. The art goes in
 -- the box's <box>BG holder.
-function CorksDropAlerts.ApplyClassicTextBox(box)
-	if not CorksDropAlerts.ClassicTextBox then
+function CorksEventDrops.ApplyClassicTextBox(box)
+	if not CorksEventDrops.ClassicTextBox then
 		return
 	end
 	local holder = box .. "BG"
 	CorksGumpArt.Clear(holder)
-	if CorksGumpArt.Background(holder, CorksDropAlerts.ClassicTextBox,
-		CorksDropAlerts.TEXTBOX_WIDTH, CorksDropAlerts.TEXTBOX_HEIGHT, CorksDropAlerts.GumpArt) then
+	if CorksGumpArt.Background(holder, CorksEventDrops.ClassicTextBox,
+		CorksEventDrops.TEXTBOX_WIDTH, CorksEventDrops.TEXTBOX_HEIGHT, CorksEventDrops.GumpArt) then
 		WindowSetShowing(holder .. "BG", false)
 		WindowSetShowing(holder .. "Frame", false)
 		TextEditBoxSetTextColor(box, 0, 0, 0)
 	end
 end
 
--- Draws the classic background at the window's height, then lines up the art
--- and the title (CorksGumpArt.FinishClassic re-scales the whole window, which
--- also fixes the size of the classic controls made from Lua). Protected, so a
--- problem with the art can never stop the list updating.
-function CorksDropAlerts.ApplyClassicBackground(height)
-	if not CorksDropAlerts.ClassicBackground then
+-- Draws the classic background, then lines up the art and the title
+-- (CorksGumpArt.FinishClassic re-scales the whole window, which also fixes the
+-- size of the classic controls made from Lua). Protected, so a problem with the
+-- art can never break the window.
+function CorksEventDrops.ApplyClassicBackground(height)
+	if not CorksEventDrops.ClassicBackground then
 		return
 	end
 	local ok, err = pcall(function()
-		CorksGumpArt.ApplyClassic("CorksDropAlertsWindow", CorksDropAlerts.ClassicBackground,
-			CorksDropAlerts.WIDTH, height, CorksDropAlerts.GumpArt)
-		CorksGumpArt.FinishClassic("CorksDropAlertsWindow", CorksDropAlerts.TitleOffsetY)
+		CorksGumpArt.ApplyClassic("CorksEventDropsWindow", CorksEventDrops.ClassicBackground,
+			CorksEventDrops.WIDTH, height, CorksEventDrops.GumpArt)
+		CorksGumpArt.FinishClassic("CorksEventDropsWindow", CorksEventDrops.TitleOffsetY)
 	end)
 	if not ok then
-		CorksDropAlerts.ReportArtError(err)
+		CorksEventDrops.ReportArtError(err)
 	end
 end
 
-function CorksDropAlerts.OnClassicButtonDown()
-	local state = CorksDropAlerts.ButtonArt[SystemData.ActiveWindow.name]
+function CorksEventDrops.OnClassicButtonDown()
+	local state = CorksEventDrops.ButtonArt[SystemData.ActiveWindow.name]
 	if state then
 		state.down = true
-		CorksDropAlerts.SetArt(state.image, state.pressed)
+		CorksEventDrops.SetArt(state.image, state.pressed)
 	end
 end
 
-function CorksDropAlerts.OnClassicButtonUp()
-	local state = CorksDropAlerts.ButtonArt[SystemData.ActiveWindow.name]
+function CorksEventDrops.OnClassicButtonUp()
+	local state = CorksEventDrops.ButtonArt[SystemData.ActiveWindow.name]
 	if state then
-		CorksDropAlerts.SetArt(state.image, state.over)
+		CorksEventDrops.SetArt(state.image, state.over)
 		if state.down then
 			state.down = false
 			state.action()
@@ -405,18 +345,18 @@ function CorksDropAlerts.OnClassicButtonUp()
 	end
 end
 
-function CorksDropAlerts.OnClassicButtonOver()
-	local state = CorksDropAlerts.ButtonArt[SystemData.ActiveWindow.name]
+function CorksEventDrops.OnClassicButtonOver()
+	local state = CorksEventDrops.ButtonArt[SystemData.ActiveWindow.name]
 	if state then
-		CorksDropAlerts.SetArt(state.image, state.over)
+		CorksEventDrops.SetArt(state.image, state.over)
 	end
 end
 
-function CorksDropAlerts.OnClassicButtonOverEnd()
-	local state = CorksDropAlerts.ButtonArt[SystemData.ActiveWindow.name]
+function CorksEventDrops.OnClassicButtonOverEnd()
+	local state = CorksEventDrops.ButtonArt[SystemData.ActiveWindow.name]
 	if state then
 		state.down = false
-		CorksDropAlerts.SetArt(state.image, state.normal)
+		CorksEventDrops.SetArt(state.image, state.normal)
 	end
 end
 
@@ -425,12 +365,12 @@ end
 ----------------------------------------------------------------
 
 -- A label takes its color when its text is set, so this sets the color first.
-function CorksDropAlerts.SetLabel(label, text, color)
+function CorksEventDrops.SetLabel(label, text, color)
 	LabelSetTextColor(label, color[1], color[2], color[3])
 	LabelSetText(label, text)
 end
 
-function CorksDropAlerts.FormatAgo(seconds)
+function CorksEventDrops.FormatAgo(seconds)
 	seconds = math.max(0, math.floor(seconds))
 	if seconds < 60 then
 		return seconds .. "s ago"
@@ -440,130 +380,62 @@ function CorksDropAlerts.FormatAgo(seconds)
 	return string.format("%dh %02dm ago", math.floor(seconds / 3600), math.floor(seconds / 60) % 60)
 end
 
--- The header total. Event items already in the backpack are added to it only
+-- The header count. Event items already in the backpack are added to it only
 -- while it's 0 (see ScanBackpack), so a drop is never counted twice.
-function CorksDropAlerts.UpdateTotal()
-	local total = CorksDropAlerts.Total
-	LabelSetText("CorksDropAlertsWindowTotalCaption", L"Event Item Count:")
-	LabelSetText("CorksDropAlertsWindowTotal", towstring(total))
+function CorksEventDrops.UpdateTotal()
+	LabelSetText("CorksEventDropsWindowTotalCaption", L"Event Item Count:")
+	LabelSetText("CorksEventDropsWindowTotal", towstring(CorksEventDrops.Total))
 end
 
-function CorksDropAlerts.UpdateLastDrop()
+function CorksEventDrops.UpdateLastDrop()
 	local text = "No drops yet"
-	if CorksDropAlerts.LastDropTime then
-		text = "Last drop: " .. CorksDropAlerts.FormatAgo(Interface.TimeSinceLogin - CorksDropAlerts.LastDropTime)
+	if #CorksEventDrops.ItemPatterns == 0 then
+		text = "Set an Event Item Tag below"
+	elseif CorksEventDrops.LastDropTime then
+		text = "Last drop: " .. CorksEventDrops.FormatAgo(Interface.TimeSinceLogin - CorksEventDrops.LastDropTime)
 	end
-	LabelSetText("CorksDropAlertsWindowLastDrop", StringToWString(text))
+	LabelSetText("CorksEventDropsWindowLastDrop", StringToWString(text))
 end
 
--- Redraw the header and the rows, and fit the window to the rows in use.
-function CorksDropAlerts.Refresh()
-	if not CorksDropAlerts.Initialized or not DoesWindowNameExist("CorksDropAlertsWindow") then
+function CorksEventDrops.Refresh()
+	if not CorksEventDrops.Initialized or not DoesWindowNameExist("CorksEventDropsWindow") then
 		return
 	end
-	local D = CorksDropAlerts
-
-	D.UpdateTotal()
-	D.UpdateLastDrop()
-	D.UpdateRewardPoints()
-
-	local classicChecks = D.CheckArt ~= nil
-	for i = 1, D.MAX_ROWS do
-		local rowName = D.RowName(i)
-		local entry = D.Entries[i]
-		-- With no messages, row 1 says how to add one
-		local placeholder = (i == 1 and entry == nil)
-		WindowSetShowing(rowName, entry ~= nil or placeholder)
-		WindowSetShowing(rowName .. "Stripe", i % 2 == 1)
-		if entry then
-			ButtonSetPressedFlag(rowName .. "Button", entry.on)
-			WindowSetShowing(rowName .. "Button", not classicChecks)
-			WindowSetShowing(rowName .. "Check", classicChecks)
-			if classicChecks then
-				D.SetArt(D.CheckImages[i], D.CheckArt[entry.on == true])
-			end
-			local color, countColor = D.COLOR_ON, D.COLOR_COUNT
-			if D.FlashRow == i then
-				color = D.COLOR_FLASH
-			elseif not entry.on then
-				color, countColor = D.COLOR_OFF, D.COLOR_OFF
-			end
-			D.SetLabel(rowName .. "Label", entry.text, color)
-			D.SetLabel(rowName .. "Count", towstring(entry.count), countColor)
-		elseif placeholder then
-			WindowSetShowing(rowName .. "Button", false)
-			WindowSetShowing(rowName .. "Check", false)
-			D.SetLabel(rowName .. "Label", L"No messages yet. Add one below.", D.COLOR_OFF)
-			LabelSetText(rowName .. "Count", L"")
-		end
-	end
-
-	local height = D.HeightFor(math.max(table.getn(D.Entries), 1))
-	if height ~= D.CurrentHeight then
-		D.CurrentHeight = height
-		WindowSetDimensions("CorksDropAlertsWindow", D.WIDTH, height)
-		D.ApplyClassicBackground(height)
-	end
+	CorksEventDrops.UpdateTotal()
+	CorksEventDrops.UpdateLastDrop()
+	CorksEventDrops.UpdateRewardPoints()
 end
 
 ----------------------------------------------------------------
 -- Drop flash
 ----------------------------------------------------------------
 
--- Windows that pulse while a row is lit
-function CorksDropAlerts.FlashWindows(row)
-	local rowName = CorksDropAlerts.RowName(row)
-	return { rowName .. "Label", rowName .. "Count", "CorksDropAlertsWindowTotal", "CorksDropAlertsWindowBanner" }
-end
+CorksEventDrops.FLASH_WINDOWS = { "CorksEventDropsWindowTotal", "CorksEventDropsWindowBanner" }
 
--- Lights up the row whose message just arrived and pulses it with the total.
--- Only while the window is showing, as it doesn't update while it's closed.
-function CorksDropAlerts.StartFlash(row)
-	if CorksDropAlerts.FlashRow then
-		CorksDropAlerts.StopFlash()
+-- Pulses the count and the banner when a drop arrives. Only while the window is
+-- showing, as it doesn't update while it's closed.
+function CorksEventDrops.StartFlash()
+	if CorksEventDrops.Flashing then
+		CorksEventDrops.StopFlash()
 	end
-	if not DoesWindowNameExist("CorksDropAlertsWindow") or not WindowGetShowing("CorksDropAlertsWindow") then
+	if not DoesWindowNameExist("CorksEventDropsWindow") or not WindowGetShowing("CorksEventDropsWindow") then
 		return
 	end
-	CorksDropAlerts.FlashRow = row
-	CorksDropAlerts.FlashLeft = CorksDropAlerts.FLASH_SECONDS
-	for _, name in ipairs(CorksDropAlerts.FlashWindows(row)) do
+	CorksEventDrops.Flashing = true
+	CorksEventDrops.FlashLeft = CorksEventDrops.FLASH_SECONDS
+	for _, name in ipairs(CorksEventDrops.FLASH_WINDOWS) do
 		WindowStartAlphaAnimation(name, Window.AnimationType.LOOP, 0.35, 1, 0.4, false, 0, 0)
 	end
 end
 
-function CorksDropAlerts.StopFlash()
-	local row = CorksDropAlerts.FlashRow
-	CorksDropAlerts.FlashRow = nil
-	if not row or not DoesWindowNameExist("CorksDropAlertsWindow") then
+function CorksEventDrops.StopFlash()
+	CorksEventDrops.Flashing = false
+	if not DoesWindowNameExist("CorksEventDropsWindow") then
 		return
 	end
-	for _, name in ipairs(CorksDropAlerts.FlashWindows(row)) do
+	for _, name in ipairs(CorksEventDrops.FLASH_WINDOWS) do
 		WindowStopAlphaAnimation(name)
 		WindowSetAlpha(name, 1)
-	end
-	CorksDropAlerts.Refresh()
-end
-
--- Copy the check boxes into the entries and save if anything changed.
-function CorksDropAlerts.SyncFromButtons()
-	if not CorksDropAlerts.Initialized then
-		return
-	end
-	local changed = false
-	for i, entry in ipairs(CorksDropAlerts.Entries) do
-		local button = CorksDropAlerts.RowName(i) .. "Button"
-		if DoesWindowNameExist(button) then
-			local on = ButtonGetPressedFlag(button)
-			if on ~= entry.on then
-				entry.on = on
-				changed = true
-			end
-		end
-	end
-	if changed then
-		CorksDropAlerts.Save()
-		CorksDropAlerts.Refresh()
 	end
 end
 
@@ -571,119 +443,57 @@ end
 -- Event Handlers
 ----------------------------------------------------------------
 
-function CorksDropAlerts.OnUpdate(timePassed)
+function CorksEventDrops.OnUpdate(timePassed)
 	timePassed = timePassed or 0
-	if CorksDropAlerts.Dirty then
-		CorksDropAlerts.Dirty = false
-		CorksDropAlerts.SyncFromButtons()
-	end
 
-	if CorksDropAlerts.FlashRow then
-		CorksDropAlerts.FlashLeft = CorksDropAlerts.FlashLeft - timePassed
-		if CorksDropAlerts.FlashLeft <= 0 then
-			CorksDropAlerts.StopFlash()
+	if CorksEventDrops.Flashing then
+		CorksEventDrops.FlashLeft = CorksEventDrops.FlashLeft - timePassed
+		if CorksEventDrops.FlashLeft <= 0 then
+			CorksEventDrops.StopFlash()
 		end
 	end
 
 	-- Keep "Last drop: 4m ago" current
-	CorksDropAlerts.LastDropTick = CorksDropAlerts.LastDropTick + timePassed
-	if CorksDropAlerts.LastDropTick >= 1 then
-		CorksDropAlerts.LastDropTick = 0
-		if CorksDropAlerts.Initialized then
-			CorksDropAlerts.UpdateLastDrop()
+	CorksEventDrops.LastDropTick = CorksEventDrops.LastDropTick + timePassed
+	if CorksEventDrops.LastDropTick >= 1 then
+		CorksEventDrops.LastDropTick = 0
+		if CorksEventDrops.Initialized then
+			CorksEventDrops.UpdateLastDrop()
 		end
 	end
 
-	CorksDropAlerts.ItemScanTick = CorksDropAlerts.ItemScanTick + timePassed
-	if CorksDropAlerts.ItemScanTick >= CorksDropAlerts.ITEM_SCAN_SECONDS then
-		CorksDropAlerts.ItemScanTick = 0
-		if WindowGetShowing("CorksDropAlertsWindow") then
-			CorksDropAlerts.ScanBackpack()
+	CorksEventDrops.ItemScanTick = CorksEventDrops.ItemScanTick + timePassed
+	if CorksEventDrops.ItemScanTick >= CorksEventDrops.ITEM_SCAN_SECONDS then
+		CorksEventDrops.ItemScanTick = 0
+		if WindowGetShowing("CorksEventDropsWindow") then
+			CorksEventDrops.ScanBackpack()
 		end
 	end
 end
 
-function CorksDropAlerts.OnRowButton()
-	CorksDropAlerts.Dirty = true
+function CorksEventDrops.OnReset()
+	CorksEventDrops.Total = 0
+	CorksEventDrops.Refresh()
 end
 
--- Flips a row's EC check button, which keeps the checked state even while the
--- classic check box art is shown in its place.
-function CorksDropAlerts.ToggleRowButton(button)
-	ButtonSetPressedFlag(button, not ButtonGetPressedFlag(button))
-	CorksDropAlerts.Dirty = true
+function CorksEventDrops.OnItemTextClick()
+	WindowAssignFocus("CorksEventDropsWindowItemTextBox", true)
 end
 
--- Clicking the message text toggles its check box too.
-function CorksDropAlerts.OnRowLabel()
-	CorksDropAlerts.ToggleRowButton((string.gsub(SystemData.ActiveWindow.name, "Label$", "Button")))
+-- The tag stays in its box; an empty box stops the counting.
+function CorksEventDrops.OnItemTextEnter()
+	CorksEventDrops.SetItemText(TextEditBoxGetText("CorksEventDropsWindowItemTextBox"))
+	Interface.SaveWString("CorksEventDropsItemName", CorksEventDrops.ItemText)
+	TextEditBoxSetText("CorksEventDropsWindowItemTextBox", CorksEventDrops.ItemText)
+	WindowAssignFocus("CorksEventDropsWindowItemTextBox", false)
+	CorksEventDrops.ItemScanTick = 0
+	CorksEventDrops.ScanBackpack()
+	CorksEventDrops.Refresh()
 end
 
--- The classic check box
-function CorksDropAlerts.OnRowCheck()
-	CorksDropAlerts.ToggleRowButton((string.gsub(SystemData.ActiveWindow.name, "Check$", "Button")))
-end
-
-function CorksDropAlerts.OnReset()
-	CorksDropAlerts.Total = 0
-	for _, entry in ipairs(CorksDropAlerts.Entries) do
-		entry.count = 0
-	end
-	CorksDropAlerts.Refresh()
-end
-
-function CorksDropAlerts.OnRemoveUnchecked()
-	CorksDropAlerts.SyncFromButtons()
-	local kept = {}
-	for _, entry in ipairs(CorksDropAlerts.Entries) do
-		if entry.on then
-			table.insert(kept, entry)
-		end
-	end
-	CorksDropAlerts.Entries = kept
-	CorksDropAlerts.Save()
-	CorksDropAlerts.Refresh()
-end
-
-function CorksDropAlerts.OnTextClick()
-	WindowAssignFocus("CorksDropAlertsWindowTextBox", true)
-end
-
-function CorksDropAlerts.OnTextEnter()
-	local text = WStringToString(TextEditBoxGetText("CorksDropAlertsWindowTextBox"))
-	text = string.gsub(text, "^%s*(.-)%s*$", "%1")
-	if text ~= "" then
-		CorksDropAlerts.SyncFromButtons()
-		if CorksDropAlerts.AddEntry(StringToWString(text)) then
-			CorksDropAlerts.Save()
-			CorksDropAlerts.Refresh()
-		end
-	end
-	TextEditBoxSetText("CorksDropAlertsWindowTextBox", L"")
-	WindowAssignFocus("CorksDropAlertsWindowTextBox", false)
-end
-
-function CorksDropAlerts.OnTextEscape()
-	WindowAssignFocus("CorksDropAlertsWindowTextBox", false)
-end
-
-function CorksDropAlerts.OnItemTextClick()
-	WindowAssignFocus("CorksDropAlertsWindowItemTextBox", true)
-end
-
--- The item name text stays in its box; an empty box stops the counting.
-function CorksDropAlerts.OnItemTextEnter()
-	CorksDropAlerts.SetItemText(TextEditBoxGetText("CorksDropAlertsWindowItemTextBox"))
-	Interface.SaveWString("CorksDropAlertsItemName", CorksDropAlerts.ItemText)
-	TextEditBoxSetText("CorksDropAlertsWindowItemTextBox", CorksDropAlerts.ItemText)
-	WindowAssignFocus("CorksDropAlertsWindowItemTextBox", false)
-	CorksDropAlerts.ItemScanTick = 0
-	CorksDropAlerts.ScanBackpack()
-end
-
-function CorksDropAlerts.OnItemTextEscape()
-	TextEditBoxSetText("CorksDropAlertsWindowItemTextBox", CorksDropAlerts.ItemText)
-	WindowAssignFocus("CorksDropAlertsWindowItemTextBox", false)
+function CorksEventDrops.OnItemTextEscape()
+	TextEditBoxSetText("CorksEventDropsWindowItemTextBox", CorksEventDrops.ItemText)
+	WindowAssignFocus("CorksEventDropsWindowItemTextBox", false)
 end
 
 ----------------------------------------------------------------
@@ -691,7 +501,7 @@ end
 ----------------------------------------------------------------
 
 -- Takes the typed text (wstring); several names can be given, split by commas.
-function CorksDropAlerts.SetItemText(text)
+function CorksEventDrops.SetItemText(text)
 	local patterns = {}
 	local parts = {}
 	for part in string.gmatch(WStringToString(text or L""), "[^,]+") do
@@ -701,11 +511,11 @@ function CorksDropAlerts.SetItemText(text)
 			table.insert(parts, part)
 		end
 	end
-	CorksDropAlerts.ItemPatterns = patterns
-	CorksDropAlerts.ItemText = StringToWString(table.concat(parts, ", "))
+	CorksEventDrops.ItemPatterns = patterns
+	CorksEventDrops.ItemText = StringToWString(table.concat(parts, ", "))
 end
 
-function CorksDropAlerts.BackpackId()
+function CorksEventDrops.BackpackId()
 	if ContainerWindow and ContainerWindow.PlayerBackpack and ContainerWindow.PlayerBackpack ~= 0 then
 		return ContainerWindow.PlayerBackpack
 	end
@@ -718,27 +528,27 @@ end
 
 -- The item's name in lower case, or nil while the client hasn't got it yet
 -- (it's looked up again on the next scan).
-function CorksDropAlerts.ItemName(objectId)
-	local name = CorksDropAlerts.ItemNames[objectId]
+function CorksEventDrops.ItemName(objectId)
+	local name = CorksEventDrops.ItemNames[objectId]
 	if name then
 		return name
 	end
-	local wname = ItemProperties.GetObjectProperties(objectId, 1, "CorksDropAlerts")
+	local wname = ItemProperties.GetObjectProperties(objectId, 1, "CorksEventDrops")
 	if not wname or wname == L"" then
 		return nil
 	end
 	name = string.lower(WStringToString(wname))
-	CorksDropAlerts.ItemNames[objectId] = name
+	CorksEventDrops.ItemNames[objectId] = name
 	return name
 end
 
 -- How many items a name stands for: "5 Unhallowed Shards" is a stack of 5
-function CorksDropAlerts.ItemAmount(name)
+function CorksEventDrops.ItemAmount(name)
 	return tonumber(string.match(name, "^(%d+) ")) or 1
 end
 
-function CorksDropAlerts.NameMatches(name)
-	for _, pattern in ipairs(CorksDropAlerts.ItemPatterns) do
+function CorksEventDrops.NameMatches(name)
+	for _, pattern in ipairs(CorksEventDrops.ItemPatterns) do
 		if string.find(name, pattern, 1, true) then
 			return true
 		end
@@ -748,7 +558,7 @@ end
 
 -- Adds up the matching items in a container and the bags in it. Only containers
 -- the client has contents for are seen (in practice, ones opened this session).
-function CorksDropAlerts.CountIn(containerId, depth, seen)
+function CorksEventDrops.CountIn(containerId, depth, seen)
 	local registered = false
 	if not WindowData.ContainerWindow[containerId] then
 		RegisterWindowData(WindowData.ContainerWindow.Type, containerId)
@@ -761,12 +571,12 @@ function CorksDropAlerts.CountIn(containerId, depth, seen)
 			local item = data.ContainedItems[i]
 			if item and item.objectId then
 				seen[item.objectId] = true
-				local name = CorksDropAlerts.ItemName(item.objectId)
-				if name and CorksDropAlerts.NameMatches(name) then
-					total = total + CorksDropAlerts.ItemAmount(name)
+				local name = CorksEventDrops.ItemName(item.objectId)
+				if name and CorksEventDrops.NameMatches(name) then
+					total = total + CorksEventDrops.ItemAmount(name)
 				end
-				if depth < CorksDropAlerts.ITEM_SCAN_DEPTH then
-					total = total + CorksDropAlerts.CountIn(item.objectId, depth + 1, seen)
+				if depth < CorksEventDrops.ITEM_SCAN_DEPTH then
+					total = total + CorksEventDrops.CountIn(item.objectId, depth + 1, seen)
 				end
 			end
 		end
@@ -782,23 +592,23 @@ end
 -- drops that arrived before the count started aren't missed. Once the total is
 -- above 0 only drop messages add to it, and the backpack isn't checked again.
 -- Protected, so a problem reading the backpack can never break the window.
-function CorksDropAlerts.ScanBackpack()
-	if not CorksDropAlerts.Initialized or CorksDropAlerts.Total > 0 then
+function CorksEventDrops.ScanBackpack()
+	if not CorksEventDrops.Initialized or CorksEventDrops.Total > 0 then
 		return
 	end
 	local count = nil
-	if #CorksDropAlerts.ItemPatterns > 0 then
+	if #CorksEventDrops.ItemPatterns > 0 then
 		local ok, result = pcall(function()
-			local backpack = CorksDropAlerts.BackpackId()
+			local backpack = CorksEventDrops.BackpackId()
 			if not backpack then
 				return nil
 			end
 			local seen = {}
-			local total = CorksDropAlerts.CountIn(backpack, 1, seen)
+			local total = CorksEventDrops.CountIn(backpack, 1, seen)
 			-- Forget the names of items that have left the backpack
-			for objectId in pairs(CorksDropAlerts.ItemNames) do
+			for objectId in pairs(CorksEventDrops.ItemNames) do
 				if not seen[objectId] then
-					CorksDropAlerts.ItemNames[objectId] = nil
+					CorksEventDrops.ItemNames[objectId] = nil
 				end
 			end
 			return total
@@ -808,8 +618,8 @@ function CorksDropAlerts.ScanBackpack()
 		end
 	end
 	if count and count > 0 then
-		CorksDropAlerts.Total = count
-		CorksDropAlerts.Refresh()
+		CorksEventDrops.Total = count
+		CorksEventDrops.Refresh()
 	end
 end
 
@@ -818,7 +628,7 @@ end
 ----------------------------------------------------------------
 
 -- A gump label parameter (wstring or string) as a plain string
-function CorksDropAlerts.ParamText(value)
+function CorksEventDrops.ParamText(value)
 	if type(value) == "string" then
 		return value
 	end
@@ -832,8 +642,8 @@ end
 -- Called every frame from Interface's update loop, so the points are read even
 -- while the Event Drops window is closed. Looks through the open server gumps
 -- for the "Your Reward Points" line.
-function CorksDropAlerts.CheckRewardGump(timePassed)
-	local D = CorksDropAlerts
+function CorksEventDrops.CheckRewardGump(timePassed)
+	local D = CorksEventDrops
 	D.RewardTick = D.RewardTick + (timePassed or 0)
 	if D.RewardTick < D.REWARD_CHECK_SECONDS then
 		return
@@ -868,8 +678,8 @@ function CorksDropAlerts.CheckRewardGump(timePassed)
 	end
 end
 
-function CorksDropAlerts.RecordRewardPoints(points, eventName, expires)
-	local D = CorksDropAlerts
+function CorksEventDrops.RecordRewardPoints(points, eventName, expires)
+	local D = CorksEventDrops
 	D.Load()
 	-- The first reading this session (or from a different event) is the start
 	-- the session's gain is measured from
@@ -884,19 +694,19 @@ function CorksDropAlerts.RecordRewardPoints(points, eventName, expires)
 	D.RewardEvent = eventName
 	D.RewardExpires = expires
 	D.RewardSeen = true
-	Interface.SaveNumber("CorksDropAlertsRewardPoints", points)
-	Interface.SaveWString("CorksDropAlertsRewardEvent", StringToWString(eventName))
-	Interface.SaveWString("CorksDropAlertsRewardExpires", StringToWString(expires))
+	Interface.SaveNumber("CorksEventDropsRewardPoints", points)
+	Interface.SaveWString("CorksEventDropsRewardEvent", StringToWString(eventName))
+	Interface.SaveWString("CorksEventDropsRewardExpires", StringToWString(expires))
 	D.UpdateRewardPoints()
 end
 
 -- "Reward points: 55 (+10 this session), expire 2027-02-01"
-function CorksDropAlerts.UpdateRewardPoints()
-	local D = CorksDropAlerts
-	if not D.Initialized or not DoesWindowNameExist("CorksDropAlertsWindow") then
+function CorksEventDrops.UpdateRewardPoints()
+	local D = CorksEventDrops
+	if not D.Initialized or not DoesWindowNameExist("CorksEventDropsWindow") then
 		return
 	end
-	local label = "CorksDropAlertsWindowRewardPoints"
+	local label = "CorksEventDropsWindowRewardPoints"
 	if not D.RewardPoints then
 		D.SetLabel(label, L"Reward points: open the event vendor to read them", D.COLOR_OFF)
 		return
@@ -918,36 +728,39 @@ function CorksDropAlerts.UpdateRewardPoints()
 	D.SetLabel(label, StringToWString(text), D.COLOR_COUNT)
 end
 
-
 -- The window only opens when the user turns it on with the Event Drops action.
 -- Whether it's open is saved, so it opens again at login if it was open when the
 -- client closed (Interface.lua reads the setting when it creates the window).
 -- Drops are matched and counted while it's closed.
 
 -- Open or close the window, creating it again if it was destroyed.
-function CorksDropAlerts.Toggle()
-	local open = DoesWindowNameExist("CorksDropAlertsWindow") and WindowGetShowing("CorksDropAlertsWindow")
-	CorksDropAlerts.SetOpen(not open)
+function CorksEventDrops.Toggle()
+	local open = DoesWindowNameExist("CorksEventDropsWindow") and WindowGetShowing("CorksEventDropsWindow")
+	CorksEventDrops.SetOpen(not open)
 end
 
 -- Right-click closes the window until the action opens it again.
-function CorksDropAlerts.OnClose()
-	CorksDropAlerts.SetOpen(false)
+function CorksEventDrops.OnClose()
+	CorksEventDrops.SetOpen(false)
 end
 
-function CorksDropAlerts.SetOpen(open)
-	Interface.SaveBoolean("CorksDropAlertsWindowOpen", open)
-	if not DoesWindowNameExist("CorksDropAlertsWindow") then
+function CorksEventDrops.SetOpen(open)
+	Interface.SaveBoolean("CorksEventDropsWindowOpen", open)
+	if not DoesWindowNameExist("CorksEventDropsWindow") then
 		if open then
-			CreateWindow("CorksDropAlertsWindow", true)
+			CreateWindow("CorksEventDropsWindow", true)
 		end
 		return
 	end
-	if not open then
-		CorksDropAlerts.SyncFromButtons()
-	end
-	WindowSetShowing("CorksDropAlertsWindow", open)
+	WindowSetShowing("CorksEventDropsWindow", open)
 	if open then
-		CorksDropAlerts.Refresh()
+		CorksEventDrops.Refresh()
 	end
 end
+
+-- Event Drops used to be called CorksDropAlerts. Hotbar buttons copy the action's
+-- text when they're placed, so a button made before the rename still runs
+-- "script CorksDropAlerts.Toggle()"; this keeps those working. Once every Event
+-- Drops hotbar button has been dragged on again from the Actions window, this
+-- line can be removed.
+CorksDropAlerts = CorksEventDrops
