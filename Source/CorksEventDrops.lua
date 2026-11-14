@@ -36,7 +36,7 @@ CorksEventDrops.GumpArt = {}
 
 -- Size; must match CorksEventDropsWindow in the XML
 CorksEventDrops.WIDTH = 420
-CorksEventDrops.HEIGHT = 266
+CorksEventDrops.HEIGHT = 284
 CorksEventDrops.TEXTBOX_WIDTH = 380
 CorksEventDrops.TEXTBOX_HEIGHT = 30
 -- How long the count and banner pulse after a drop (seconds)
@@ -700,20 +700,27 @@ function CorksEventDrops.RecordRewardPoints(points, eventName, expires)
 	D.UpdateRewardPoints()
 end
 
--- "Reward points: 55 (+10 this session), expire 2027-02-01"
+-- "Reward points: 1065 (+10 this session)", with "Expires 2027-02-01" on the
+-- line under it (one line would run off the gump with 4-5 digit points)
 function CorksEventDrops.UpdateRewardPoints()
 	local D = CorksEventDrops
 	if not D.Initialized or not DoesWindowNameExist("CorksEventDropsWindow") then
 		return
 	end
 	local label = "CorksEventDropsWindowRewardPoints"
+	local expiresLabel = "CorksEventDropsWindowRewardExpires"
+	local expires = L""
+	if D.RewardPoints and D.RewardExpires ~= "" then
+		expires = StringToWString("Expires " .. D.RewardExpires)
+	end
+	LabelSetText(expiresLabel, expires)
 	if not D.RewardPoints then
 		D.SetLabel(label, L"Reward points: open the event vendor to read them", D.COLOR_OFF)
 		return
 	end
 	local text = "Reward points: " .. D.RewardPoints
 	if not D.RewardSeen then
-		text = text .. " (at last visit)"
+		text = text .. " (last visit)"
 	elseif D.RewardStart and D.RewardPoints ~= D.RewardStart then
 		local gain = D.RewardPoints - D.RewardStart
 		local sign = ""
@@ -721,9 +728,6 @@ function CorksEventDrops.UpdateRewardPoints()
 			sign = "+"
 		end
 		text = text .. " (" .. sign .. gain .. " this session)"
-	end
-	if D.RewardExpires ~= "" then
-		text = text .. ", expire " .. D.RewardExpires
 	end
 	D.SetLabel(label, StringToWString(text), D.COLOR_COUNT)
 end

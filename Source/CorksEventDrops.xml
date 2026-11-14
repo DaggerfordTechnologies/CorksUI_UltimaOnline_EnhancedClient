@@ -38,7 +38,7 @@
     <!-- Size must match CorksEventDrops.WIDTH / HEIGHT -->
     <Window name="CorksEventDropsWindow" movable="true" layer="popup">
       <Size>
-        <AbsPoint x="420" y="266" />
+        <AbsPoint x="420" y="284" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
@@ -136,6 +136,18 @@
             </Anchor>
           </Anchors>
           <Color r="255" g="200" b="50" a="255" />
+        </Label>
+        <!-- When the reward points expire, on its own line so long values fit -->
+        <Label name="$parentRewardExpires" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="384" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="134" />
+            </Anchor>
+          </Anchors>
+          <Color r="160" g="160" b="160" a="255" />
         </Label>
 
         <!-- Bottom section, anchored to the bottom of the window -->
