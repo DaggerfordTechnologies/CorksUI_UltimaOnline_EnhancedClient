@@ -79,28 +79,29 @@
             </Anchor>
           </Anchors>
         </DynamicImage>
-        <!-- "Event Item Count:" with the total under it -->
-        <Label name="$parentTotalCaption" font="UO_DefaultText" maxchars="64" textalign="right" handleinput="false">
+        <!-- "Event Item Count: 12" on one line: the count sits at the right edge and
+             sizes itself to its digits, and the caption is placed just left of it -->
+        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="right" autoresize="true" wordwrap="false" handleinput="false">
           <Size>
-            <AbsPoint x="200" y="18" />
+            <AbsPoint x="0" y="26" />
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="38" />
-            </Anchor>
-          </Anchors>
-          <Color r="220" g="220" b="220" a="255" />
-        </Label>
-        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="right" handleinput="false">
-          <Size>
-            <AbsPoint x="200" y="26" />
-          </Size>
-          <Anchors>
-            <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-22" y="56" />
+              <AbsPoint x="-22" y="50" />
             </Anchor>
           </Anchors>
           <Color r="255" g="200" b="50" a="255" />
+        </Label>
+        <Label name="$parentTotalCaption" font="UO_DefaultText" maxchars="64" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="190" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="right" relativeTo="$parentTotal">
+              <AbsPoint x="-6" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="220" g="220" b="220" a="255" />
         </Label>
         <Label name="$parentLastDrop" font="UO_DefaultText" maxchars="64" textalign="right" handleinput="false">
           <Size>
