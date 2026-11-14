@@ -383,8 +383,15 @@ end
 -- The header count. Event items already in the backpack are added to it only
 -- while it's 0 (see ScanBackpack), so a drop is never counted twice.
 function CorksEventDrops.UpdateTotal()
+	local total = "CorksEventDropsWindowTotal"
 	LabelSetText("CorksEventDropsWindowTotalCaption", L"Event Item Count:")
-	LabelSetText("CorksEventDropsWindowTotal", towstring(CorksEventDrops.Total))
+	LabelSetText(total, towstring(CorksEventDrops.Total))
+	-- Fit the count's width to its digits, so the caption (anchored to its left
+	-- edge) sits right next to it. Keeps the XML width if it can't be measured.
+	local ok, width = pcall(LabelGetTextDimensions, total)
+	if ok and type(width) == "number" and width > 0 then
+		WindowSetDimensions(total, math.ceil(width) + 2, 26)
+	end
 end
 
 function CorksEventDrops.UpdateLastDrop()

@@ -80,10 +80,11 @@
           </Anchors>
         </DynamicImage>
         <!-- "Event Item Count: 12" on one line: the count sits at the right edge and
-             sizes itself to its digits, and the caption is placed just left of it -->
-        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="right" autoresize="true" wordwrap="false" handleinput="false">
+             is sized to its digits from Lua (CorksEventDrops.UpdateTotal), and the
+             caption is placed just left of it -->
+        <Label name="$parentTotal" font="UO_Title" maxchars="16" textalign="right" wordwrap="false" handleinput="false">
           <Size>
-            <AbsPoint x="0" y="26" />
+            <AbsPoint x="60" y="26" />
           </Size>
           <Anchors>
             <Anchor point="topright" relativePoint="topright">
