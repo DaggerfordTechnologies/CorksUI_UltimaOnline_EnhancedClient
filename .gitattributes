@@ -6,11 +6,8 @@ tests               export-ignore
 .luacheckrc         export-ignore
 .markdownlint.json  export-ignore
 .gitattributes      export-ignore
+.gitignore          export-ignore
 
 # README and its screenshots; GitHub shows them from the repo
 README.md           export-ignore
-ChatFilter.png      export-ignore
-CustomUI.png        export-ignore
-GearWatcher.png     export-ignore
-TargetingGump.png   export-ignore
-TimersGump.png      export-ignore
+*.png               export-ignore
