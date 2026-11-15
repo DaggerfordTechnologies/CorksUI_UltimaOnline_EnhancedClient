@@ -8,6 +8,10 @@ tests               export-ignore
 .gitattributes      export-ignore
 .gitignore          export-ignore
 
+# Dev-only gump style preview (/gumppreview)
+Source/CorksGumpPreview.lua  export-ignore
+Source/CorksGumpPreview.xml  export-ignore
+
 # README and its screenshots; GitHub shows them from the repo
 README.md           export-ignore
 *.png               export-ignore

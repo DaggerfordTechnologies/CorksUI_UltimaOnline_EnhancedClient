@@ -1916,7 +1916,8 @@ Interface.ChatAliases = {
 		Interface.ErrorTracker(ok, err)
 		InterfaceCore.ReloadUI()
 	end,
-	["/gumppreview"] = function() CorksGumpPreview.Toggle() end,
+	-- The preview is dev-only and left out of release downloads (.gitattributes)
+	["/gumppreview"] = function() if CorksGumpPreview then CorksGumpPreview.Toggle() end end,
 	["/gumpdump"] = function() CorksGumpDump.Run() end,
 }
 
