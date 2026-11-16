@@ -301,12 +301,7 @@ CorksUI/
     ├── CorksJewelrySearch.lua Jewelry box search: reads the open box's items, matching, remembered pages, covers
     ├── CorksJewelrySearch.xml Jewelry box search bar and the cover template
     └── MapWindow.lua          Map Window changes
-tests/
-├── test_chatfilter.lua        Chat filter tests, run outside the game (see Development Notes)
-└── test_jewelrysearch.lua     Jewelry box search tests: matching, page memory, result line
 ```
-
-Files that aren't in this folder load from the default UI. The client only loads what `Interface.xml` names, so `tests/` and `.luacheckrc` are never loaded in game. They're also left out of GitHub's **Download ZIP** (see `.gitattributes`), along with the README screenshots; clone the repo to get them.
 
 ## Development Notes
 
