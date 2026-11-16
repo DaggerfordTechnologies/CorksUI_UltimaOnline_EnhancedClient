@@ -22,9 +22,20 @@ CorksJewelrySearch.BOX = "CorksJewelrySearchBox"
 CorksJewelrySearch.MARK_TEMPLATE = "CorksJewelrySearchMarkTemplate"
 CorksJewelrySearch.MARK_PREFIX = "CorksJewelrySearchMark"
 CorksJewelrySearch.CHECK_SECONDS = 0.25
--- Changing page closes the gump and the server sends a new one; only forget the
--- viewed pages once the box has been gone for longer than that takes
-CorksJewelrySearch.CLOSE_SECONDS = 3
+-- Changing page closes the gump and the server sends a new one. If the box
+-- vanishes within CLICK_SECONDS of a click on one of its buttons, the search is
+-- kept for up to CLOSE_SECONDS while the new one arrives. Vanishing without a
+-- click means the player closed it, and the search is cleared after
+-- QUICK_SECONDS: short enough that nobody reopens the box in time, long enough
+-- that a page change still survives if the click wasn't seen.
+CorksJewelrySearch.CLICK_SECONDS = 1
+CorksJewelrySearch.CLOSE_SECONDS = 5
+CorksJewelrySearch.QUICK_SECONDS = 0.75
+CorksJewelrySearch.Clock = 0
+CorksJewelrySearch.ClickedAt = nil
+CorksJewelrySearch.Reopening = false
+-- Window names of the open box's buttons, to recognise clicks on them
+CorksJewelrySearch.Buttons = {}
 CorksJewelrySearch.DIM_ALPHA = 0.75
 -- How far up from the jewelry box's bottom edge the search box sits
 CorksJewelrySearch.BOTTOM_INSET = 12
@@ -260,7 +271,7 @@ function CorksJewelrySearch.ReadGump()
 
 	-- Every button that shows an item is one of the page's item pictures; the
 	-- filter, page and Add Jewelry buttons don't have one
-	local current, ids = {}, {}
+	local current, ids, buttons = {}, {}, {}
 	if type(gump.Buttons) == "table" then
 		local numbers = {}
 		for number in pairs(gump.Buttons) do
@@ -269,6 +280,9 @@ function CorksJewelrySearch.ReadGump()
 		table.sort(numbers, function(a, b) return tostring(a) < tostring(b) end)
 		for _, number in ipairs(numbers) do
 			local name = gump.Buttons[number]
+			if type(name) == "string" then
+				buttons[name] = true
+			end
 			local id = J.ItemIdOf(name)
 			if id then
 				table.insert(current, { button = name, id = id })
@@ -277,8 +291,29 @@ function CorksJewelrySearch.ReadGump()
 		end
 	end
 	J.Current = current
+	J.Buttons = buttons
 	J.RecordPage(J.Seen, J.Page, ids)
 	return true
+end
+
+-- Wraps GenericGump.OnClicked to note clicks on the jewelry box's buttons.
+-- A page, filter or item click makes the server close the box and send it
+-- again, so the box vanishing right after one isn't the player closing it.
+function CorksJewelrySearch.InstallClickHook()
+	if not GenericGump or CorksJewelrySearch.HookedOnClicked or type(GenericGump.OnClicked) ~= "function" then
+		return
+	end
+	local original = GenericGump.OnClicked
+	CorksJewelrySearch.HookedOnClicked = original
+	GenericGump.OnClicked = function(...)
+		pcall(function()
+			local J = CorksJewelrySearch
+			if J.Showing and J.Buttons[SystemData.ActiveWindow.name] then
+				J.ClickedAt = J.Clock
+			end
+		end)
+		return original(...)
+	end
 end
 
 ----------------------------------------------------------------
@@ -367,7 +402,8 @@ function CorksJewelrySearch.ShowBar(gumpWindow)
 	end
 end
 
--- Hides the bar and covers. forget = the box was closed, so drop what was seen.
+-- Hides the bar and covers. forget = the box was closed, so drop what was seen
+-- and empty the search box.
 function CorksJewelrySearch.HideBar(forget)
 	local J = CorksJewelrySearch
 	J.HideMarks()
@@ -380,9 +416,16 @@ function CorksJewelrySearch.HideBar(forget)
 	J.Scale = nil
 	J.LastShown = nil
 	J.Current = {}
+	J.Buttons = {}
 	if forget then
 		J.Seen = {}
 		J.Signature = nil
+		J.Reopening = false
+		J.Terms = {}
+		J.SummaryText = nil
+		if DoesWindowNameExist(J.BOX) then
+			TextEditBoxSetText(J.BOX, L"")
+		end
 		for id in pairs(J.Requested) do
 			J.ReleaseRequest(id)
 		end
@@ -395,6 +438,7 @@ end
 
 function CorksJewelrySearch.OnUpdate(timePassed)
 	local J = CorksJewelrySearch
+	J.Clock = J.Clock + (timePassed or 0)
 	J.Tick = J.Tick + (timePassed or 0)
 	if J.Tick < J.CHECK_SECONDS then
 		return
@@ -404,13 +448,18 @@ function CorksJewelrySearch.OnUpdate(timePassed)
 
 	if J.ReadGump() then
 		J.GoneFor = 0
+		J.Reopening = false
 		J.ShowBar(J.GumpWindow)
 		J.Apply()
 	elseif J.Showing or J.Signature then
-		-- Gone: hide right away (covers would point at missing windows), but only
-		-- forget the viewed pages if it stays gone (a page change reopens it)
+		-- Gone: hide right away (covers would point at missing windows). If one
+		-- of its buttons was just clicked the server is sending it again, so keep
+		-- the search for a while; otherwise the player closed it.
+		if J.Showing then
+			J.Reopening = J.ClickedAt ~= nil and J.Clock - J.ClickedAt <= J.CLICK_SECONDS
+		end
 		J.GoneFor = J.GoneFor + elapsed
-		J.HideBar(J.GoneFor >= J.CLOSE_SECONDS)
+		J.HideBar(J.GoneFor >= (J.Reopening and J.CLOSE_SECONDS or J.QUICK_SECONDS))
 	end
 end
 

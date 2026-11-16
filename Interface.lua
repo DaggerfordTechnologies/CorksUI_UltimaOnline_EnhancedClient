@@ -720,6 +720,9 @@ function Interface.CreateWindows()
 	-- /gumpdump notes the item pictures hovered in server gumps (GenericGump.lua loads after it)
 	local hooked, hookErr = pcall(CorksGumpDump.InstallHoverHook)
 	Interface.ErrorTracker(hooked, hookErr)
+	-- Jewelry box search tells a page change from closing the box by its button clicks
+	hooked, hookErr = pcall(CorksJewelrySearch.InstallClickHook)
+	Interface.ErrorTracker(hooked, hookErr)
 	Interface.CreateTCTools()
 	
 	if( SystemData.Settings.Interface.showTipoftheDay ) then

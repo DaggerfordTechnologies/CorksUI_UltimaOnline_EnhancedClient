@@ -220,7 +220,7 @@ A search box appears over the bottom of a jewelry box whenever you open one. Typ
 The jewelry box only sends the page you're looking at, so other pages can't be searched until you view them. Each page you view is remembered while the box stays open. Hover over the search box to see the matches on this page, the matches on each other page you've viewed, and the pages not viewed yet, e.g. `This page: 2 | Page 3: 1 | Not viewed: 4`. Use the box's own page buttons to go to them.
 
 - Picking a filter (Ring, Bracelet, …) or adding or taking out an item changes the page layout, so the remembered pages are cleared and you'll need to view them again.
-- Closing the box for more than a few seconds clears them too.
+- Closing the box clears the search box and the remembered pages. Changing page or filter, or taking an item out, doesn't: the box closes and reopens for those too, but the search carries over.
 - Items whose properties haven't arrived from the server yet aren't covered, and are counted as "Loading" until they arrive.
 
 ### Map Window Changes
