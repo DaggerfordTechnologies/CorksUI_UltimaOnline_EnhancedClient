@@ -107,7 +107,7 @@ CorksDurabilityGump.SlotNames = {
 function CorksDurabilityGump.Initialize()
 	WindowSetScale("CorksDurabilityGump", SystemData.Settings.Interface.customUiScale * 0.80)
 	WindowUtils.LoadScale("CorksDurabilityGump")
-	WindowUtils.SetWindowTitle("CorksDurabilityGump", L"Corks Gear Watcher")
+	WindowUtils.SetWindowTitle("CorksDurabilityGump", L"Corks' Gear Watcher")
 
 	LabelSetText("CorksDurabilityGumpHeaderItem", L"Item")
 	LabelSetText("CorksDurabilityGumpHeaderDur", L"Durability")
