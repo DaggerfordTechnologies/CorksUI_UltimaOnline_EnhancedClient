@@ -38,7 +38,7 @@
     <!-- Size must match CorksEventTracker.WIDTH / HEIGHT -->
     <Window name="CorksEventTrackerWindow" movable="true" layer="popup">
       <Size>
-        <AbsPoint x="420" y="304" />
+        <AbsPoint x="420" y="344" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
@@ -184,7 +184,7 @@
           </Size>
           <Anchors>
             <Anchor point="bottomleft" relativePoint="topleft">
-              <AbsPoint x="18" y="-126" />
+              <AbsPoint x="18" y="-166" />
             </Anchor>
           </Anchors>
         </HorizontalResizeImage>
@@ -192,7 +192,7 @@
         <Button name="$parentResetButton" inherits="UO_Default_Medium_Select_Button">
           <Anchors>
             <Anchor point="bottomleft" relativePoint="bottomleft">
-              <AbsPoint x="18" y="-84" />
+              <AbsPoint x="18" y="-124" />
             </Anchor>
           </Anchors>
           <EventHandlers>
@@ -203,7 +203,7 @@
         <Window name="$parentResetClassic" inherits="CorksEventTrackerClassicButton">
           <Anchors>
             <Anchor point="bottomleft" relativePoint="bottomleft">
-              <AbsPoint x="18" y="-88" />
+              <AbsPoint x="18" y="-128" />
             </Anchor>
           </Anchors>
         </Window>
@@ -212,7 +212,7 @@
         <Button name="$parentResetEventButton" inherits="UO_Default_Medium_Select_Button">
           <Anchors>
             <Anchor point="bottomright" relativePoint="bottomright">
-              <AbsPoint x="-18" y="-84" />
+              <AbsPoint x="-18" y="-124" />
             </Anchor>
           </Anchors>
           <EventHandlers>
@@ -223,7 +223,7 @@
         <Window name="$parentResetEventClassic" inherits="CorksEventTrackerClassicButton">
           <Anchors>
             <Anchor point="bottomright" relativePoint="bottomright">
-              <AbsPoint x="-18" y="-88" />
+              <AbsPoint x="-18" y="-128" />
             </Anchor>
           </Anchors>
         </Window>
@@ -237,7 +237,7 @@
           </Size>
           <Anchors>
             <Anchor point="bottomright" relativePoint="topright">
-              <AbsPoint x="-18" y="-76" />
+              <AbsPoint x="-18" y="-116" />
             </Anchor>
           </Anchors>
           <Color r="255" g="200" b="50" a="255" />
@@ -248,7 +248,7 @@
           </Size>
           <Anchors>
             <Anchor point="bottomleft" relativePoint="topleft">
-              <AbsPoint x="18" y="-76" />
+              <AbsPoint x="18" y="-116" />
             </Anchor>
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
@@ -259,7 +259,7 @@
           </Size>
           <Anchors>
             <Anchor point="bottomleft" relativePoint="bottomleft">
-              <AbsPoint x="23" y="-25" />
+              <AbsPoint x="23" y="-65" />
             </Anchor>
           </Anchors>
           <EventHandlers>
@@ -293,6 +293,30 @@
             </FullResizeImage>
           </Windows>
         </Window>
+
+        <!-- Under the Event Item Tag box: "Shard: 6" on the left, "Facet: Felucca" on the right -->
+        <Label name="$parentShard" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="190" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="18" y="-18" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="$parentFacet" font="UO_DefaultText" maxchars="64" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="190" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-22" y="-18" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
       </Windows>
     </Window>
 
