@@ -76,7 +76,7 @@ function CorksDurabilityGump.Initialize()
 
 	LabelSetText("CorksDurabilityGumpHeaderItem", L"Item")
 	LabelSetText("CorksDurabilityGumpHeaderDur", L"Durability")
-	ButtonSetText("CorksDurabilityGumpSetupButton", L"Setup")
+	LabelSetText("CorksDurabilityGumpSetupLabel", L"Setup")
 
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
 
@@ -369,4 +369,16 @@ end
 
 function CorksDurabilityGump.OnSetupButton()
 	CorksGearWatcherSetup.Toggle()
+end
+
+-- The Setup text is a label over the button, so it's coloured here: pale gold
+-- while the mouse is over the button, white otherwise
+function CorksDurabilityGump.OnSetupButtonOver()
+	LabelSetTextColor("CorksDurabilityGumpSetupLabel", 255, 220, 120)
+	LabelSetText("CorksDurabilityGumpSetupLabel", L"Setup")
+end
+
+function CorksDurabilityGump.OnSetupButtonOverEnd()
+	LabelSetTextColor("CorksDurabilityGumpSetupLabel", 255, 255, 255)
+	LabelSetText("CorksDurabilityGumpSetupLabel", L"Setup")
 end

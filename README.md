@@ -89,7 +89,7 @@ A compact window that lists every equipped item that has durability, with its cu
 
 **Repair popup:** when an equipped item wears down to your alert level, a "Repair" graphic with a hammer flashes in the middle of the screen. It shows once for each item, and again only after that item is repaired and wears down again. It works even while the Gear Watcher window is closed, checking every 10 seconds.
 
-Click **Setup** in the top-left corner of the Gear Watcher to change it:
+Click **Setup**, between the Item and Durability headings on the Gear Watcher, to change it:
 
 - **Show the Repair popup**: turn the popup on or off (on by default).
 - **Alert level**: use **−** and **+** to set the durability percentage, from 5% to 95% in steps of 5 (25% by default).

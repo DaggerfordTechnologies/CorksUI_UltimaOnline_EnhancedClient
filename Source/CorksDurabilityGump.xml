@@ -63,18 +63,39 @@
         </Window>
 
         <!-- Opens the Gear Watcher Setup window (repair popup settings) -->
-        <!-- textalign="top" as the default UI uses it: centred text is cut off at
-             the bottom, the button being shorter than its font -->
-        <Button name="$parentSetupButton" inherits="UO_Default_Small_Select_Button" textalign="top">
+        <!-- Small blue button. The client draws button text too low on it, so the
+             button has no text of its own and the Setup label below sits on top. -->
+        <!-- Centred in the header row between Item and Durability (the 20px-high
+             headings at y 38; the button is 18 high, so 1px lower lines them up) -->
+        <!-- popable="false": a click would otherwise bring the button to the front,
+             covering the Setup label -->
+        <Button name="$parentSetupButton" inherits="UO_Default_Small_Select_Button" popable="false">
           <Anchors>
-            <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="18" y="10" />
+            <Anchor point="top" relativePoint="top">
+              <AbsPoint x="0" y="39" />
             </Anchor>
           </Anchors>
           <EventHandlers>
             <EventHandler event="OnLButtonUp" function="CorksDurabilityGump.OnSetupButton" />
+            <EventHandler event="OnMouseOver" function="CorksDurabilityGump.OnSetupButtonOver" />
+            <EventHandler event="OnMouseOverEnd" function="CorksDurabilityGump.OnSetupButtonOverEnd" />
           </EventHandlers>
         </Button>
+        <!-- The button's text: a label pinned to the button, so its height on the
+             button is set here (the y offset; -4 found by eye in game, the font has
+             space above its letters). Ignores the mouse, so clicks reach the button.
+             Defined after the button so it draws on top. -->
+        <Label name="$parentSetupLabel" font="Arial_Black_Shadow_12" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="57" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" relativeTo="$parentSetupButton">
+              <AbsPoint x="0" y="-4" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
 
         <Label name="$parentHeaderItem" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
           <Size>
