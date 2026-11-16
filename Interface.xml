@@ -3,6 +3,7 @@
 
 	<!-- Assets -->
 	<Include file="Textures/Textures.xml" />
+	<Include file="Source/CorksTextures.xml" />
 	<Include file="Fonts/Fonts.xml" />
 	<Include file="Icons/Icons.xml" />
 
