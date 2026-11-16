@@ -75,7 +75,7 @@ A compact window that lists every equipped item that has durability, with its cu
 
 - It updates when your paperdoll changes and also refreshes every 10 seconds.
 - The window resizes to fit the number of items.
-- The durability value is colored by how much is left:
+- The durability value is colored by how much is left. These are the default levels; you can change them in Setup:
 
   | Remaining | Color |
   | --- | --- |
@@ -87,14 +87,20 @@ A compact window that lists every equipped item that has durability, with its cu
 
 - If nothing you're wearing has durability, it shows "No items with durability equipped."
 
-**Repair popup:** when an equipped item wears down to your alert level, a "Repair" graphic with a hammer flashes in the middle of the screen. It shows once for each item, and again only after that item is repaired and wears down again. It works even while the Gear Watcher window is closed, checking every 10 seconds.
+**Repair alert:** when an equipped item wears down to your alert level, a "Repair" graphic with a hammer flashes in the middle of the screen, and a chat message names the item, for example "Gear Watcher: Platemail Tunic needs repair (22%, 11 / 50)." The alert shows once for each item, and again only after that item is repaired and wears down again. It works even while the Gear Watcher window is closed, checking every 10 seconds.
 
-Click **Setup**, between the Item and Durability headings on the Gear Watcher, to change it:
+**Setup:** click **Setup**, between the Item and Durability headings, to open the Gear Watcher Setup window. Changes apply straight away and are saved. The repair alert waits while the Setup window is open, so trying out the sliders doesn't set it off; it checks as soon as you close the window.
 
-- **Show the Repair popup**: turn the popup on or off (on by default).
-- **Alert level**: use **−** and **+** to set the durability percentage, from 5% to 95% in steps of 5 (25% by default).
+- **Repair alert**
+  - **Show the Repair popup**: on by default.
+  - **Name the item in chat**: also print the chat message naming the item; on by default.
+  - **Alert at or below**: slider, 1–99% (25% by default).
+- **Gear Watcher list**
+  - **Hide items above**: slider that leaves out items in good shape, 1–100%. At 100% ("None", the default) every item is listed. If everything is hidden, the list says "All items are above X%."
+  - **Show durability as**: `11 / 50` (default), `22%`, or both, `22% (11 / 50)`.
+- **Colour levels**: sliders for where green, yellow, orange and dark orange start (75 / 50 / 25 / 10% by default). Each level stays below the one above it. Anything at or below the dark orange level is red.
 
-The settings are saved. Type `/repairpopup` in chat to see the popup at any time.
+Type `/repairpopup` in chat to see the popup at any time.
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale. The same goes for the Setup window.
 

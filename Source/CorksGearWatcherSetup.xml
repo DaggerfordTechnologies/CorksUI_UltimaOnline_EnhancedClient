@@ -1,11 +1,123 @@
 <Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
   <Windows>
 
-    <!-- Gear Watcher Setup: the repair popup settings. Opened from the Setup
-         button on the Gear Watcher. Size must match CorksGearWatcherSetup.WIDTH / HEIGHT -->
+    <!-- Check box with its text; clicking the text toggles it too -->
+    <Window name="CorksGearSetupCheckRow">
+      <Size>
+        <AbsPoint x="300" y="24" />
+      </Size>
+      <Windows>
+        <Button name="$parentButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="left" relativePoint="left" />
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentLabel" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="265" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+              <AbsPoint x="8" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+      </Windows>
+    </Window>
+
+    <!-- One of the "Show durability as" choices; works like a radio button -->
+    <Window name="CorksGearSetupFormatRow">
+      <Size>
+        <AbsPoint x="100" y="24" />
+      </Size>
+      <Windows>
+        <Button name="$parentButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="left" relativePoint="left" />
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnFormatClick" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentLabel" font="UO_DefaultText" maxchars="16" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="68" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+              <AbsPoint x="6" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnFormatClick" />
+          </EventHandlers>
+        </Label>
+      </Windows>
+    </Window>
+
+    <!-- Name, slider and value ("25%") on one line -->
+    <Window name="CorksGearSetupSliderRow">
+      <Size>
+        <AbsPoint x="300" y="24" />
+      </Size>
+      <Windows>
+        <Label name="$parentName" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="128" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left" />
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <!-- numticks: one step per whole percent over 1..99 (the template has 50).
+             Lua rounds the position to a whole percent either way. -->
+        <SliderBar name="$parentSlider" inherits="UO_Default_Horizontal_SliderBar" numticks="98">
+          <Size>
+            <AbsPoint x="112" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="132" y="0" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnSlide" function="CorksGearWatcherSetup.OnSlide" />
+          </EventHandlers>
+        </SliderBar>
+        <Label name="$parentValue" font="UO_DefaultText" maxchars="8" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="50" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="right" />
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+      </Windows>
+    </Window>
+
+    <!-- Section heading -->
+    <Label name="CorksGearSetupHeading" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false" handleinput="false">
+      <Size>
+        <AbsPoint x="300" y="20" />
+      </Size>
+      <Color r="255" g="200" b="50" a="255" />
+    </Label>
+
+    <!-- Gear Watcher Setup. Opened from the Setup button on the Gear Watcher.
+         Size must match CorksGearWatcherSetup.WIDTH / HEIGHT -->
     <Window name="CorksGearWatcherSetup" movable="true" layer="popup">
       <Size>
-        <AbsPoint x="320" y="190" />
+        <AbsPoint x="340" y="470" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
@@ -34,84 +146,129 @@
           </Anchors>
         </Window>
 
-        <!-- Turn the repair popup on or off -->
-        <Button name="$parentPopupButton" inherits="UO_Default_Check_Button">
+        <!-- Repair alert -->
+        <Label name="$parentAlertHeading" inherits="CorksGearSetupHeading">
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="20" y="44" />
+              <AbsPoint x="20" y="40" />
             </Anchor>
           </Anchors>
-          <EventHandlers>
-            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnPopupButton" />
-          </EventHandlers>
-        </Button>
-        <Label name="$parentPopupLabel" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false">
-          <Size>
-            <AbsPoint x="250" y="20" />
-          </Size>
-          <Anchors>
-            <Anchor point="right" relativePoint="left" relativeTo="$parentPopupButton">
-              <AbsPoint x="8" y="0" />
-            </Anchor>
-          </Anchors>
-          <Color r="255" g="200" b="50" a="255" />
-          <EventHandlers>
-            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnPopupLabel" />
-          </EventHandlers>
         </Label>
+        <Window name="$parentPopup" inherits="CorksGearSetupCheckRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="64" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentChat" inherits="CorksGearSetupCheckRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="90" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentAlert" inherits="CorksGearSetupSliderRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="118" />
+            </Anchor>
+          </Anchors>
+        </Window>
 
-        <!-- Alert level: - 25% + -->
-        <Label name="$parentLevelHeader" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+        <!-- Gear Watcher list -->
+        <Label name="$parentListHeading" inherits="CorksGearSetupHeading">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="156" />
+            </Anchor>
+          </Anchors>
+        </Label>
+        <Window name="$parentHide" inherits="CorksGearSetupSliderRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="180" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Label name="$parentFormatHeading" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false" handleinput="false">
           <Size>
-            <AbsPoint x="280" y="20" />
+            <AbsPoint x="300" y="20" />
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="20" y="80" />
+              <AbsPoint x="20" y="210" />
             </Anchor>
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
         </Label>
-        <Button name="$parentMinusButton" inherits="UO_Default_Minus_Button">
+        <Window name="$parentFormatPoints" inherits="CorksGearSetupFormatRow">
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="100" y="106" />
+              <AbsPoint x="20" y="234" />
             </Anchor>
           </Anchors>
-          <EventHandlers>
-            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnMinus" />
-          </EventHandlers>
-        </Button>
-        <Label name="$parentLevel" font="UO_DefaultText" maxchars="8" textalign="center" handleinput="false">
-          <Size>
-            <AbsPoint x="74" y="20" />
-          </Size>
+        </Window>
+        <Window name="$parentFormatPercent" inherits="CorksGearSetupFormatRow">
           <Anchors>
-            <Anchor point="right" relativePoint="left" relativeTo="$parentMinusButton">
-              <AbsPoint x="0" y="0" />
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="120" y="234" />
             </Anchor>
           </Anchors>
-          <Color r="255" g="255" b="255" a="255" />
-        </Label>
-        <Button name="$parentPlusButton" inherits="UO_Default_Plus_Button">
+        </Window>
+        <Window name="$parentFormatBoth" inherits="CorksGearSetupFormatRow">
           <Anchors>
-            <Anchor point="right" relativePoint="left" relativeTo="$parentLevel">
-              <AbsPoint x="0" y="0" />
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="220" y="234" />
             </Anchor>
           </Anchors>
-          <EventHandlers>
-            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnPlus" />
-          </EventHandlers>
-        </Button>
+        </Window>
 
-        <!-- When the popup shows -->
-        <Label name="$parentNote" font="UO_DefaultText" maxchars="128" textalign="left" handleinput="false" wordwrap="true">
+        <!-- Colour levels -->
+        <Label name="$parentColorHeading" inherits="CorksGearSetupHeading">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="272" />
+            </Anchor>
+          </Anchors>
+        </Label>
+        <Window name="$parentGreen" inherits="CorksGearSetupSliderRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="296" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentYellow" inherits="CorksGearSetupSliderRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="322" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentOrange" inherits="CorksGearSetupSliderRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="348" />
+            </Anchor>
+          </Anchors>
+        </Window>
+        <Window name="$parentDarkOrange" inherits="CorksGearSetupSliderRow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="20" y="374" />
+            </Anchor>
+          </Anchors>
+        </Window>
+
+        <!-- Notes -->
+        <Label name="$parentNote" font="UO_DefaultText" maxchars="256" textalign="left" handleinput="false" wordwrap="true">
           <Size>
-            <AbsPoint x="280" y="40" />
+            <AbsPoint x="300" y="60" />
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="20" y="138" />
+              <AbsPoint x="20" y="404" />
             </Anchor>
           </Anchors>
           <Color r="180" g="180" b="180" a="255" />

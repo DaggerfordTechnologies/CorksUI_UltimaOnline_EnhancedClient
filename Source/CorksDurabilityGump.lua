@@ -27,19 +27,53 @@ CorksDurabilityGump.TitleOffsetY = 8
 -- Gump art loaded for the classic background, released on shutdown
 CorksDurabilityGump.GumpArt = {}
 
--- Repair popup: shown once when an equipped item drops to AlertPercent or lower,
--- and again only after that item has been repaired above it and worn down again.
--- Checked from Interface's update loop, so it works while the window is closed.
--- The player changes these in the Gear Watcher Setup window (CorksGearWatcherSetup).
-CorksDurabilityGump.ALERT_DEFAULT = 25
-CorksDurabilityGump.ALERT_MIN = 5
-CorksDurabilityGump.ALERT_MAX = 95
-CorksDurabilityGump.ALERT_STEP = 5
+-- Settings, changed in the Gear Watcher Setup window (CorksGearWatcherSetup) and
+-- read with CorksDurabilityGump.Get / changed with CorksDurabilityGump.Set.
+-- save: the saved setting's name; numbers are kept within min..max.
+CorksDurabilityGump.SETTINGS = {
+	-- Repair alert: shown once when an equipped item drops to AlertPercent or lower,
+	-- and again only after that item has been repaired above it and worn down again
+	PopupOn      = { save = "CorksGearWatcherPopupOn",      default = true },
+	ChatOn       = { save = "CorksGearWatcherChatOn",       default = true },
+	AlertPercent = { save = "CorksGearWatcherAlertPercent", default = 25,  min = 1, max = 99 },
+	-- List: items above this are left out (100 shows everything)
+	HideAbove    = { save = "CorksGearWatcherHideAbove",    default = 100, min = 1, max = 100 },
+	-- How durability is shown (FORMAT_POINTS, FORMAT_PERCENT or FORMAT_BOTH)
+	Format       = { save = "CorksGearWatcherFormat",       default = 1,   min = 1, max = 3 },
+	-- Colour levels: green above Green, yellow above Yellow, ... red at or below DarkOrange.
+	-- Kept in order (each at least 1 below the one before), see COLOR_ORDER.
+	Green        = { save = "CorksGearWatcherGreen",        default = 75,  min = 1, max = 99 },
+	Yellow       = { save = "CorksGearWatcherYellow",       default = 50,  min = 1, max = 99 },
+	Orange       = { save = "CorksGearWatcherOrange",       default = 25,  min = 1, max = 99 },
+	DarkOrange   = { save = "CorksGearWatcherDarkOrange",   default = 10,  min = 1, max = 99 },
+}
+CorksDurabilityGump.FORMAT_POINTS = 1   -- "11 / 50"
+CorksDurabilityGump.FORMAT_PERCENT = 2  -- "22%"
+CorksDurabilityGump.FORMAT_BOTH = 3     -- "22% (11 / 50)"
+-- Item name and durability column widths in the list ("22% (11 / 50)" needs a
+-- wider durability column, so the name gives some up); the row is 360 wide
+CorksDurabilityGump.COLUMN_WIDTHS = {
+	[1] = { name = 240, durability = 100 },
+	[2] = { name = 240, durability = 100 },
+	[3] = { name = 205, durability = 135 },
+}
+-- Format the columns were last sized for
+CorksDurabilityGump.ColumnsFormat = nil
+CorksDurabilityGump.COLOR_ORDER = { "Green", "Yellow", "Orange", "DarkOrange" }
+CorksDurabilityGump.COLORS = {
+	Green      = { 0, 255, 0 },
+	Yellow     = { 255, 255, 0 },
+	Orange     = { 255, 165, 0 },
+	DarkOrange = { 255, 80, 0 },
+	Red        = { 255, 0, 0 },
+}
+-- Current values, filled from the saved settings on first use
+CorksDurabilityGump.Values = nil
+
+-- The repair alert is checked from Interface's update loop, so it works while the
+-- window is closed
 CorksDurabilityGump.ALERT_CHECK_SECONDS = 10
 CorksDurabilityGump.AlertTick = 0
-CorksDurabilityGump.AlertLoaded = false
-CorksDurabilityGump.AlertOn = true
-CorksDurabilityGump.AlertPercent = CorksDurabilityGump.ALERT_DEFAULT
 -- Items already warned about, by object id
 CorksDurabilityGump.Alerted = {}
 
@@ -180,7 +214,11 @@ function CorksDurabilityGump.Update()
 		WindowSetShowing(scrollChild .. "Row" .. i, false)
 	end
 
+	CorksDurabilityGump.SizeColumns()
+
 	local rowCount = 0
+	local hiddenCount = 0
+	local hideAbove = CorksDurabilityGump.Get("HideAbove")
 
 	for index = 1, WindowData.Paperdoll[playerId].numSlots do
 		local slotData = WindowData.Paperdoll[playerId][index]
@@ -189,7 +227,9 @@ function CorksDurabilityGump.Update()
 			local objectId = slotData.slotId
 			local current, max, perc = CorksDurabilityGump.GetDurability(objectId)
 
-			if current then
+			if current and hideAbove < 100 and perc > hideAbove then
+				hiddenCount = hiddenCount + 1
+			elseif current then
 				rowCount = rowCount + 1
 
 				local itemName = ItemProperties.GetObjectProperties(objectId, 1, "CorksDurabilityGump")
@@ -205,31 +245,24 @@ function CorksDurabilityGump.Update()
 				LabelSetTextColor(rowName .. "ItemName", 255, 255, 255)
 				LabelSetText(rowName .. "ItemName", itemName)
 
-				if perc > 75 then
-					LabelSetTextColor(rowName .. "Durability", 0, 255, 0)
-				elseif perc > 50 then
-					LabelSetTextColor(rowName .. "Durability", 255, 255, 0)
-				elseif perc > 25 then
-					LabelSetTextColor(rowName .. "Durability", 255, 165, 0)
-				elseif perc > 10 then
-					LabelSetTextColor(rowName .. "Durability", 255, 80, 0)
-				else
-					LabelSetTextColor(rowName .. "Durability", 255, 0, 0)
-				end
-
-				local durText = towstring(tostring(current) .. " / " .. tostring(max))
-				LabelSetText(rowName .. "Durability", durText)
+				local color = CorksDurabilityGump.DurabilityColor(perc)
+				LabelSetTextColor(rowName .. "Durability", color[1], color[2], color[3])
+				LabelSetText(rowName .. "Durability", StringToWString(CorksDurabilityGump.DurabilityText(current, max, perc)))
 			end
 		end
 	end
 
-	-- If no items with durability, show placeholder in row 1
+	-- If nothing is listed, show a placeholder in row 1
 	if rowCount == 0 then
 		rowCount = 1
 		local rowName = scrollChild .. "Row1"
 		WindowSetShowing(rowName, true)
 		LabelSetTextColor(rowName .. "ItemName", 180, 180, 180)
-		LabelSetText(rowName .. "ItemName", L"No items with durability equipped.")
+		if hiddenCount > 0 then
+			LabelSetText(rowName .. "ItemName", StringToWString("All items are above " .. hideAbove .. "%."))
+		else
+			LabelSetText(rowName .. "ItemName", L"No items with durability equipped.")
+		end
 		LabelSetText(rowName .. "Durability", L"")
 	end
 
@@ -266,56 +299,162 @@ function CorksDurabilityGump.GetDurability(objectId)
 	return current, max, perc
 end
 
-----------------------------------------------------------------
--- Repair popup
-----------------------------------------------------------------
-
-function CorksDurabilityGump.LoadAlertSettings()
-	if CorksDurabilityGump.AlertLoaded then
+-- Sizes the item name and durability columns of every row for the chosen format
+-- (only when the format has changed since last time)
+function CorksDurabilityGump.SizeColumns()
+	local D = CorksDurabilityGump
+	local format = D.Get("Format")
+	if D.ColumnsFormat == format then
 		return
 	end
-	CorksDurabilityGump.AlertLoaded = true
-	CorksDurabilityGump.AlertOn = Interface.LoadBoolean("CorksGearWatcherPopupOn", true)
-	CorksDurabilityGump.AlertPercent = CorksDurabilityGump.ClampAlertPercent(
-		Interface.LoadNumber("CorksGearWatcherAlertPercent", CorksDurabilityGump.ALERT_DEFAULT))
+	local widths = D.COLUMN_WIDTHS[format] or D.COLUMN_WIDTHS[D.FORMAT_POINTS]
+	local scrollChild = "CorksDurabilityGumpListScrollChild"
+	for i = 1, D.MAX_ROWS do
+		local rowName = scrollChild .. "Row" .. i
+		WindowSetDimensions(rowName .. "ItemName", widths.name, 20)
+		WindowSetDimensions(rowName .. "Durability", widths.durability, 20)
+	end
+	D.ColumnsFormat = format
 end
 
-function CorksDurabilityGump.ClampAlertPercent(value)
-	value = tonumber(value) or CorksDurabilityGump.ALERT_DEFAULT
-	return math.max(CorksDurabilityGump.ALERT_MIN, math.min(CorksDurabilityGump.ALERT_MAX, value))
+-- The colour for a durability percentage, from the colour levels
+function CorksDurabilityGump.DurabilityColor(perc)
+	local D = CorksDurabilityGump
+	for _, key in ipairs(D.COLOR_ORDER) do
+		if perc > D.Get(key) then
+			return D.COLORS[key]
+		end
+	end
+	return D.COLORS.Red
 end
 
-function CorksDurabilityGump.SetAlertOn(on)
-	CorksDurabilityGump.LoadAlertSettings()
-	CorksDurabilityGump.AlertOn = on
-	Interface.SaveBoolean("CorksGearWatcherPopupOn", on)
-	-- Check straight away rather than waiting for the next timed check
-	CorksDurabilityGump.AlertTick = CorksDurabilityGump.ALERT_CHECK_SECONDS
+-- The durability as shown in the list, in the chosen format
+function CorksDurabilityGump.DurabilityText(current, max, perc)
+	local D = CorksDurabilityGump
+	local points = tostring(current) .. " / " .. tostring(max)
+	local format = D.Get("Format")
+	if format == D.FORMAT_PERCENT then
+		return perc .. "%"
+	elseif format == D.FORMAT_BOTH then
+		return perc .. "% (" .. points .. ")"
+	end
+	return points
 end
 
-function CorksDurabilityGump.SetAlertPercent(value)
-	CorksDurabilityGump.LoadAlertSettings()
-	CorksDurabilityGump.AlertPercent = CorksDurabilityGump.ClampAlertPercent(value)
-	Interface.SaveNumber("CorksGearWatcherAlertPercent", CorksDurabilityGump.AlertPercent)
-	CorksDurabilityGump.AlertTick = CorksDurabilityGump.ALERT_CHECK_SECONDS
+----------------------------------------------------------------
+-- Settings
+----------------------------------------------------------------
+
+function CorksDurabilityGump.LoadSettings()
+	local D = CorksDurabilityGump
+	if D.Values then
+		return
+	end
+	-- Filled before D.Values is set, so Clamp only applies each setting's own
+	-- limits here (not the colour level neighbours)
+	local values = {}
+	for key, setting in pairs(D.SETTINGS) do
+		if type(setting.default) == "boolean" then
+			values[key] = Interface.LoadBoolean(setting.save, setting.default)
+		else
+			values[key] = D.Clamp(key, Interface.LoadNumber(setting.save, setting.default))
+		end
+	end
+	-- Saved colour levels out of order (shouldn't happen) go back to the defaults
+	for i = 2, table.getn(D.COLOR_ORDER) do
+		if values[D.COLOR_ORDER[i]] >= values[D.COLOR_ORDER[i - 1]] then
+			for _, key in ipairs(D.COLOR_ORDER) do
+				values[key] = D.SETTINGS[key].default
+			end
+			break
+		end
+	end
+	D.Values = values
 end
+
+function CorksDurabilityGump.Get(key)
+	CorksDurabilityGump.LoadSettings()
+	return CorksDurabilityGump.Values[key]
+end
+
+-- Whole number within the setting's min..max (and between its neighbours for a
+-- colour level)
+function CorksDurabilityGump.Clamp(key, value)
+	local D = CorksDurabilityGump
+	local setting = D.SETTINGS[key]
+	value = math.floor((tonumber(value) or setting.default) + 0.5)
+	local low, high = setting.min, setting.max
+	if D.Values then
+		for i, colorKey in ipairs(D.COLOR_ORDER) do
+			if colorKey == key then
+				local above = D.COLOR_ORDER[i - 1]
+				local below = D.COLOR_ORDER[i + 1]
+				if above then
+					high = math.min(high, D.Values[above] - 1)
+				end
+				if below then
+					low = math.max(low, D.Values[below] + 1)
+				end
+			end
+		end
+	end
+	return math.max(low, math.min(high, value))
+end
+
+-- Changes and saves a setting, then applies it. Returns the value kept (numbers
+-- may be pulled back within their limits).
+function CorksDurabilityGump.Set(key, value)
+	local D = CorksDurabilityGump
+	D.LoadSettings()
+	local setting = D.SETTINGS[key]
+	if type(setting.default) == "boolean" then
+		value = value and true or false
+		Interface.SaveBoolean(setting.save, value)
+	else
+		value = D.Clamp(key, value)
+		Interface.SaveNumber(setting.save, value)
+	end
+	if D.Values[key] == value then
+		return value
+	end
+	D.Values[key] = value
+
+	if key == "PopupOn" or key == "ChatOn" or key == "AlertPercent" then
+		-- Check straight away rather than waiting for the next timed check
+		D.AlertTick = D.ALERT_CHECK_SECONDS
+	else
+		D.Update()
+	end
+	return value
+end
+
+----------------------------------------------------------------
+-- Repair alert
+----------------------------------------------------------------
 
 -- Called every frame from Interface's update loop; looks at the equipped items
--- every ALERT_CHECK_SECONDS and shows the popup for any newly worn-down item.
+-- every ALERT_CHECK_SECONDS and alerts (popup and/or chat) for any newly worn-down item.
 function CorksDurabilityGump.CheckAlerts(timePassed)
 	local D = CorksDurabilityGump
 	D.AlertTick = D.AlertTick + (timePassed or 0)
 	if D.AlertTick < D.ALERT_CHECK_SECONDS then
 		return
 	end
+	-- Paused while the Setup window is open, so trying out the settings doesn't set
+	-- it off; the tick stays due, so it checks as soon as the window closes
+	if CorksGearWatcherSetup and CorksGearWatcherSetup.IsOpen() then
+		D.AlertTick = D.ALERT_CHECK_SECONDS
+		return
+	end
 	D.AlertTick = 0
 
-	D.LoadAlertSettings()
-	if not D.AlertOn then
-		-- Start fresh, so turning it back on warns about anything already worn down
+	local popupOn, chatOn = D.Get("PopupOn"), D.Get("ChatOn")
+	if not popupOn and not chatOn then
+		-- Start fresh, so turning an alert back on warns about anything already worn down
 		D.Alerted = {}
 		return
 	end
+	local alertPercent = D.Get("AlertPercent")
 
 	local playerId = WindowData.PlayerStatus and WindowData.PlayerStatus.PlayerId
 	if not playerId or playerId == 0 then
@@ -335,12 +474,15 @@ function CorksDurabilityGump.CheckAlerts(timePassed)
 		local slotData = paperdoll[index]
 		if slotData and slotData.slotId ~= 0 and D.SlotNames[index] then
 			local objectId = slotData.slotId
-			local _, max, perc = D.GetDurability(objectId)
+			local current, max, perc = D.GetDurability(objectId)
 			if max and max > 0 then
-				if perc <= D.AlertPercent then
+				if perc <= alertPercent then
 					if not D.Alerted[objectId] then
 						D.Alerted[objectId] = true
 						show = true
+						if chatOn then
+							D.SayRepair(objectId, current, max, perc)
+						end
 					end
 				else
 					-- Repaired (or the level was lowered): warn again next time it wears down
@@ -350,9 +492,22 @@ function CorksDurabilityGump.CheckAlerts(timePassed)
 		end
 	end
 
-	if show then
+	if show and popupOn then
 		D.ShowRepairPopup()
 	end
+end
+
+-- "Gear Watcher: Platemail Tunic needs repair (22%, 11 / 50)." in chat
+function CorksDurabilityGump.SayRepair(objectId, current, max, perc)
+	local name = "An item"
+	local ok, text = pcall(function()
+		return WStringToString(ItemProperties.GetObjectProperties(objectId, 1, "CorksDurabilityGump"))
+	end)
+	if ok and type(text) == "string" and text ~= "" then
+		name = text
+	end
+	local message = "Gear Watcher: " .. name .. " needs repair (" .. perc .. "%, " .. current .. " / " .. max .. ")."
+	pcall(WindowUtils.ChatPrint, StringToWString(message), SystemData.ChatLogFilters.SYSTEM)
 end
 
 -- Flashes the CST_Repair graphic (Source/CorksTextures.xml) mid-screen, the same
