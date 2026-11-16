@@ -8,7 +8,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
 - [Features](#features)
   - [Corks' Targeting](#corks-targeting)
   - [Corks' Gear Watcher (Durability)](#corks-gear-watcher-durability)
-  - [Potion Timers](#potion-timers)
+  - [Consumable Timers](#consumable-timers)
   - [Combat Timers](#combat-timers)
   - [Event Tracker](#event-tracker)
   - [Corks' Chat Filter](#corks-chat-filter)
@@ -140,7 +140,6 @@ Timers are defined in the `CorksTimers.Timers` table at the top of `Source/Corks
   <img src="CombatTimersGump.png" alt="Item Timers" height="200">
 </p>
 
-
 A second timer window, laid out like the potion timers, for combat abilities. A row appears when the ability's buff icon appears, and goes through three stages:
 
 1. **Active** (blue bar): counts down the time the ability has left, taken from the buff icon.
@@ -217,10 +216,10 @@ The client's chat window shows the game's own `Chat` log, and the UI can't remov
 ### Jewelry Box Search
 
 <p>
-  <img src="JewelryBoxSearch.png" alt="Item Timers" height="200">
+  <img src="JewelryBoxSearch.png" alt="Jewelry Box Search" height="200">
 </p>
 
-A search box appears over the bottom of a jewelry box whenever you open one. Type part of an item's name or properties, e.g. `luck`, `mana regen` or `gold ring`, and the items on the page that don't match are covered with a dark square. Several words must all match, in any order. Matching ignores case. Click the red **X** on the left of the box, or press **Escape**, to clear the search.
+A search box appears over the bottom of a jewelry box whenever you open one. Type words from an item's name or properties, e.g. `luck`, `mana regeneration` or `gold ring`, and the items on the page that don't match are covered with a dark square. Several words must all match, in any order. Each word must match a whole word, so `ring` finds a Gold Ring but not Earrings, and `10` doesn't match `100`. Matching ignores case. Click the red **X** on the left of the box, or press **Escape**, to clear the search.
 
 The jewelry box only sends the page you're looking at, so other pages can't be searched until you view them. Each page you view is remembered while the box stays open. Hover over the search box to see the matches on this page, the matches on each other page you've viewed, and the pages not viewed yet, e.g. `This page: 2 | Page 3: 1 | Not viewed: 4`. Use the box's own page buttons to go to them.
 
