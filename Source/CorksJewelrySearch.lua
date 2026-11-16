@@ -9,7 +9,8 @@
 -- and hovering the search box lists how many matches each of those pages has.
 --
 -- Searching matches an item's name and property text, ignoring case. Several
--- words must all match ("gold ring luck"), in any order.
+-- words must all match ("gold ring luck"), in any order. Each word must match
+-- a whole word ("ring" finds "Gold Ring" but not "Earrings").
 ----------------------------------------------------------------
 
 CorksJewelrySearch = {}
@@ -95,13 +96,31 @@ function CorksJewelrySearch.ParseTerms(text)
 	return terms
 end
 
--- True when the item text contains every search word
+-- True when the text contains the term as a whole word: the characters on
+-- either side of it aren't letters or digits ("ring" doesn't match "earring")
+function CorksJewelrySearch.HasWord(text, term)
+	local start = 1
+	while true do
+		local first, last = string.find(text, term, start, true)
+		if not first then
+			return false
+		end
+		local before = string.sub(text, first - 1, first - 1)
+		local after = string.sub(text, last + 1, last + 1)
+		if not string.find(before, "%w") and not string.find(after, "%w") then
+			return true
+		end
+		start = first + 1
+	end
+end
+
+-- True when the item text contains every search word, as whole words
 function CorksJewelrySearch.Matches(itemText, terms)
 	if not itemText then
 		return false
 	end
 	for _, term in ipairs(terms) do
-		if not string.find(itemText, term, 1, true) then
+		if not CorksJewelrySearch.HasWord(itemText, term) then
 			return false
 		end
 	end
