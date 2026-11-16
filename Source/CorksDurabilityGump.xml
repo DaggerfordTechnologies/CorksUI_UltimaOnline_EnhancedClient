@@ -63,10 +63,12 @@
         </Window>
 
         <!-- Opens the Gear Watcher Setup window (repair popup settings) -->
-        <Button name="$parentSetupButton" inherits="UO_Default_Small_Select_Button">
+        <!-- textalign="top" as the default UI uses it: centred text is cut off at
+             the bottom, the button being shorter than its font -->
+        <Button name="$parentSetupButton" inherits="UO_Default_Small_Select_Button" textalign="top">
           <Anchors>
-            <Anchor point="topright" relativePoint="topright">
-              <AbsPoint x="-18" y="10" />
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="10" />
             </Anchor>
           </Anchors>
           <EventHandlers>
