@@ -226,7 +226,7 @@ function CorksEventTracker.Initialize()
 	SnapUtils.SnappableWindows["CorksEventTrackerWindow"] = true
 	WindowUtils.RestoreWindowPosition("CorksEventTrackerWindow", false)
 	WindowUtils.LoadScale("CorksEventTrackerWindow")
-	WindowUtils.SetWindowTitle("CorksEventTrackerWindow", L"Event Tracker")
+	WindowUtils.SetWindowTitle("CorksEventTrackerWindow", L"CORKS EVENT TRACKER")
 
 	LabelSetText("CorksEventTrackerWindowItemLabel", L"Event Item Tag:")
 	ButtonSetText("CorksEventTrackerWindowResetButton", L"Reset Count")
