@@ -3,7 +3,7 @@
 	<!-- Textures added by CorksUI. Kept apart from Textures/Textures.xml, which
 	     still loads from the default UI with all the stock textures. -->
 	<Assets>
-		<!-- Center screen popup: hammer and "Repair", 300x80 DXT5 -->
+		<!-- Center screen popup: hammer and "Repair", 400x100 DXT5 -->
 		<Texture name="CST_Repair" file="Textures/cst_Repair.dds"/>
 	</Assets>
 </Interface>
