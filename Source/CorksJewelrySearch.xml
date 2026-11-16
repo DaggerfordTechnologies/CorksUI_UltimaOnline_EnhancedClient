@@ -1,0 +1,97 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- Dark cover over an item that doesn't match. Anchored from Lua to both corners of
+         the item's picture, so it follows the jewelry box's position and scale. It takes no
+         input, so the item underneath can still be hovered and clicked. -->
+    <Window name="CorksJewelrySearchMarkTemplate" layer="overlay" handleinput="false" popable="false">
+      <Size>
+        <AbsPoint x="40" y="40" />
+      </Size>
+      <Windows>
+        <FullResizeImage name="$parentDim" inherits="UO_Simple_Black_Background" handleinput="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </FullResizeImage>
+      </Windows>
+    </Window>
+
+    <!-- Search box laid over the bottom of an open jewelry box: a red X that clears it
+         on the left, then the text entry. Anchored and scaled from Lua. -->
+    <Window name="CorksJewelrySearch" layer="overlay" handleinput="true" movable="false">
+      <Size>
+        <AbsPoint x="250" y="28" />
+      </Size>
+      <Windows>
+        <Button name="$parentClear" backgroundtexture="CloseButton" highlighttexture="CloseButton" texturescale="1.15" layer="overlay">
+          <Size>
+            <AbsPoint x="22" y="22" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="0" y="0" />
+            </Anchor>
+          </Anchors>
+          <TexCoords>
+            <Normal x="21" y="0" />
+            <NormalHighlit x="63" y="0" />
+            <Pressed x="42" y="0" />
+            <PressedHighlit x="42" y="0" />
+            <Disabled x="0" y="0" />
+          </TexCoords>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksJewelrySearch.OnClear" />
+            <EventHandler event="OnMouseOver" function="CorksJewelrySearch.OnClearTooltip" />
+          </EventHandlers>
+        </Button>
+
+        <!-- Border behind the edit box; declared first so it's drawn under the text -->
+        <Window name="$parentBoxBG" handleinput="false" layer="overlay">
+          <Size>
+            <AbsPoint x="224" y="28" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="26" y="0" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+            <FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+          </Windows>
+        </Window>
+        <!-- Hovering it shows the match counts per page -->
+        <EditBox name="$parentBox" font="UO_DefaultText" taborder="1" maxchars="60" scrolling="horz" layer="overlay">
+          <Size>
+            <AbsPoint x="214" y="22" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="31" y="4" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksJewelrySearch.OnBoxClick" />
+            <EventHandler event="OnTextChanged" function="CorksJewelrySearch.OnTextChanged" />
+            <EventHandler event="OnKeyEnter" function="CorksJewelrySearch.OnBoxEnter" />
+            <EventHandler event="OnKeyEscape" function="CorksJewelrySearch.OnClear" />
+            <EventHandler event="OnMouseOver" function="CorksJewelrySearch.OnBoxTooltip" />
+          </EventHandlers>
+        </EditBox>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>

@@ -27,6 +27,8 @@ globals = {
 	"CorksDropAlerts",
 	"CorksDurabilityGump",
 	"CorksGearWatcherSetup",
+	"CorksGumpDump",
+	"CorksJewelrySearch",
 	"CorksTargeting",
 	"CorksTimers",
 }

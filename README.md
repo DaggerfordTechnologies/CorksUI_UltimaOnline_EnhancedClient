@@ -12,6 +12,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Combat Timers](#combat-timers)
   - [Event Tracker](#event-tracker)
   - [Corks' Chat Filter](#corks-chat-filter)
+  - [Jewelry Box Search](#jewelry-box-search)
   - [Map Window Changes](#map-window-changes)
 - [Actions Reference](#actions-reference)
 - [Saved Settings](#saved-settings)
@@ -212,6 +213,16 @@ The client's chat window shows the game's own `Chat` log, and the UI can't remov
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
+### Jewelry Box Search
+
+A search box appears over the bottom of a jewelry box whenever you open one. Type part of an item's name or properties, e.g. `luck`, `mana regen` or `gold ring`, and the items on the page that don't match are covered with a dark square. Several words must all match, in any order. Matching ignores case. Click the red **X** on the left of the box, or press **Escape**, to clear the search.
+
+The jewelry box only sends the page you're looking at, so other pages can't be searched until you view them. Each page you view is remembered while the box stays open. Hover over the search box to see the matches on this page, the matches on each other page you've viewed, and the pages not viewed yet, e.g. `This page: 2 | Page 3: 1 | Not viewed: 4`. Use the box's own page buttons to go to them.
+
+- Picking a filter (Ring, Bracelet, …) or adding or taking out an item changes the page layout, so the remembered pages are cleared and you'll need to view them again.
+- Closing the box clears the search box and the remembered pages. Changing page or filter, or taking an item out, doesn't: the box closes and reopens for those too, but the search carries over.
+- Items whose properties haven't arrived from the server yet aren't covered, and are counted as "Loading" until they arrive.
+
 ### Map Window Changes
 
 `Source/MapWindow.lua` replaces the default Map Window with these changes:
@@ -282,9 +293,12 @@ CorksUI/
     ├── CorksEventTracker.xml  Event Tracker window
     ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
     ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
+    ├── CorksJewelrySearch.lua Jewelry box search: reads the open box's items, matching, remembered pages, covers
+    ├── CorksJewelrySearch.xml Jewelry box search bar and the cover template
     └── MapWindow.lua          Map Window changes
 tests/
-└── test_chatfilter.lua        Chat filter tests, run outside the game (see Development Notes)
+├── test_chatfilter.lua        Chat filter tests, run outside the game (see Development Notes)
+└── test_jewelrysearch.lua     Jewelry box search tests: matching, page memory, result line
 ```
 
 Files that aren't in this folder load from the default UI. The client only loads what `Interface.xml` names, so `tests/` and `.luacheckrc` are never loaded in game. They're also left out of GitHub's **Download ZIP** (see `.gitattributes`), along with the README screenshots; clone the repo to get them.
@@ -301,4 +315,5 @@ A few things about the client's Lua environment that come up when working on thi
   - `luac5.1 -p Source/*.lua Interface.lua` checks syntax.
   - `luacheck .` looks for misspelled names and accidental globals. `.luacheckrc` lists the client's and the default UI's globals.
   - `lua5.1 tests/test_chatfilter.lua` runs the chat filter tests against stand-ins for the client's chat log, overhead text and settings functions. It runs everything twice, once for a chat log that counts entries from 0 (what the client does) and once from 1 (what the docs say).
+  - `lua5.1 tests/test_jewelrysearch.lua` runs the jewelry box search tests.
 - **The client differs from its docs in places:** `TextLogGetEntry` counts from 0, and `WStringToString` errors on a number. Errors inside the message handlers are swallowed by `pcall`, so mistakes like these show up as features silently doing nothing.

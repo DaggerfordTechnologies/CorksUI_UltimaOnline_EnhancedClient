@@ -97,6 +97,7 @@
 	<Include file="Source/CorksEventTracker.xml"/>
 	<Include file="Source/CorksGumpPreview.xml"/>
 	<Include file="Source/CorksChatFilter.xml"/>
+	<Include file="Source/CorksJewelrySearch.xml"/>
 	<Include file="Source/QuickStats.xml"/>
 	<Include file="Source/FontSelector.xml"/>
 	<Include file="Source/LegacyRunebook.xml"/>
@@ -169,6 +170,7 @@
 		<Script file="Source/CorksGumpDump.lua"/>
 		<Script file="Source/CorksBuffRestore.lua"/>
 		<Script file="Source/CorksChatFilter.lua"/>
+		<Script file="Source/CorksJewelrySearch.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>
 		<Script file="Source/ContainersInfo.lua"/>
