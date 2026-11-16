@@ -63,7 +63,8 @@
       </Windows>
     </Window>
 
-    <!-- Name, slider and value ("25%") on one line -->
+    <!-- Name, - slider +, and value ("25%") on one line. - and + move the slider
+         by 1% for fine changes. -->
     <Window name="CorksGearSetupSliderRow">
       <Size>
         <AbsPoint x="300" y="24" />
@@ -71,31 +72,58 @@
       <Windows>
         <Label name="$parentName" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false" handleinput="false">
           <Size>
-            <AbsPoint x="128" y="20" />
+            <AbsPoint x="122" y="20" />
           </Size>
           <Anchors>
             <Anchor point="left" relativePoint="left" />
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
         </Label>
+        <!-- The stock 23px minus/plus buttons, drawn at 16px -->
+        <Button name="$parentMinus" inherits="UO_Default_Minus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="124" y="0" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnSliderMinus" />
+          </EventHandlers>
+        </Button>
         <!-- numticks: one step per whole percent over 1..99 (the template has 50).
              Lua rounds the position to a whole percent either way. -->
         <SliderBar name="$parentSlider" inherits="UO_Default_Horizontal_SliderBar" numticks="98">
           <Size>
-            <AbsPoint x="112" y="16" />
+            <AbsPoint x="100" y="16" />
           </Size>
           <Anchors>
             <Anchor point="left" relativePoint="left">
-              <AbsPoint x="132" y="0" />
+              <AbsPoint x="143" y="0" />
             </Anchor>
           </Anchors>
           <EventHandlers>
             <EventHandler event="OnSlide" function="CorksGearWatcherSetup.OnSlide" />
           </EventHandlers>
         </SliderBar>
+        <Button name="$parentPlus" inherits="UO_Default_Plus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="246" y="0" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksGearWatcherSetup.OnSliderPlus" />
+          </EventHandlers>
+        </Button>
         <Label name="$parentValue" font="UO_DefaultText" maxchars="8" textalign="right" wordwrap="false" handleinput="false">
           <Size>
-            <AbsPoint x="50" y="20" />
+            <AbsPoint x="36" y="20" />
           </Size>
           <Anchors>
             <Anchor point="right" relativePoint="right" />
@@ -117,7 +145,7 @@
          Size must match CorksGearWatcherSetup.WIDTH / HEIGHT -->
     <Window name="CorksGearWatcherSetup" movable="true" layer="popup">
       <Size>
-        <AbsPoint x="340" y="470" />
+        <AbsPoint x="340" y="444" />
       </Size>
       <Anchors>
         <Anchor point="center" relativePoint="center">
@@ -246,17 +274,10 @@
             </Anchor>
           </Anchors>
         </Window>
-        <Window name="$parentOrange" inherits="CorksGearSetupSliderRow">
+        <Window name="$parentRed" inherits="CorksGearSetupSliderRow">
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
               <AbsPoint x="20" y="348" />
-            </Anchor>
-          </Anchors>
-        </Window>
-        <Window name="$parentDarkOrange" inherits="CorksGearSetupSliderRow">
-          <Anchors>
-            <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="20" y="374" />
             </Anchor>
           </Anchors>
         </Window>
@@ -268,7 +289,7 @@
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
-              <AbsPoint x="20" y="404" />
+              <AbsPoint x="20" y="378" />
             </Anchor>
           </Anchors>
           <Color r="180" g="180" b="180" a="255" />

@@ -40,12 +40,12 @@ CorksDurabilityGump.SETTINGS = {
 	HideAbove    = { save = "CorksGearWatcherHideAbove",    default = 100, min = 1, max = 100 },
 	-- How durability is shown (FORMAT_POINTS, FORMAT_PERCENT or FORMAT_BOTH)
 	Format       = { save = "CorksGearWatcherFormat",       default = 1,   min = 1, max = 3 },
-	-- Colour levels: green above Green, yellow above Yellow, ... red at or below DarkOrange.
-	-- Kept in order (each at least 1 below the one before), see COLOR_ORDER.
+	-- Colour levels: green above Green, yellow above Yellow, orange above Red, and
+	-- red at or below Red. Kept in order (each at least 1 below the one before),
+	-- see COLOR_ORDER.
 	Green        = { save = "CorksGearWatcherGreen",        default = 75,  min = 1, max = 99 },
 	Yellow       = { save = "CorksGearWatcherYellow",       default = 50,  min = 1, max = 99 },
-	Orange       = { save = "CorksGearWatcherOrange",       default = 25,  min = 1, max = 99 },
-	DarkOrange   = { save = "CorksGearWatcherDarkOrange",   default = 10,  min = 1, max = 99 },
+	Red          = { save = "CorksGearWatcherRed",          default = 25,  min = 1, max = 99 },
 }
 CorksDurabilityGump.FORMAT_POINTS = 1   -- "11 / 50"
 CorksDurabilityGump.FORMAT_PERCENT = 2  -- "22%"
@@ -59,12 +59,13 @@ CorksDurabilityGump.COLUMN_WIDTHS = {
 }
 -- Format the columns were last sized for
 CorksDurabilityGump.ColumnsFormat = nil
-CorksDurabilityGump.COLOR_ORDER = { "Green", "Yellow", "Orange", "DarkOrange" }
+-- Colour levels, highest first, and the colour shown above each one (red below the last)
+CorksDurabilityGump.COLOR_ORDER = { "Green", "Yellow", "Red" }
+CorksDurabilityGump.COLOR_ABOVE = { Green = "Green", Yellow = "Yellow", Red = "Orange" }
 CorksDurabilityGump.COLORS = {
 	Green      = { 0, 255, 0 },
 	Yellow     = { 255, 255, 0 },
 	Orange     = { 255, 165, 0 },
-	DarkOrange = { 255, 80, 0 },
 	Red        = { 255, 0, 0 },
 }
 -- Current values, filled from the saved settings on first use
@@ -322,7 +323,7 @@ function CorksDurabilityGump.DurabilityColor(perc)
 	local D = CorksDurabilityGump
 	for _, key in ipairs(D.COLOR_ORDER) do
 		if perc > D.Get(key) then
-			return D.COLORS[key]
+			return D.COLORS[D.COLOR_ABOVE[key]]
 		end
 	end
 	return D.COLORS.Red

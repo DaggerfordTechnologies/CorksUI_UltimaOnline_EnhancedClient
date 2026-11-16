@@ -9,7 +9,7 @@ CorksGearWatcherSetup = {}
 CorksGearWatcherSetup.WINDOW = "CorksGearWatcherSetup"
 -- Size, as in the XML
 CorksGearWatcherSetup.WIDTH = 340
-CorksGearWatcherSetup.HEIGHT = 470
+CorksGearWatcherSetup.HEIGHT = 444
 
 -- Same classic background as the Gear Watcher, or nil for the standard EC look
 CorksGearWatcherSetup.ClassicBackground = 2620
@@ -28,8 +28,8 @@ CorksGearWatcherSetup.SLIDERS = {
 	{ row = "Hide",       key = "HideAbove",    text = "Hide items above" },
 	{ row = "Green",      key = "Green",        text = "Green above" },
 	{ row = "Yellow",     key = "Yellow",       text = "Yellow above" },
-	{ row = "Orange",     key = "Orange",       text = "Orange above" },
-	{ row = "DarkOrange", key = "DarkOrange",   text = "Dark orange above" },
+	-- Where red starts; orange is between it and the yellow level
+	{ row = "Red",        key = "Red",          text = "Red at or below" },
 }
 -- "Show durability as" choices; value is the Format setting
 CorksGearWatcherSetup.FORMATS = {
@@ -60,7 +60,7 @@ function CorksGearWatcherSetup.Initialize()
 	LabelSetText(W .. "ListHeading", L"Gear Watcher list")
 	LabelSetText(W .. "FormatHeading", L"Show durability as:")
 	LabelSetText(W .. "ColorHeading", L"Colour levels")
-	LabelSetText(W .. "Note", L"Red at or below the dark orange level. The alert shows once for each item, and again after that item is repaired and wears down.")
+	LabelSetText(W .. "Note", L"Orange is between the yellow and red levels. The alert shows once for each item, and again after that item is repaired and wears down.")
 
 	for _, check in ipairs(S.CHECKS) do
 		ButtonSetCheckButtonFlag(W .. check.row .. "Button", true)
@@ -233,6 +233,28 @@ function CorksGearWatcherSetup.OnSlide()
 			return
 		end
 	end
+end
+
+-- The - and + beside a slider: move its setting by 1 (within the same limits as
+-- dragging), then show where it ended up
+function CorksGearWatcherSetup.StepSlider(suffix, step)
+	local S = CorksGearWatcherSetup
+	local row = S.RowOf(SystemData.ActiveWindow.name, suffix)
+	for _, slider in ipairs(S.SLIDERS) do
+		if slider.row == row then
+			CorksDurabilityGump.Set(slider.key, CorksDurabilityGump.Get(slider.key) + step)
+			S.ShowSlider(slider)
+			return
+		end
+	end
+end
+
+function CorksGearWatcherSetup.OnSliderMinus()
+	CorksGearWatcherSetup.StepSlider("Minus", -1)
+end
+
+function CorksGearWatcherSetup.OnSliderPlus()
+	CorksGearWatcherSetup.StepSlider("Plus", 1)
 end
 
 -- Right-click closes the window

@@ -82,14 +82,13 @@ A compact window that lists every equipped item that has durability, with its cu
   | Over 75% | Green |
   | 51–75% | Yellow |
   | 26–50% | Orange |
-  | 11–25% | Dark orange |
-  | 10% or less | Red |
+  | 25% or less | Red |
 
 - If nothing you're wearing has durability, it shows "No items with durability equipped."
 
 **Repair alert:** when an equipped item wears down to your alert level, a "Repair" graphic with a hammer flashes in the middle of the screen, and a chat message names the item, for example "Gear Watcher: Platemail Tunic needs repair (22%, 11 / 50)." The alert shows once for each item, and again only after that item is repaired and wears down again. It works even while the Gear Watcher window is closed, checking every 10 seconds.
 
-**Setup:** click **Setup**, between the Item and Durability headings, to open the Gear Watcher Setup window. Changes apply straight away and are saved. The repair alert waits while the Setup window is open, so trying out the sliders doesn't set it off; it checks as soon as you close the window.
+**Setup:** click **Setup**, between the Item and Durability headings, to open the Gear Watcher Setup window. Changes apply straight away and are saved. Each slider has a small **−** on its left and **+** on its right that move it by 1% for fine changes. The repair alert waits while the Setup window is open, so trying out the sliders doesn't set it off; it checks as soon as you close the window.
 
 - **Repair alert**
   - **Show the Repair popup**: on by default.
@@ -98,7 +97,7 @@ A compact window that lists every equipped item that has durability, with its cu
 - **Gear Watcher list**
   - **Hide items above**: slider that leaves out items in good shape, 1–100%. At 100% ("None", the default) every item is listed. If everything is hidden, the list says "All items are above X%."
   - **Show durability as**: `11 / 50` (default), `22%`, or both, `22% (11 / 50)`.
-- **Colour levels**: sliders for where green, yellow, orange and dark orange start (75 / 50 / 25 / 10% by default). Each level stays below the one above it. Anything at or below the dark orange level is red.
+- **Colour levels**: sliders for where green and yellow start (**Green above**, **Yellow above**: 75 / 50% by default) and where red starts (**Red at or below**: 25% by default). Orange fills the gap between the yellow and red levels. Each level stays below the one above it.
 
 Type `/repairpopup` in chat to see the popup at any time.
 
