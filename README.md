@@ -216,6 +216,10 @@ The client's chat window shows the game's own `Chat` log, and the UI can't remov
 
 ### Jewelry Box Search
 
+<p>
+  <img src="JewelryBoxSearch.png" alt="Item Timers" height="200">
+</p>
+
 A search box appears over the bottom of a jewelry box whenever you open one. Type part of an item's name or properties, e.g. `luck`, `mana regen` or `gold ring`, and the items on the page that don't match are covered with a dark square. Several words must all match, in any order. Matching ignores case. Click the red **X** on the left of the box, or press **Escape**, to clear the search.
 
 The jewelry box only sends the page you're looking at, so other pages can't be searched until you view them. Each page you view is remembered while the box stays open. Hover over the search box to see the matches on this page, the matches on each other page you've viewed, and the pages not viewed yet, e.g. `This page: 2 | Page 3: 1 | Not viewed: 4`. Use the box's own page buttons to go to them.
