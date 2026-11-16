@@ -37,7 +37,7 @@ CorksEventTracker.GumpArt = {}
 
 -- Size; must match CorksEventTrackerWindow in the XML
 CorksEventTracker.WIDTH = 420
-CorksEventTracker.HEIGHT = 304
+CorksEventTracker.HEIGHT = 344
 CorksEventTracker.TEXTBOX_WIDTH = 380
 CorksEventTracker.TEXTBOX_HEIGHT = 30
 -- How long the count and banner pulse after a drop (seconds)
@@ -454,6 +454,53 @@ function CorksEventTracker.UpdateLuck()
 	LabelSetText("CorksEventTrackerWindowLuck", StringToWString(text))
 end
 
+-- Shard names by the ID the client keeps for the shard picked at login
+-- (UserData.Settings.Login.lastShardSelected). The client has no names, so this
+-- list is kept by hand; a shard not listed shows its ID. To find a shard's ID,
+-- log in there and run in chat:
+--   /script WindowUtils.ChatPrint(towstring(UserData.Settings.Login.lastShardSelected), SystemData.ChatLogFilters.SYSTEM)
+CorksEventTracker.SHARD_NAMES = {
+	[0] = "Atlantic",         -- confirmed in game
+	[1] = "Lake Superior",    -- confirmed in game
+	[3] = "Great Lakes",      -- confirmed in game
+	[5] = "Baja",             -- confirmed in game
+	[6] = "Chesapeake",       -- confirmed in game
+	[8] = "Catskills",        -- confirmed in game
+	[12] = "Siege Perilous",  -- from the default UI's Map Window
+	[14] = "Legends",         -- confirmed in game
+	[54] = "Test Center",     -- from the default UI's Interface.lua (TC tools)
+}
+
+-- A shard's name, or its ID when it isn't in SHARD_NAMES, or "--" when unknown
+function CorksEventTracker.ShardName(shard)
+	if shard == nil then
+		return "--"
+	end
+	return CorksEventTracker.SHARD_NAMES[tonumber(shard)] or tostring(shard)
+end
+
+-- "Shard: Chesapeake" and "Facet: Felucca". The facet is the one the player
+-- stands in.
+function CorksEventTracker.UpdateLocation()
+	local login = UserData and UserData.Settings and UserData.Settings.Login
+	local shard = login and login.lastShardSelected
+	LabelSetText("CorksEventTrackerWindowShard", StringToWString("Shard: " .. CorksEventTracker.ShardName(shard)))
+
+	local facet = WindowData.PlayerLocation and WindowData.PlayerLocation.facet
+	local name
+	if facet ~= nil then
+		local ok, text = pcall(function()
+			return GetStringFromTid(UORadarGetFacetLabel(facet))
+		end)
+		if ok and text and text ~= L"" then
+			name = text
+		else
+			name = StringToWString(tostring(facet))
+		end
+	end
+	LabelSetText("CorksEventTrackerWindowFacet", L"Facet: " .. (name or L"--"))
+end
+
 function CorksEventTracker.Refresh()
 	if not CorksEventTracker.Initialized or not DoesWindowNameExist("CorksEventTrackerWindow") then
 		return
@@ -462,6 +509,7 @@ function CorksEventTracker.Refresh()
 	CorksEventTracker.UpdateLastDrop()
 	CorksEventTracker.UpdateDropRate()
 	CorksEventTracker.UpdateLuck()
+	CorksEventTracker.UpdateLocation()
 	CorksEventTracker.UpdateRewardPoints()
 end
 
@@ -520,6 +568,7 @@ function CorksEventTracker.OnUpdate(timePassed)
 			CorksEventTracker.UpdateLastDrop()
 			CorksEventTracker.UpdateDropRate()
 			CorksEventTracker.UpdateLuck()
+			CorksEventTracker.UpdateLocation()
 		end
 	end
 
