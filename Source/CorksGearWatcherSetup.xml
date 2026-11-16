@@ -274,7 +274,7 @@
             </Anchor>
           </Anchors>
         </Window>
-        <Window name="$parentRed" inherits="CorksGearSetupSliderRow">
+        <Window name="$parentOrange" inherits="CorksGearSetupSliderRow">
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
               <AbsPoint x="20" y="348" />

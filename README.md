@@ -97,7 +97,7 @@ A compact window that lists every equipped item that has durability, with its cu
 - **Gear Watcher list**
   - **Hide items above**: slider that leaves out items in good shape, 1–100%. At 100% ("None", the default) every item is listed. If everything is hidden, the list says "All items are above X%."
   - **Show durability as**: `11 / 50` (default), `22%`, or both, `22% (11 / 50)`.
-- **Colour levels**: sliders for where green and yellow start (**Green above**, **Yellow above**: 75 / 50% by default) and where red starts (**Red at or below**: 25% by default). Orange fills the gap between the yellow and red levels. Each level stays below the one above it.
+- **Colour levels**: sliders for where green, yellow and orange start (**Green above**, **Yellow above**, **Orange above**: 75 / 50 / 25% by default). Anything at or below the orange level is red. Each level stays below the one above it.
 
 Type `/repairpopup` in chat to see the popup at any time.
 

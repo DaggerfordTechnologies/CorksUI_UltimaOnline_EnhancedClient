@@ -28,8 +28,7 @@ CorksGearWatcherSetup.SLIDERS = {
 	{ row = "Hide",       key = "HideAbove",    text = "Hide items above" },
 	{ row = "Green",      key = "Green",        text = "Green above" },
 	{ row = "Yellow",     key = "Yellow",       text = "Yellow above" },
-	-- Where red starts; orange is between it and the yellow level
-	{ row = "Red",        key = "Red",          text = "Red at or below" },
+	{ row = "Orange",     key = "Orange",       text = "Orange above" },
 }
 -- "Show durability as" choices; value is the Format setting
 CorksGearWatcherSetup.FORMATS = {
@@ -60,7 +59,7 @@ function CorksGearWatcherSetup.Initialize()
 	LabelSetText(W .. "ListHeading", L"Gear Watcher list")
 	LabelSetText(W .. "FormatHeading", L"Show durability as:")
 	LabelSetText(W .. "ColorHeading", L"Colour levels")
-	LabelSetText(W .. "Note", L"Orange is between the yellow and red levels. The alert shows once for each item, and again after that item is repaired and wears down.")
+	LabelSetText(W .. "Note", L"Red at or below the orange level. The alert shows once for each item, and again after that item is repaired and wears down.")
 
 	for _, check in ipairs(S.CHECKS) do
 		ButtonSetCheckButtonFlag(W .. check.row .. "Button", true)
