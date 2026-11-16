@@ -27,6 +27,22 @@ CorksDurabilityGump.TitleOffsetY = 8
 -- Gump art loaded for the classic background, released on shutdown
 CorksDurabilityGump.GumpArt = {}
 
+-- Repair popup: shown once when an equipped item drops to AlertPercent or lower,
+-- and again only after that item has been repaired above it and worn down again.
+-- Checked from Interface's update loop, so it works while the window is closed.
+-- The player changes these in the Gear Watcher Setup window (CorksGearWatcherSetup).
+CorksDurabilityGump.ALERT_DEFAULT = 25
+CorksDurabilityGump.ALERT_MIN = 5
+CorksDurabilityGump.ALERT_MAX = 95
+CorksDurabilityGump.ALERT_STEP = 5
+CorksDurabilityGump.ALERT_CHECK_SECONDS = 10
+CorksDurabilityGump.AlertTick = 0
+CorksDurabilityGump.AlertLoaded = false
+CorksDurabilityGump.AlertOn = true
+CorksDurabilityGump.AlertPercent = CorksDurabilityGump.ALERT_DEFAULT
+-- Items already warned about, by object id
+CorksDurabilityGump.Alerted = {}
+
 CorksDurabilityGump.SlotNames = {
 	[1]  = "Head",
 	[2]  = "Neck",
@@ -60,6 +76,7 @@ function CorksDurabilityGump.Initialize()
 
 	LabelSetText("CorksDurabilityGumpHeaderItem", L"Item")
 	LabelSetText("CorksDurabilityGumpHeaderDur", L"Durability")
+	ButtonSetText("CorksDurabilityGumpSetupButton", L"Setup")
 
 	WindowRegisterEventHandler("Root", WindowData.Paperdoll.Event, "CorksDurabilityGump.OnPaperdollEvent")
 
@@ -170,12 +187,10 @@ function CorksDurabilityGump.Update()
 
 		if slotData.slotId ~= 0 and CorksDurabilityGump.SlotNames[index] then
 			local objectId = slotData.slotId
-			local dur = ItemProperties.GetObjectPropertiesParamsForTid(objectId, CorksDurabilityGump.DURABILITY_TID, "CorksDurabilityGump")
+			local current, max, perc = CorksDurabilityGump.GetDurability(objectId)
 
-			if dur then
+			if current then
 				rowCount = rowCount + 1
-				local current = tonumber(dur[1])
-				local max = tonumber(dur[2])
 
 				local itemName = ItemProperties.GetObjectProperties(objectId, 1, "CorksDurabilityGump")
 				if not itemName then
@@ -189,11 +204,6 @@ function CorksDurabilityGump.Update()
 				-- Row 1 may have been gray from the "no items" placeholder.
 				LabelSetTextColor(rowName .. "ItemName", 255, 255, 255)
 				LabelSetText(rowName .. "ItemName", itemName)
-
-				local perc = 0
-				if max > 0 then
-					perc = math.floor((current / max) * 100)
-				end
 
 				if perc > 75 then
 					LabelSetTextColor(rowName .. "Durability", 0, 255, 0)
@@ -235,4 +245,128 @@ function CorksDurabilityGump.Update()
 		WindowSetDimensions(scrollChild, 360, rowCount * 22)
 		CorksDurabilityGump.ApplyClassicLook(targetHeight)
 	end
+end
+
+-- An item's durability as current, max and percent left (rounded down),
+-- or nil when the item has no durability (or its properties haven't loaded yet).
+function CorksDurabilityGump.GetDurability(objectId)
+	local dur = ItemProperties.GetObjectPropertiesParamsForTid(objectId, CorksDurabilityGump.DURABILITY_TID, "CorksDurabilityGump")
+	if not dur then
+		return nil
+	end
+	local current = tonumber(dur[1])
+	local max = tonumber(dur[2])
+	if not current or not max then
+		return nil
+	end
+	local perc = 0
+	if max > 0 then
+		perc = math.floor((current / max) * 100)
+	end
+	return current, max, perc
+end
+
+----------------------------------------------------------------
+-- Repair popup
+----------------------------------------------------------------
+
+function CorksDurabilityGump.LoadAlertSettings()
+	if CorksDurabilityGump.AlertLoaded then
+		return
+	end
+	CorksDurabilityGump.AlertLoaded = true
+	CorksDurabilityGump.AlertOn = Interface.LoadBoolean("CorksGearWatcherPopupOn", true)
+	CorksDurabilityGump.AlertPercent = CorksDurabilityGump.ClampAlertPercent(
+		Interface.LoadNumber("CorksGearWatcherAlertPercent", CorksDurabilityGump.ALERT_DEFAULT))
+end
+
+function CorksDurabilityGump.ClampAlertPercent(value)
+	value = tonumber(value) or CorksDurabilityGump.ALERT_DEFAULT
+	return math.max(CorksDurabilityGump.ALERT_MIN, math.min(CorksDurabilityGump.ALERT_MAX, value))
+end
+
+function CorksDurabilityGump.SetAlertOn(on)
+	CorksDurabilityGump.LoadAlertSettings()
+	CorksDurabilityGump.AlertOn = on
+	Interface.SaveBoolean("CorksGearWatcherPopupOn", on)
+	-- Check straight away rather than waiting for the next timed check
+	CorksDurabilityGump.AlertTick = CorksDurabilityGump.ALERT_CHECK_SECONDS
+end
+
+function CorksDurabilityGump.SetAlertPercent(value)
+	CorksDurabilityGump.LoadAlertSettings()
+	CorksDurabilityGump.AlertPercent = CorksDurabilityGump.ClampAlertPercent(value)
+	Interface.SaveNumber("CorksGearWatcherAlertPercent", CorksDurabilityGump.AlertPercent)
+	CorksDurabilityGump.AlertTick = CorksDurabilityGump.ALERT_CHECK_SECONDS
+end
+
+-- Called every frame from Interface's update loop; looks at the equipped items
+-- every ALERT_CHECK_SECONDS and shows the popup for any newly worn-down item.
+function CorksDurabilityGump.CheckAlerts(timePassed)
+	local D = CorksDurabilityGump
+	D.AlertTick = D.AlertTick + (timePassed or 0)
+	if D.AlertTick < D.ALERT_CHECK_SECONDS then
+		return
+	end
+	D.AlertTick = 0
+
+	D.LoadAlertSettings()
+	if not D.AlertOn then
+		-- Start fresh, so turning it back on warns about anything already worn down
+		D.Alerted = {}
+		return
+	end
+
+	local playerId = WindowData.PlayerStatus and WindowData.PlayerStatus.PlayerId
+	if not playerId or playerId == 0 then
+		return
+	end
+	-- The player's paperdoll data stays registered once asked for (as PaperdollWindow does)
+	if not WindowData.Paperdoll[playerId] then
+		RegisterWindowData(WindowData.Paperdoll.Type, playerId)
+	end
+	local paperdoll = WindowData.Paperdoll[playerId]
+	if not paperdoll then
+		return
+	end
+
+	local show = false
+	for index = 1, paperdoll.numSlots do
+		local slotData = paperdoll[index]
+		if slotData and slotData.slotId ~= 0 and D.SlotNames[index] then
+			local objectId = slotData.slotId
+			local _, max, perc = D.GetDurability(objectId)
+			if max and max > 0 then
+				if perc <= D.AlertPercent then
+					if not D.Alerted[objectId] then
+						D.Alerted[objectId] = true
+						show = true
+					end
+				else
+					-- Repaired (or the level was lowered): warn again next time it wears down
+					D.Alerted[objectId] = nil
+				end
+			end
+		end
+	end
+
+	if show then
+		D.ShowRepairPopup()
+	end
+end
+
+-- Flashes the CST_Repair graphic (Source/CorksTextures.xml) mid-screen, the same
+-- way CenterScreenText shows the stock popups like Low Life
+function CorksDurabilityGump.ShowRepairPopup()
+	local image = "CenterScreenTextImage"
+	DynamicImageSetTexture(image, "CST_Repair", 0, 0)
+	DynamicImageSetTextureDimensions(image, 400, 100)
+	WindowSetDimensions(image, 400, 100)
+	WindowStopAlphaAnimation(image)
+	WindowSetAlpha(image, 0)
+	WindowStartAlphaAnimation(image, Window.AnimationType.LOOP, 0.5, 1, 1, false, 0, 3)
+end
+
+function CorksDurabilityGump.OnSetupButton()
+	CorksGearWatcherSetup.Toggle()
 end

@@ -1072,6 +1072,10 @@ function Interface.Update( timePassed )
 
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
+
+	-- Gear Watcher repair popup; checks even while the Gear Watcher is closed
+	ok, err = pcall(CorksDurabilityGump.CheckAlerts, timePassed)
+	Interface.ErrorTracker(ok, err)
 	
 	ok, err = pcall(Interface.SOSWaypointsCleaner, timePassed)	
 	Interface.ErrorTracker(ok, err)
@@ -1919,23 +1923,8 @@ Interface.ChatAliases = {
 	-- The preview is dev-only and left out of release downloads (.gitattributes)
 	["/gumppreview"] = function() if CorksGumpPreview then CorksGumpPreview.Toggle() end end,
 	["/gumpdump"] = function() CorksGumpDump.Run() end,
-	["/repairpopup"] = function() Interface.ShowRepairPopup() end,
+	["/repairpopup"] = function() CorksDurabilityGump.ShowRepairPopup() end,
 }
-
--- Flashes the CST_Repair graphic (Source/CorksTextures.xml) mid-screen, the same
--- way CenterScreenText shows the stock popups like Low Life
-function Interface.ShowRepairPopup()
-	local ok, err = pcall(function()
-		local image = "CenterScreenTextImage"
-		DynamicImageSetTexture(image, "CST_Repair", 0, 0)
-		DynamicImageSetTextureDimensions(image, 400, 100)
-		WindowSetDimensions(image, 400, 100)
-		WindowStopAlphaAnimation(image)
-		WindowSetAlpha(image, 0)
-		WindowStartAlphaAnimation(image, Window.AnimationType.LOOP, 0.5, 1, 1, false, 0, 3)
-	end)
-	Interface.ErrorTracker(ok, err)
-end
 
 -- Every line typed in chat is sent with SendChat, whichever Enter handler the chat
 -- box ends up calling, so wrap it to catch aliases before they reach the server.

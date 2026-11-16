@@ -91,6 +91,7 @@
 	<Include file="Source/CorksGumpArt.xml"/>
 	<Include file="Source/CorksTargeting.xml"/>
 	<Include file="Source/CorksDurabilityGump.xml"/>
+	<Include file="Source/CorksGearWatcherSetup.xml"/>
 	<Include file="Source/CorksTimers.xml"/>
 	<Include file="Source/CorksCombatTimers.xml"/>
 	<Include file="Source/CorksEventTracker.xml"/>
@@ -159,6 +160,7 @@
 		<Script file="Source/Actions.lua"/>
 		<Script file="Source/CorksTargeting.lua"/>
 		<Script file="Source/CorksDurabilityGump.lua"/>
+		<Script file="Source/CorksGearWatcherSetup.lua"/>
 		<Script file="Source/CorksTimers.lua"/>
 		<Script file="Source/CorksCombatTimers.lua"/>
 		<Script file="Source/CorksEventTracker.lua"/>

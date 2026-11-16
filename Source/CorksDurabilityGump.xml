@@ -62,6 +62,18 @@
           </Anchors>
         </Window>
 
+        <!-- Opens the Gear Watcher Setup window (repair popup settings) -->
+        <Button name="$parentSetupButton" inherits="UO_Default_Small_Select_Button">
+          <Anchors>
+            <Anchor point="topright" relativePoint="topright">
+              <AbsPoint x="-18" y="10" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksDurabilityGump.OnSetupButton" />
+          </EventHandlers>
+        </Button>
+
         <Label name="$parentHeaderItem" font="UO_DefaultText" maxchars="32" textalign="left" handleinput="false">
           <Size>
             <AbsPoint x="260" y="20" />
