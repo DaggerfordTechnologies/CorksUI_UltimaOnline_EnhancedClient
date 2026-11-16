@@ -1072,6 +1072,10 @@ function Interface.Update( timePassed )
 
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
+
+	-- Gear Watcher repair popup; checks even while the Gear Watcher is closed
+	ok, err = pcall(CorksDurabilityGump.CheckAlerts, timePassed)
+	Interface.ErrorTracker(ok, err)
 	
 	ok, err = pcall(Interface.SOSWaypointsCleaner, timePassed)	
 	Interface.ErrorTracker(ok, err)
@@ -1919,7 +1923,7 @@ Interface.ChatAliases = {
 	-- The preview is dev-only and left out of release downloads (.gitattributes)
 	["/gumppreview"] = function() if CorksGumpPreview then CorksGumpPreview.Toggle() end end,
 	["/gumpdump"] = function() CorksGumpDump.Run() end,
-}
+	["/repairpopup"] = function() CorksDurabilityGump.ShowRepairPopup() end,}
 
 -- Every line typed in chat is sent with SendChat, whichever Enter handler the chat
 -- box ends up calling, so wrap it to catch aliases before they reach the server.

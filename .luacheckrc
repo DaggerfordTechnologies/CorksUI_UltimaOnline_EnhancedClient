@@ -26,6 +26,7 @@ globals = {
 	"CorksCombatTimers",
 	"CorksDropAlerts",
 	"CorksDurabilityGump",
+	"CorksGearWatcherSetup",
 	"CorksTargeting",
 	"CorksTimers",
 }

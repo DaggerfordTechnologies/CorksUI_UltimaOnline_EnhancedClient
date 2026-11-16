@@ -298,7 +298,6 @@ function CorksBuffRestore.Restore(snapshot)
 	local originalSplash = CenterScreenText.SendCenterScreenTexture
 	CenterScreenText.SendCenterScreenTexture = function() end
 
-	local restored = 0
 	local ok, err = pcall(function()
 		for _, buff in ipairs(snapshot.buffs) do
 			local id = buff.id
@@ -316,9 +315,7 @@ function CorksBuffRestore.Restore(snapshot)
 				BuffDebuff.ActiveBuffs[id] = true
 				system.CurrentBuffId = id
 				local made, problem = pcall(BuffDebuff.CreateNewBuff)
-				if made then
-					restored = restored + 1
-				else
+				if not made then
 					BuffDebuff.BuffData[id] = nil
 					BuffDebuff.ActiveBuffs[id] = nil
 					CorksBuffRestore.Say("Buff icon " .. tostring(id) .. " could not be restored: " .. tostring(problem))
@@ -329,9 +326,8 @@ function CorksBuffRestore.Restore(snapshot)
 
 	system.CurrentBuffId = originalId
 	CenterScreenText.SendCenterScreenTexture = originalSplash
+	-- Only problems are reported; a successful restore is silent
 	if not ok then
 		CorksBuffRestore.Say("Restoring buff icons failed: " .. tostring(err))
-	elseif restored > 0 then
-		CorksBuffRestore.Say("Restored " .. restored .. " buff icon(s) after the UI reload.")
 	end
 end
