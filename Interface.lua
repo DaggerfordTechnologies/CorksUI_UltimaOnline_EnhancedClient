@@ -715,6 +715,11 @@ function Interface.CreateWindows()
 	Interface.ErrorTracker(migrated, migrateErr)
 	CreateWindow( "CorksEventTrackerWindow", Interface.LoadBoolean("CorksEventTrackerWindowOpen", false))
 	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
+	-- Shown above a jewelry box while one is open
+	CreateWindow( "CorksJewelrySearch", false)
+	-- /gumpdump notes the item pictures hovered in server gumps (GenericGump.lua loads after it)
+	local hooked, hookErr = pcall(CorksGumpDump.InstallHoverHook)
+	Interface.ErrorTracker(hooked, hookErr)
 	Interface.CreateTCTools()
 	
 	if( SystemData.Settings.Interface.showTipoftheDay ) then
@@ -1071,6 +1076,10 @@ function Interface.Update( timePassed )
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksChatFilter.OnLogUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	-- Search bar for an open jewelry box
+	ok, err = pcall(CorksJewelrySearch.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	-- Gear Watcher repair popup; checks even while the Gear Watcher is closed
