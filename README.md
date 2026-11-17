@@ -14,6 +14,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Chat Filter](#corks-chat-filter)
   - [Jewelry Box Search](#jewelry-box-search)
   - [Map Window Changes](#map-window-changes)
+  - [UOAM Bridge](#uoam-bridge)
 - [Actions Reference](#actions-reference)
 - [Saved Settings](#saved-settings)
 - [File Layout](#file-layout)
@@ -237,6 +238,31 @@ The jewelry box only sends the page you're looking at, so other pages can't be s
 - **Zoom:** your saved zoom level is restored when the map opens, with an adjusted default if none is saved.
 - The combo box, lock and tilt settings are saved between sessions.
 
+### UOAM Bridge
+
+`Tools/UOAMBridge/uoam_bridge.py` lets [UOAM](https://uoguide.com/UOAM) (UO Automap) follow an Enhanced Client player, so EC players appear on a shared UOAM map alongside classic client and ClassicUO players.
+
+UOAM can't read the Enhanced Client directly. It gets positions through the UOAssist interface: a hidden window called `UOASSIST-TP-MSG-WND` that answers requests for the player's coordinates. ClassicUO and Razor provide that window; the EC doesn't. The bridge provides it, answering with the position the EC writes to `logs/pos.log` (see [Map Window Changes](#map-window-changes)).
+
+**Using it:**
+
+1. Install [Python](https://www.python.org/downloads/) 3.8 or newer for Windows. Nothing else is needed.
+2. Log in to the EC.
+3. Run the bridge by double-clicking `Start UOAM Bridge.bat`, or from a command prompt in that folder:
+
+   ```text
+   py uoam_bridge.py
+   ```
+
+   It finds `logs/pos.log` from its own location. If you moved it, give the path: `py uoam_bridge.py --log "D:\...\Ultima Online Enhanced\logs\pos.log"`.
+4. Start UOAM and link to your group's UOAM server as usual. UOAM follows you as you move and change facets. If UOAM was already running, it connects to the bridge by itself within a few seconds.
+
+Leave the bridge window open while you play; it should say `Ready` and then `UOAM connected`. Close it, or press **Ctrl+C** in it, to stop. Only one UOAssist window can be open at a time, so close UOAssist or Razor first; the bridge says so if one is already open.
+
+**What works:** position and facet. **What doesn't:** height is always reported as 0, and other UOAssist features (stats, skills, macros) aren't supported. Text UOAM sends to the game, such as UOAM chat, is printed in the bridge window, because the EC can't receive text from outside programs.
+
+`--verbose` prints every request UOAM sends, which helps if something isn't working.
+
 ## Actions Reference
 
 Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
@@ -283,23 +309,27 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
 ├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows, the drop alerts and the chat filter, and runs the chat log copy each frame
-└── Source/
-    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6108) to the Actions menu
-    ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
-    ├── CorksTargeting.xml     Targeting settings window
-    ├── CorksDurabilityGump.lua  Gear Watcher logic
-    ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
-    ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
-    ├── CorksTimers.xml        Item Timers window (9 rows defined up front)
-    ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
-    ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
-    ├── CorksEventTracker.lua  Event Tracker: artifact graphic and session count for an Event Item Tag, reward points
-    ├── CorksEventTracker.xml  Event Tracker window
-    ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
-    ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
-    ├── CorksJewelrySearch.lua Jewelry box search: reads the open box's items, matching, remembered pages, covers
-    ├── CorksJewelrySearch.xml Jewelry box search bar and the cover template
-    └── MapWindow.lua          Map Window changes
+├── Source/
+│   ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6108) to the Actions menu
+│   ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
+│   ├── CorksTargeting.xml     Targeting settings window
+│   ├── CorksDurabilityGump.lua  Gear Watcher logic
+│   ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
+│   ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
+│   ├── CorksTimers.xml        Item Timers window (9 rows defined up front)
+│   ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
+│   ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
+│   ├── CorksEventTracker.lua  Event Tracker: artifact graphic and session count for an Event Item Tag, reward points
+│   ├── CorksEventTracker.xml  Event Tracker window
+│   ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
+│   ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
+│   ├── CorksJewelrySearch.lua Jewelry box search: reads the open box's items, matching, remembered pages, covers
+│   ├── CorksJewelrySearch.xml Jewelry box search bar and the cover template
+│   └── MapWindow.lua          Map Window changes
+└── Tools/
+    └── UOAMBridge/
+        ├── uoam_bridge.py     UOAM Bridge: lets UOAM follow the EC player (not loaded by the client)
+        └── Start UOAM Bridge.bat  Double-click launcher for the bridge
 ```
 
 ## Development Notes
