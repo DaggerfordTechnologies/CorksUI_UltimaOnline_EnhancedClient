@@ -147,8 +147,12 @@ def log(msg):
 
 
 def default_log_path():
-    # This script lives in <EC>\UserInterface\CorksUI\Tools\UOAMBridge
-    here = os.path.dirname(os.path.abspath(__file__))
+    # This script (or CorksUOAMBridge.exe) lives in <EC>\UserInterface\CorksUI\Tools\UOAMBridge.
+    # In the .exe, __file__ is in a temporary folder, so use the .exe's own folder.
+    if getattr(sys, "frozen", False):
+        here = os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        here = os.path.dirname(os.path.abspath(__file__))
     return os.path.normpath(os.path.join(here, "..", "..", "..", "..", "logs", "pos.log"))
 
 
@@ -411,6 +415,12 @@ def main():
     if relay:
         relay.clear()  # so the EC map doesn't keep showing players
     log("Stopped")
+    if result and getattr(sys, "frozen", False):
+        # Double-clicked .exe: keep the window open so the error can be read
+        try:
+            input("Press Enter to close.")
+        except EOFError:
+            pass
     return result
 
 

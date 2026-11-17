@@ -246,15 +246,13 @@ UOAM can't read the Enhanced Client directly. It gets positions through the UOAs
 
 **Using it:**
 
-1. Install [Python](https://www.python.org/downloads/) 3.8 or newer for Windows. Nothing else is needed.
-2. Log in to the EC.
-3. Run the bridge by double-clicking `Start UOAM Bridge.bat`, or from a command prompt in that folder:
+1. Log in to the EC.
+2. Download `CorksUOAMBridge.exe` from the [Releases page](https://github.com/DaggerfordTechnologies/CorksUI_UltimaOnline_EnhancedClient/releases) and put it in `Tools/UOAMBridge`. Run the bridge by double-clicking it. It has Python built in, so nothing needs installing.
 
-   ```text
-   py uoam_bridge.py
-   ```
+   If you have [Python](https://www.python.org/downloads/) 3.8 or newer, you can run the script instead: double-click `Start UOAM Bridge.bat`, or from a command prompt in that folder run `py uoam_bridge.py`.
 
-   It finds `logs/pos.log` from its own location. If you moved it, give the path: `py uoam_bridge.py --log "D:\...\Ultima Online Enhanced\logs\pos.log"`.
+   The bridge finds `logs/pos.log` from its own location, so keep it in `Tools/UOAMBridge`. If you moved it, give the path: `CorksUOAMBridge.exe --log "D:\...\Ultima Online Enhanced\logs\pos.log"`. Other options (`--verbose`, `--hub`) work the same for the `.exe` and the script.
+3. If Windows or your antivirus warns about `CorksUOAMBridge.exe`, that's common for programs packaged this way that aren't signed. You can run the script with Python instead.
 4. Start UOAM and link it to **server `127.0.0.1`, port `2000`**, with your usual name and password. The bridge passes the link on to the UOAM hub (`uoamhub.classicuo.org`, port 443) unchanged, so UOAM works as usual, and the other players also appear on the EC map. If your group uses another hub, start the bridge with `--hub host:port`.
 
    Linking UOAM straight to the hub also works, but then the other players only show in UOAM, not on the EC map.
@@ -337,7 +335,9 @@ CorksUI/
     └── UOAMBridge/
         ├── uoam_bridge.py     UOAM Bridge: lets UOAM follow the EC player (not loaded by the client)
         ├── uoam_relay.py      Relays UOAM's hub link and reads the group's positions from it
-        └── Start UOAM Bridge.bat  Double-click launcher for the bridge
+        ├── Start UOAM Bridge.bat  Double-click launcher for the bridge script (needs Python)
+        ├── CorksUOAMBridge.exe    The bridge with Python built in (from Releases or build_exe.bat; not in git)
+        └── build_exe.bat          Rebuilds CorksUOAMBridge.exe after changing the bridge
 ```
 
 ## Development Notes
@@ -354,4 +354,5 @@ A few things about the client's Lua environment that come up when working on thi
   - `lua5.1 tests/test_chatfilter.lua` runs the chat filter tests against stand-ins for the client's chat log, overhead text and settings functions. It runs everything twice, once for a chat log that counts entries from 0 (what the client does) and once from 1 (what the docs say).
   - `lua5.1 tests/test_jewelrysearch.lua` runs the jewelry box search tests.
   - `lua5.1 tests/test_uoambridge.lua` runs the tests for reading the UOAM Bridge's player file.
+- **Rebuilding the UOAM Bridge `.exe`:** after changing `uoam_bridge.py` or `uoam_relay.py`, run `Tools/UOAMBridge/build_exe.bat`. It installs PyInstaller into `%TEMP%\CorksUOAMBridgeBuild` the first time, not into your own Python, and writes a new `CorksUOAMBridge.exe` next to the script. The `.exe` is left out of git (`.gitignore`); attach it to a GitHub release instead.
 - **The client differs from its docs in places:** `TextLogGetEntry` counts from 0, and `WStringToString` errors on a number. Errors inside the message handlers are swallowed by `pcall`, so mistakes like these show up as features silently doing nothing.
