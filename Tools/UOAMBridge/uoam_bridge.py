@@ -9,11 +9,16 @@ Windows messages. ClassicUO and Razor provide that window; the EC doesn't.
 This script provides it, answering with the position the EC writes to
 logs/pos.log (map|x|y, rewritten as the player moves).
 
+It also relays UOAM's link to its hub (uoam_relay.py): link UOAM to
+127.0.0.1 port 2000 instead of the hub, and the other players are written to
+logs/CorksUOAMBridge.txt for CorksUI to show on the EC map.
+
 Run it while the EC is running, then start UOAM. Windows only, Python 3,
 standard library only.
 
     py uoam_bridge.py                 (pos.log found from this script's folder)
     py uoam_bridge.py --log "D:\\...\\Ultima Online Enhanced\\logs\\pos.log"
+    py uoam_bridge.py --hub uoamhub.classicuo.org:443   (the hub to relay to)
     py uoam_bridge.py --verbose       (print every message UOAM sends)
 """
 
@@ -25,6 +30,8 @@ import signal
 import sys
 import time
 from ctypes import wintypes
+
+from uoam_relay import Relay
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -127,6 +134,12 @@ QUIET_MESSAGES = {0x0001, 0x0002, 0x0003, 0x0005, 0x0006, 0x0007, 0x0008, 0x000C
                   0x001C, 0x0024, 0x0046, 0x0047, 0x0081, 0x0082, 0x0083, 0x0086, 0x007F, 0x0090, 0x031F}
 POLL_MS = 250
 TIMER_ID = 1
+# UOAM can miss the map number sent when it connects, and is only told again
+# on a map change, so it's repeated this often (seconds)
+MAP_INFO_EVERY = 5
+DEFAULT_HUB = "uoamhub.classicuo.org:443"
+DEFAULT_LISTEN_PORT = 2000
+PLAYERS_FILE = "CorksUOAMBridge.txt"  # next to pos.log
 
 
 def log(msg):
@@ -176,9 +189,11 @@ def window_title(hwnd):
 
 
 class Bridge:
-    def __init__(self, log_path, verbose):
+    def __init__(self, log_path, verbose, relay=None):
         self.log_path = log_path
         self.verbose = verbose
+        self.relay = relay
+        self.last_map_info = 0.0
         self.hwnd = None
         self.listeners = set()  # UOAM windows that sent REGISTER
         self.position = None  # (map, x, y)
@@ -215,7 +230,10 @@ class Bridge:
         self.position = new
         if old is None or old[0] != new[0]:
             log(f"Map {new[0]}, at {new[1]}, {new[2]}")
-            self.post_all(MAP_INFO, new[0], 0)
+            self.send_map()
+            if self.relay:
+                self.relay.expected_facet = new[0]
+                self.relay.check_own_facet()
         elif self.verbose:
             log(f"At {new[1]}, {new[2]}")
 
@@ -242,6 +260,12 @@ class Bridge:
 
     # --- messages ---------------------------------------------------------
 
+    def send_map(self):
+        """Tells every connected UOAM which map the EC player is on."""
+        if self.position:
+            self.last_map_info = time.monotonic()
+            self.post_all(MAP_INFO, self.position[0], 0)
+
     def post_all(self, msg, wparam, lparam):
         for hwnd in list(self.listeners):
             if not user32.PostMessageW(hwnd, msg, wparam, lparam):
@@ -253,6 +277,8 @@ class Bridge:
                 user32.PostQuitMessage(0)
             else:
                 self.read_position()
+                if time.monotonic() - self.last_map_info >= MAP_INFO_EVERY:
+                    self.send_map()
                 self.report()
             return 0
         if self.verbose and msg not in QUIET_MESSAGES and not (WM_USER + 200 <= msg < WM_USER + 315):
@@ -358,8 +384,23 @@ def main():
     parser = argparse.ArgumentParser(description="Lets UOAM follow an Enhanced Client player.")
     parser.add_argument("--log", default=default_log_path(), help="path to the EC's logs\\pos.log")
     parser.add_argument("--verbose", action="store_true", help="print every message UOAM sends")
+    parser.add_argument("--hub", default=DEFAULT_HUB, help="the UOAM hub to relay to, as host:port (default %(default)s)")
+    parser.add_argument("--listen-port", type=int, default=DEFAULT_LISTEN_PORT,
+                        help="the port UOAM links to on 127.0.0.1 (default %(default)s)")
+    parser.add_argument("--no-relay", action="store_true", help="don't relay UOAM's hub link (no other players on the EC map)")
     args = parser.parse_args()
-    bridge = Bridge(args.log, args.verbose)
+
+    relay = None
+    if not args.no_relay:
+        host, _, port = args.hub.rpartition(":")
+        if not host or not port.isdigit():
+            print("--hub must be host:port, e.g. " + DEFAULT_HUB)
+            return 1
+        out = os.path.join(os.path.dirname(os.path.abspath(args.log)), PLAYERS_FILE)
+        relay = Relay(host, int(port), args.listen_port, out, log, args.verbose)
+        relay.start()
+
+    bridge = Bridge(args.log, args.verbose, relay)
 
     def stop(*_):
         bridge.stopping = True
@@ -367,6 +408,8 @@ def main():
     # Ctrl+C can't interrupt the Windows message loop, so it sets a flag instead
     signal.signal(signal.SIGINT, stop)
     result = bridge.run()
+    if relay:
+        relay.clear()  # so the EC map doesn't keep showing players
     log("Stopped")
     return result
 
