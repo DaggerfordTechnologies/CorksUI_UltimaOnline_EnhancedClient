@@ -5,7 +5,7 @@ up on a shared UOAM map with classic and ClassicUO players.
 
 UOAM reads positions through the UOAssist API: it looks for a hidden window
 named "UOASSIST-TP-MSG-WND" and asks it for the player's coordinates with
-Windows messages. ClassicUO and Razor provide that window; the EC doesn't.
+Windows messages. ClassicUO  provides that window; the EC doesn't.
 This script provides it, answering with the position the EC writes to
 logs/pos.log (map|x|y, rewritten as the player moves).
 
@@ -344,7 +344,7 @@ class Bridge:
 
     def run(self):
         if user32.FindWindowW(None, WINDOW_NAME):
-            log("Another UOAssist window is already open (UOAssist, Razor, ClassicUO or another bridge). Close it first.")
+            log("Another UOAssist window is already open (UOAssist, ClassicUO or another bridge). Close it first.")
             return 1
 
         hinst = kernel32.GetModuleHandleW(None)
