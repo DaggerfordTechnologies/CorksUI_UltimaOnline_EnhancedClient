@@ -723,6 +723,9 @@ function Interface.CreateWindows()
 	-- Jewelry box search tells a page change from closing the box by its button clicks
 	hooked, hookErr = pcall(CorksJewelrySearch.InstallClickHook)
 	Interface.ErrorTracker(hooked, hookErr)
+	-- Other UOAM players on the map, from the UOAM Bridge (MapCommon loads after it)
+	hooked, hookErr = pcall(CorksUOAMBridge.InstallMapHook)
+	Interface.ErrorTracker(hooked, hookErr)
 	Interface.CreateTCTools()
 	
 	if( SystemData.Settings.Interface.showTipoftheDay ) then
@@ -1083,6 +1086,10 @@ function Interface.Update( timePassed )
 
 	-- Search bar for an open jewelry box
 	ok, err = pcall(CorksJewelrySearch.OnUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	-- Other UOAM players' positions, written by the UOAM Bridge
+	ok, err = pcall(CorksUOAMBridge.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	-- Gear Watcher repair popup; checks even while the Gear Watcher is closed

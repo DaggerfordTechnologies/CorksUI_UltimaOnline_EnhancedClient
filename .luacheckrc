@@ -32,6 +32,7 @@ globals = {
 	"CorksJewelrySearch",
 	"CorksTargeting",
 	"CorksTimers",
+	"CorksUOAMBridge",
 }
 
 -- Globals from the client and the default UI. CorksUI replaces functions on several

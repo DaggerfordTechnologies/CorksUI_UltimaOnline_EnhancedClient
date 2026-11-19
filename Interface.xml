@@ -171,6 +171,7 @@
 		<Script file="Source/CorksBuffRestore.lua"/>
 		<Script file="Source/CorksChatFilter.lua"/>
 		<Script file="Source/CorksJewelrySearch.lua"/>
+		<Script file="Source/CorksUOAMBridge.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>
 		<Script file="Source/ContainersInfo.lua"/>

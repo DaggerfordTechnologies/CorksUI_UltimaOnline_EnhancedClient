@@ -14,6 +14,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Chat Filter](#corks-chat-filter)
   - [Jewelry Box Search](#jewelry-box-search)
   - [Map Window Changes](#map-window-changes)
+  - [UOAM Bridge](#uoam-bridge)
 - [Actions Reference](#actions-reference)
 - [Saved Settings](#saved-settings)
 - [File Layout](#file-layout)
@@ -237,6 +238,35 @@ The jewelry box only sends the page you're looking at, so other pages can't be s
 - **Zoom:** your saved zoom level is restored when the map opens, with an adjusted default if none is saved.
 - The combo box, lock and tilt settings are saved between sessions.
 
+### UOAM Bridge
+
+`Tools/UOAMBridge/uoam_bridge.py` lets [UOAM](https://uoguide.com/UOAM) (UO Automap) follow an Enhanced Client player, so EC players appear on a shared UOAM map alongside classic client and ClassicUO players. It can also show the other players in your UOAM group on the EC's own Atlas and radar.
+
+UOAM can't read the Enhanced Client directly. It gets positions through the UOAssist interface: a hidden window called `UOASSIST-TP-MSG-WND` that answers requests for the player's coordinates. ClassicUO and Razor provide that window; the EC doesn't. The bridge provides it, answering with the position the EC writes to `logs/pos.log` (see [Map Window Changes](#map-window-changes)).
+
+**Using it:**
+
+1. Log in to the EC.
+2. Download `CorksUOAMBridge.exe` from the [Releases page](https://github.com/DaggerfordTechnologies/CorksUI_UltimaOnline_EnhancedClient/releases) and put it in `Tools/UOAMBridge`. Run the bridge by double-clicking it. It has Python built in, so nothing needs installing.
+
+   If you have [Python](https://www.python.org/downloads/) 3.8 or newer, you can run the script instead: double-click `Start UOAM Bridge.bat`, or from a command prompt in that folder run `py uoam_bridge.py`.
+
+   The bridge finds `logs/pos.log` from its own location, so keep it in `Tools/UOAMBridge`. If you moved it, give the path: `CorksUOAMBridge.exe --log "D:\...\Ultima Online Enhanced\logs\pos.log"`. Other options (`--verbose`, `--hub`) work the same for the `.exe` and the script.
+3. If Windows or your antivirus warns about `CorksUOAMBridge.exe`, that's common for programs packaged this way that aren't signed. You can run the script with Python instead.
+4. Start UOAM and link it to **server `127.0.0.1`, port `2000`**, with your usual name and password. The bridge passes the link on to the UOAM hub (`uoamhub.classicuo.org`, port 443) unchanged, so UOAM works as usual, and the other players also appear on the EC map. If your group uses another hub, start the bridge with `--hub host:port`.
+
+   Linking UOAM straight to the hub also works, but then the other players only show in UOAM, not on the EC map.
+
+UOAM follows you as you move. UOAM doesn't pick up facet changes from the bridge, so when it's linked through the bridge, the bridge corrects your facet in the updates UOAM sends to the hub, and the rest of the group sees you on the right one. If UOAM was already running, it connects to the bridge by itself within a few seconds.
+
+Leave the bridge window open while you play; it should say `Ready` and then `UOAM connected`. Close it, or press **Ctrl+C** in it, to stop. Only one UOAssist window can be open at a time, so close UOAssist or Razor first; the bridge says so if one is already open.
+
+**Other players on the EC map:** each player in your UOAM group who is on the facet you're viewing appears on the Atlas and radar as a light blue party icon with their name. Hover over one for their location. They update about every 5 seconds, as UOAM fetches them from the hub, and disappear about 30 seconds after the bridge or UOAM is closed. The bridge writes them to `logs/CorksUOAMBridge.txt`, and `Source/CorksUOAMBridge.lua` reads that file. Players on Ter Mur aren't shown, because UOAM has no code for that facet.
+
+**What works:** position and facet. **What doesn't:** height is always reported as 0, and other UOAssist features (stats, skills, macros) aren't supported. Text UOAM sends to the game, such as UOAM chat, is printed in the bridge window, because the EC can't receive text from outside programs.
+
+`--verbose` prints every request UOAM sends, which helps if something isn't working.
+
 ## Actions Reference
 
 Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
@@ -283,23 +313,31 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
 ├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows, the drop alerts and the chat filter, and runs the chat log copy each frame
-└── Source/
-    ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6108) to the Actions menu
-    ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
-    ├── CorksTargeting.xml     Targeting settings window
-    ├── CorksDurabilityGump.lua  Gear Watcher logic
-    ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
-    ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
-    ├── CorksTimers.xml        Item Timers window (9 rows defined up front)
-    ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
-    ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
-    ├── CorksEventTracker.lua  Event Tracker: artifact graphic and session count for an Event Item Tag, reward points
-    ├── CorksEventTracker.xml  Event Tracker window
-    ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
-    ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
-    ├── CorksJewelrySearch.lua Jewelry box search: reads the open box's items, matching, remembered pages, covers
-    ├── CorksJewelrySearch.xml Jewelry box search bar and the cover template
-    └── MapWindow.lua          Map Window changes
+├── Source/
+│   ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6108) to the Actions menu
+│   ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
+│   ├── CorksTargeting.xml     Targeting settings window
+│   ├── CorksDurabilityGump.lua  Gear Watcher logic
+│   ├── CorksDurabilityGump.xml  Gear Watcher window (19 rows defined up front)
+│   ├── CorksTimers.lua        Potion timers: double-click trigger, journal checks, countdown
+│   ├── CorksTimers.xml        Item Timers window (9 rows defined up front)
+│   ├── CorksCombatTimers.lua  Combat timers: Evasion, War Cry and Rejuvenate, driven by buff icons and game messages
+│   ├── CorksCombatTimers.xml  Combat Timers window (4 rows defined up front)
+│   ├── CorksEventTracker.lua  Event Tracker: artifact graphic and session count for an Event Item Tag, reward points
+│   ├── CorksEventTracker.xml  Event Tracker window
+│   ├── CorksChatFilter.lua    Chat filter: matching, saved rows, window, filtered copy of the chat log
+│   ├── CorksChatFilter.xml    Corks' Chat Filter window (30 rows defined up front)
+│   ├── CorksJewelrySearch.lua Jewelry box search: reads the open box's items, matching, remembered pages, covers
+│   ├── CorksJewelrySearch.xml Jewelry box search bar and the cover template
+│   ├── CorksUOAMBridge.lua    Other UOAM players on the Atlas and radar, read from the UOAM Bridge's file
+│   └── MapWindow.lua          Map Window changes
+└── Tools/
+    └── UOAMBridge/
+        ├── uoam_bridge.py     UOAM Bridge: lets UOAM follow the EC player (not loaded by the client)
+        ├── uoam_relay.py      Relays UOAM's hub link and reads the group's positions from it
+        ├── Start UOAM Bridge.bat  Double-click launcher for the bridge script (needs Python)
+        ├── CorksUOAMBridge.exe    The bridge with Python built in (from Releases or build_exe.bat; not in git)
+        └── build_exe.bat          Rebuilds CorksUOAMBridge.exe after changing the bridge
 ```
 
 ## Development Notes
@@ -315,4 +353,6 @@ A few things about the client's Lua environment that come up when working on thi
   - `luacheck .` looks for misspelled names and accidental globals. `.luacheckrc` lists the client's and the default UI's globals.
   - `lua5.1 tests/test_chatfilter.lua` runs the chat filter tests against stand-ins for the client's chat log, overhead text and settings functions. It runs everything twice, once for a chat log that counts entries from 0 (what the client does) and once from 1 (what the docs say).
   - `lua5.1 tests/test_jewelrysearch.lua` runs the jewelry box search tests.
+  - `lua5.1 tests/test_uoambridge.lua` runs the tests for reading the UOAM Bridge's player file.
+- **Rebuilding the UOAM Bridge `.exe`:** after changing `uoam_bridge.py` or `uoam_relay.py`, run `Tools/UOAMBridge/build_exe.bat`. It installs PyInstaller into `%TEMP%\CorksUOAMBridgeBuild` the first time, not into your own Python, and writes a new `CorksUOAMBridge.exe` next to the script. The `.exe` is left out of git (`.gitignore`); attach it to a GitHub release instead.
 - **The client differs from its docs in places:** `TextLogGetEntry` counts from 0, and `WStringToString` errors on a number. Errors inside the message handlers are swallowed by `pcall`, so mistakes like these show up as features silently doing nothing.
