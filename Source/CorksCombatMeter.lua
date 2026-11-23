@@ -54,8 +54,11 @@ CorksCombatMeter.FIGHT_ROWS = 4
 -- The meter's tab pages, in button order
 CorksCombatMeter.TABS = { "Totals", "Foes", "Recent", "Fights" }
 CorksCombatMeter.Tab = "Totals"
--- Color of a bar's empty track
-CorksCombatMeter.TRACK_COLOR = { 45, 40, 35 }
+-- Color and see-through-ness of a bar's track (its full length), light enough to
+-- show on the dark background
+CorksCombatMeter.TRACK_COLOR = { 150, 140, 125 }
+CorksCombatMeter.TRACK_ALPHA = 0.35
+CorksCombatMeter.BarErrorShown = false
 
 CorksCombatMeter.COLOR = {
 	dealt  = { 255, 220, 90 },
@@ -84,7 +87,7 @@ CorksCombatMeter.SLIDERS = {
 }
 CorksCombatMeter.FILTERS = {
 	{ row = "Dealt", key = "ShowDealt", text = "Dealt", color = "dealt" },
-	{ row = "Taken", key = "ShowTaken", text = "Taken", color = "you" },
+	{ row = "Taken", key = "ShowTaken", text = "Received", color = "you" },
 	{ row = "Pet",   key = "ShowPet",   text = "Pet",   color = "pet" },
 	{ row = "Heals", key = "ShowHeals", text = "Heals", color = "heal" },
 }
@@ -570,8 +573,8 @@ function CorksCombatMeter.BarRows(fight)
 	end
 	return {
 		{ "Dealt",    fight.dealt,    M.Commas(fight.dealt),    C.dealt },
-		{ "Taken",    fight.taken,    M.Commas(fight.taken),    C.you },
-		{ "Pet",      fight.petTaken, M.Commas(fight.petTaken), C.pet },
+		{ "Received", fight.taken,    M.Commas(fight.taken),    C.you },
+		{ "Pet taken", fight.petTaken, M.Commas(fight.petTaken), C.pet },
 		{ "Healed",   fight.healed,   M.Commas(fight.healed),   C.heal },
 		{ "Regen",    fight.regen,    M.Commas(fight.regen),    C.regen },
 		{ "Absorbed", fight.absorbed, M.Commas(fight.absorbed), C.absorb },
@@ -615,7 +618,7 @@ function CorksCombatMeter.RecentText(entry)
 	if entry.kind == "dealt" then
 		return entry.time .. "  " .. amount .. " on " .. (entry.name or "Unknown")
 	elseif entry.kind == "you" then
-		return entry.time .. "  " .. amount .. " taken"
+		return entry.time .. "  " .. amount .. " received"
 	elseif entry.kind == "pet" then
 		return entry.time .. "  " .. amount .. " on " .. (entry.name or "your pet")
 	elseif entry.kind == "heal" then
@@ -659,25 +662,44 @@ function CorksCombatMeter.FightTitle(fight)
 	return "Lasted " .. M.Duration(M.FightLength(fight)) .. ", ended " .. M.Duration(M.Now() - fight.last) .. " ago"
 end
 
--- Fills a bar: amount out of most, in color. A zero amount leaves only the track.
+-- Draws a bar: the track at full length, the fill at amount out of most, in
+-- color. Set the way the stock summon timer is (current, then maximum, then
+-- tint). Protected: an error is shown once in chat rather than lost, and the
+-- rest of the window still updates.
 function CorksCombatMeter.SetBar(name, amount, most, color)
-	StatusBarSetMaximumValue(name .. "Fill", math.max(most, 1))
-	StatusBarSetCurrentValue(name .. "Fill", math.max(amount, 0))
-	WindowSetTintColor(name .. "Fill", color[1], color[2], color[3])
+	local ok, err = pcall(function()
+		local c = CorksCombatMeter.TRACK_COLOR
+		WindowSetShowing(name .. "Track", true)
+		StatusBarSetCurrentValue(name .. "Track", 1)
+		StatusBarSetMaximumValue(name .. "Track", 1)
+		WindowSetTintColor(name .. "Track", c[1], c[2], c[3])
+		WindowSetAlpha(name .. "Track", CorksCombatMeter.TRACK_ALPHA)
+
+		WindowSetShowing(name .. "Fill", true)
+		StatusBarSetCurrentValue(name .. "Fill", math.max(amount, 0))
+		StatusBarSetMaximumValue(name .. "Fill", math.max(most, 1))
+		WindowSetTintColor(name .. "Fill", color[1], color[2], color[3])
+	end)
+	CorksCombatMeter.ReportBarError(ok, err)
 end
 
--- A bar row with nothing in it: no text, no track, no fill
+-- A bar row with nothing in it: no track, no fill
 function CorksCombatMeter.ClearBar(name)
-	StatusBarSetCurrentValue(name .. "Fill", 0)
-	WindowSetShowing(name .. "Track", false)
+	local ok, err = pcall(function()
+		WindowSetShowing(name .. "Track", false)
+		WindowSetShowing(name .. "Fill", false)
+	end)
+	CorksCombatMeter.ReportBarError(ok, err)
 end
 
-function CorksCombatMeter.ShowTrack(name)
-	local c = CorksCombatMeter.TRACK_COLOR
-	WindowSetShowing(name .. "Track", true)
-	StatusBarSetMaximumValue(name .. "Track", 1)
-	StatusBarSetCurrentValue(name .. "Track", 1)
-	WindowSetTintColor(name .. "Track", c[1], c[2], c[3])
+function CorksCombatMeter.ReportBarError(ok, err)
+	if ok or CorksCombatMeter.BarErrorShown then
+		return
+	end
+	CorksCombatMeter.BarErrorShown = true
+	pcall(function()
+		WindowUtils.ChatPrint(StringToWString("Combat Meter bars: " .. tostring(err)), SystemData.ChatLogFilters.SYSTEM)
+	end)
 end
 
 function CorksCombatMeter.Refresh()
@@ -699,7 +721,6 @@ function CorksCombatMeter.Refresh()
 		local name = W .. "Bar" .. i
 		M.SetLabel(name .. "Name", row[1], row[4])
 		M.SetLabel(name .. "Value", row[3], C.white)
-		M.ShowTrack(name)
 		M.SetBar(name, row[2], most, row[4])
 	end
 	M.SetLabel(W .. "BiggestLabel", M.BiggestText(fight), C.dealt)
@@ -715,7 +736,6 @@ function CorksCombatMeter.Refresh()
 			local share = math.floor(enemy.total * 100 / math.max(dealt, 1) + 0.5)
 			M.SetLabel(name .. "Name", enemy.name, C.white)
 			M.SetLabel(name .. "Value", M.Commas(enemy.total) .. " (" .. share .. "%)", C.white)
-			M.ShowTrack(name)
 			M.SetBar(name, enemy.total, dealt, C.dealt)
 		else
 			M.SetLabel(name .. "Name", i == 1 and "None yet" or "", C.grey)
@@ -751,7 +771,6 @@ function CorksCombatMeter.Refresh()
 			local color = (listed == fight) and C.gold or C.white
 			M.SetLabel(name .. "Name", when, color)
 			M.SetLabel(name .. "Value", M.Commas(listed.dealt) .. " (" .. M.Commas(dps) .. "/s)", color)
-			M.ShowTrack(name)
 			M.SetBar(name, dps, bestDps, C.dealt)
 		else
 			M.SetLabel(name .. "Name", i == 1 and "None yet" or "", C.grey)

@@ -276,9 +276,9 @@ Sums up each fight: damage dealt, damage per second, biggest hit, damage taken b
 
 - **A fight** starts with the first damage number and ends after 10 seconds without one. The window shows the fight in progress, or the last one.
 - **Tabs** along the top show one page at a time. The current tab's name is gold, and the window remembers it.
-- **Totals:** the fight's length and damage per second, then a colored bar for each total: Dealt, Taken, Pet (damage your pet took), Healed, Regen and Absorbed. The bars share one scale, so you can compare them at a glance. Below them, the biggest hit and what it hit.
+- **Totals:** the fight's length and damage per second, then a colored bar for each total: Dealt, Received (damage you took), Pet taken (damage your pet took; its own hits count in Dealt), Healed, Regen and Absorbed. The bars share one scale, so you can compare them at a glance. Below them, the biggest hit and what it hit.
 - **Foes:** up to seven enemies that took the most damage, each with a bar showing its share of the damage dealt, e.g. `1,871 (91%)`.
-- **Recent:** the last eight hits and heals. The **Dealt**, **Taken**, **Pet** and **Heals** check boxes pick what's listed.
+- **Recent:** the last eight hits and heals. The **Dealt**, **Received**, **Pet** and **Heals** check boxes pick what's listed.
 - **Fights:** the fight in progress and the last 3 fights, with their damage and damage per second, and bars comparing them. Click one to show it on the Totals tab.
 - **Reset** clears the fights and the recent list. Fights are kept until you reset, reload the UI or log out.
 
