@@ -14,7 +14,8 @@ CorksEventTracker = {}
 -- UI); the tag is saved.
 
 -- The default UI already shows the artifact graphic for these (TextParsing.lua), so
--- they're counted here but don't show it a second time.
+-- they're counted here but don't show it a second time. Only used if Corks' Alerts
+-- isn't loaded; otherwise CorksAlerts.CoversArtifact decides (see ShowArtifact).
 CorksEventTracker.DEFAULT_UI_ARTIFACT_IDS = {
 	[1062317] = true,  -- "For your valor in combating the fallen beast, a special artifact has been bestowed on you."
 	[502088]  = true,  -- "A special gift has been placed in your backpack."
@@ -210,11 +211,30 @@ function CorksEventTracker.OnChatText()
 		CorksEventTracker.Total = CorksEventTracker.Total + 1
 		CorksEventTracker.LastDropTime = Interface.TimeSinceLogin
 		CorksEventTracker.SessionDrops = CorksEventTracker.SessionDrops + 1
-		if not CorksEventTracker.DEFAULT_UI_ARTIFACT_IDS[SystemData.TextID] then
-			CenterScreenText.SendCenterScreenTexture("artifact")
-		end
+		CorksEventTracker.ShowArtifact()
 		CorksEventTracker.StartFlash()
 		CorksEventTracker.Refresh()
+	end
+end
+
+-- Shows the artifact graphic for a drop, unless an alert that's turned on in
+-- Corks' Alerts shows it for this message already. If that alert is turned off,
+-- the graphic still shows here, since the drop matched the event tag.
+function CorksEventTracker.ShowArtifact()
+	local covered
+	if CorksAlerts and CorksAlerts.CoversArtifact then
+		local ok, result = pcall(CorksAlerts.CoversArtifact)
+		covered = ok and result
+	else
+		covered = CorksEventTracker.DEFAULT_UI_ARTIFACT_IDS[SystemData.TextID]
+	end
+	if covered then
+		return
+	end
+	if CorksAlerts and CorksAlerts.ShowStock then
+		CorksAlerts.ShowStock("artifact")
+	else
+		CenterScreenText.SendCenterScreenTexture("artifact")
 	end
 end
 

@@ -22,6 +22,7 @@ ignore = { "61.", "62." }
 
 -- Tables CorksUI defines itself.
 globals = {
+	"CorksAlerts",
 	"CorksChatFilter",
 	"CorksCombatTimers",
 	"CorksDropAlerts",
@@ -30,6 +31,7 @@ globals = {
 	"CorksGearWatcherSetup",
 	"CorksGumpDump",
 	"CorksJewelrySearch",
+	"CorksLootTags",
 	"CorksTargeting",
 	"CorksTimers",
 	"CorksUOAMBridge",

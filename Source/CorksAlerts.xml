@@ -1,0 +1,472 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- One row per alert (check box plus its name), or a group title -->
+    <Window name="CorksAlertsRowTemplate">
+      <Size>
+        <AbsPoint x="300" y="24" />
+      </Size>
+      <Windows>
+        <Button name="$parentButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="5" y="0" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksAlerts.OnRowButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentLabel" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="265" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+              <AbsPoint x="8" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksAlerts.OnRowLabel" />
+          </EventHandlers>
+        </Label>
+      </Windows>
+    </Window>
+
+    <Window name="CorksAlerts" movable="true" layer="popup">
+      <Size>
+        <AbsPoint x="350" y="560" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="0" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksAlerts.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksAlerts.Shutdown" />
+        <EventHandler event="OnUpdate" function="CorksAlerts.OnUpdate" />
+        <EventHandler event="OnRButtonUp" function="CorksAlerts.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <Label name="$parentHint" font="UO_DefaultText" maxchars="128" textalign="left" handleinput="false" wordwrap="true">
+          <Size>
+            <AbsPoint x="310" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="38" />
+            </Anchor>
+          </Anchors>
+        </Label>
+
+        <!-- Rows are defined up front (not created at runtime) so they keep the
+             window's scale. Keep in sync with CorksAlerts.MAX_ROWS. -->
+        <ScrollWindow name="$parentList" childscrollwindow="$parentScrollChild" scrollbar="$parentScrollbar" lineheight="24" autoHideScrollBar="true">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="10" y="64" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-10" y="-60" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <VerticalScrollbar name="$parentScrollbar" inherits="StandardVertScroll" />
+            <Window name="$parentScrollChild">
+              <Size>
+                <AbsPoint x="300" y="24" />
+              </Size>
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+              </Anchors>
+              <Windows>
+                <Window name="$parentRow1" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="0" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow2" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="24" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow3" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="48" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow4" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="72" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow5" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="96" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow6" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="120" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow7" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="144" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow8" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="168" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow9" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="192" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow10" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="216" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow11" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="240" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow12" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="264" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow13" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="288" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow14" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="312" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow15" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="336" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow16" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="360" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow17" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="384" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow18" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="408" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow19" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="432" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow20" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="456" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow21" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="480" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow22" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="504" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow23" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="528" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow24" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="552" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow25" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="576" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow26" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="600" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow27" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="624" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow28" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="648" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow29" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="672" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow30" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="696" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow31" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="720" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow32" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="744" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow33" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="768" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow34" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="792" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow35" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="816" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow36" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="840" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow37" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="864" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow38" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="888" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow39" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="912" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow40" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="936" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow41" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="960" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow42" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="984" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow43" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1008" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow44" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1032" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow45" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1056" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow46" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1080" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow47" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1104" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow48" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1128" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow49" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1152" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow50" inherits="CorksAlertsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="1176" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+              </Windows>
+            </Window>
+          </Windows>
+        </ScrollWindow>
+
+        <Button name="$parentAllOnButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="18" y="-18" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksAlerts.OnAllOn" />
+          </EventHandlers>
+        </Button>
+        <Button name="$parentAllOffButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-18" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksAlerts.OnAllOff" />
+          </EventHandlers>
+        </Button>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>

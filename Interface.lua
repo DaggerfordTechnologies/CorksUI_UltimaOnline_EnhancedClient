@@ -715,6 +715,8 @@ function Interface.CreateWindows()
 	Interface.ErrorTracker(migrated, migrateErr)
 	CreateWindow( "CorksEventTrackerWindow", Interface.LoadBoolean("CorksEventTrackerWindowOpen", false))
 	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
+	CreateWindow( "CorksAlerts", Interface.LoadBoolean("CorksAlertsOpen", false))
+	CreateWindow( "CorksLootTags", Interface.LoadBoolean("CorksLootTagsOpen", false))
 	-- Shown above a jewelry box while one is open
 	CreateWindow( "CorksJewelrySearch", false)
 	-- /gumpdump notes the item pictures hovered in server gumps (GenericGump.lua loads after it)
@@ -725,6 +727,12 @@ function Interface.CreateWindows()
 	Interface.ErrorTracker(hooked, hookErr)
 	-- Other UOAM players on the map, from the UOAM Bridge (MapCommon loads after it)
 	hooked, hookErr = pcall(CorksUOAMBridge.InstallMapHook)
+	Interface.ErrorTracker(hooked, hookErr)
+	-- Corks' Alerts can turn off the default UI's center screen alerts
+	hooked, hookErr = pcall(CorksAlerts.InstallHook)
+	Interface.ErrorTracker(hooked, hookErr)
+	-- Loot Tags marks items in container grid view as the stock code draws them
+	hooked, hookErr = pcall(CorksLootTags.InstallHook)
 	Interface.ErrorTracker(hooked, hookErr)
 	Interface.CreateTCTools()
 	
@@ -1070,6 +1078,9 @@ function Interface.Update( timePassed )
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksTimers.OnUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksLootTags.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksCombatTimers.OnUpdate, timePassed)
@@ -1841,7 +1852,11 @@ function Interface.NewChatText()
 	end
 	
 		
-	ok, err = pcall(TextParsing.CenterScreenText, timePassed)	
+	ok, err = pcall(TextParsing.CenterScreenText, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	-- After the stock alerts, so a Corks alert for the same message shows last
+	ok, err = pcall(CorksAlerts.OnChatText)
 	Interface.ErrorTracker(ok, err)
 	
 	if (SystemData.TextSourceID == WindowData.PlayerStatus.PlayerId) then

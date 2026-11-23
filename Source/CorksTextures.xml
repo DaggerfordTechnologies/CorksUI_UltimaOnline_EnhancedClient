@@ -5,5 +5,24 @@
 	<Assets>
 		<!-- Center screen popup: hammer and "Repair", 400x100 DXT5 -->
 		<Texture name="CST_Repair" file="Textures/cst_Repair.dds"/>
+		<!-- Corks' Alerts popups, made by Tools/AlertTextures/make_alert_textures.py.
+		     Sizes are in CorksAlerts.TEXTURES. -->
+		<Texture name="CST_CorksCalmed" file="Textures/cst_CorksCalmed.dds"/>
+		<Texture name="CST_CorksStripped" file="Textures/cst_CorksStripped.dds"/>
+		<Texture name="CST_CorksDeathStrike" file="Textures/cst_CorksDeathStrike.dds"/>
+		<Texture name="CST_CorksRevealed" file="Textures/cst_CorksRevealed.dds"/>
+		<Texture name="CST_CorksHitSplinter" file="Textures/cst_CorksHitSplinter.dds"/>
+		<Texture name="CST_CorksHitDisarm" file="Textures/cst_CorksHitDisarm.dds"/>
+		<Texture name="CST_CorksHiddenObject" file="Textures/cst_CorksHiddenObject.dds"/>
+		<Texture name="CST_CorksStealther" file="Textures/cst_CorksStealther.dds"/>
+		<Texture name="CST_CorksMeteor" file="Textures/cst_CorksMeteor.dds"/>
+		<Texture name="CST_CorksEruption" file="Textures/cst_CorksEruption.dds"/>
+		<Texture name="CST_CorksLavaRock" file="Textures/cst_CorksLavaRock.dds"/>
+		<Texture name="CST_CorksAmbush" file="Textures/cst_CorksAmbush.dds"/>
+		<Texture name="CST_CorksTreat" file="Textures/cst_CorksTreat.dds"/>
+		<Texture name="CST_CorksCargo" file="Textures/cst_CorksCargo.dds"/>
+		<Texture name="CST_CorksKrampus" file="Textures/cst_CorksKrampus.dds"/>
+		<Texture name="CST_CorksLuckRanOut" file="Textures/cst_CorksLuckRanOut.dds"/>
+		<Texture name="CST_CorksPetals" file="Textures/cst_CorksPetals.dds"/>
 	</Assets>
 </Interface>

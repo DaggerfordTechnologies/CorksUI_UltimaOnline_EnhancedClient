@@ -1,6 +1,6 @@
 # CorksUI
 
-Custom lightweight user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a scalable notoriety-aware targeting system, an equipment durability tracker, potion timers, a system message chat filter and several Map Window improvements.
+Custom lightweight user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a scalable notoriety-aware targeting system, an equipment durability tracker, potion timers, a system message chat filter, center screen alerts, loot tags for containers and several Map Window improvements.
 
 ## Contents
 
@@ -12,6 +12,8 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Combat Timers](#combat-timers)
   - [Event Tracker](#event-tracker)
   - [Corks' Chat Filter](#corks-chat-filter)
+  - [Corks' Alerts](#corks-alerts)
+  - [Corks' Loot Tags](#corks-loot-tags)
   - [Jewelry Box Search](#jewelry-box-search)
   - [Map Window Changes](#map-window-changes)
   - [UOAM Bridge](#uoam-bridge)
@@ -177,7 +179,7 @@ The default UI shows the artifact graphic over your head when certain game messa
 - **Shard and Facet:** the line under the Event Item Tag box shows the shard you logged in to on the left and the facet you're in on the right. The client only knows the shard by a number, so CorksUI names it from a list in `CorksEventTracker.SHARD_NAMES` (`Source/CorksEventTracker.lua`): Atlantic, Baja, Catskills, Chesapeake, Great Lakes, Lake Superior, Legends, Siege Perilous and Test Center so far. Other shards show their number until they're added; the comment above the list has a chat command that prints a shard's number.
 - **Reset Event:** starts over for a new event. It clears the Event Item Tag, the event name, the saved reward points and the Artifact Count (with the drops per hour and last drop).
 
-Only game messages count, so a player typing the tag won't show the graphic. Any game message containing the tag counts as a drop, so pick text that only appears in drop messages and item names. Drops that use one of the default UI's own artifact messages are counted, but the graphic isn't shown a second time.
+Only game messages count, so a player typing the tag won't show the graphic. Any game message containing the tag counts as a drop, so pick text that only appears in drop messages and item names. Drops whose message already shows the artifact graphic through [Corks' Alerts](#corks-alerts) are counted, but the graphic isn't shown a second time.
 
 **Opening the window:** Actions → **Corks' Addons** → **Event Tracker**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Drops are counted while it is closed.
 
@@ -211,6 +213,57 @@ The client's chat window shows the game's own `Chat` log, and the UI can't remov
 - Blocking a message hides it from then on; lines already in chat stay.
 - If copying ever fails, the chat window goes back to the game's log and a message in chat says why.
 - For troubleshooting, set `CorksChatFilter.DEBUG = true` near the top of `Source/CorksChatFilter.lua`. Each message, each chat line copied or skipped, and the tabs moved to the copy are then written to `logs/CorksChatFilter.log` in the client folder.
+
+**Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
+
+### Corks' Alerts
+
+Flashes a graphic in the middle of the screen when something happens that's easy to miss in chat, like being revealed, hit by a Death Strike or bumping into a stealther. The same window turns the default UI's own center screen alerts on or off.
+
+**Opening the window:** Actions → **Corks' Addons** → **Alerts**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. The alerts keep working while it is closed.
+
+- **Checked alerts are shown.** All are on to start with, except **Vice vs Virtue battle**. Click a check box to turn an alert on or off.
+- **Click an alert's name** to see its graphic.
+- **All On** and **All Off** change every alert at once.
+
+| Group | Alerts |
+| --- | --- |
+| Things done to you | You can move again (also after untangling), Webbed, Turned to stone, Slowed, Panic, You are disarmed, Calmed, Stripped, Hit by Death Strike, Revealed, Blood Oath on you, Honor wears off |
+| Your attacks | Target splintered, Target disarmed |
+| Nearby | Something hidden nearby, Bumped a stealther, Meteor, Trade route ambush |
+| Loot | Artifact for valor, Special gift, Minax artifact, Fellowship artifact, Cult and lost kingdom treasure, Reward put in your backpack, Trick or treat (from your last target), Cargo crate, Lava rock |
+| Events | Void Pool battle begins, Void Pool battle lost, Vice vs Virtue battle, Minax's Beacon vulnerable, Volcano eruption, Krampus spotted |
+| Items | Gorgon lenses crumble, Bone machete snaps, Luck ran out, Orange petals wore off, Container full |
+| Server | Server going down, A GM is talking to you |
+
+The loot alerts show the default UI's artifact graphic. Most of the others have their own graphic. Only game messages trigger an alert, so a player typing the same words doesn't. Low Life and Low Pet Life aren't in the list; they keep the default UI's own settings.
+
+Event Tracker shows the artifact graphic for drops matching your Event Item Tag. If an alert above already shows it for that message, it isn't shown twice. If you turned that alert off, Event Tracker still shows it, because the drop matched your tag.
+
+**Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
+
+### Corks' Loot Tags
+
+Marks items in containers shown in grid view, so the good drops in a corpse stand out. Each item gets a short tag in the corner of its slot and a colored slot:
+
+| Tag | Item | Slot color |
+| --- | --- | --- |
+| `SP20` | Splintering weapon, with its % | Cyan |
+| `PARA` | Reactive paralyze | Red |
+| `mA`, `LA`, `GA`, `MA`, `LGND` | Minor, lesser, greater, major or legendary artifact | Green, green, yellow, orange, purple |
+| `AR11` | Artifact rarity, with its number | Green to purple as the rarity goes up |
+| `mM`, `LM`, `GM`, `MM` | Minor, lesser, greater or major magic item (off to start with) | Blue |
+| (none) | An item containing one of your highlight words | Gold |
+
+When an item matches more than one, the tag shows the first in this list. A highlight word decides the slot color. Stacks and items with charges keep showing their amount or charges.
+
+**Opening the window:** Actions → **Corks' Addons** → **Loot Tags**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Containers are tagged while it is closed.
+
+- **Tag items in container grid view** turns the whole feature on or off. **Show a short tag on the item** and **Tint the item's slot** turn each half on or off.
+- **Tag these:** pick which kinds of items are tagged. Click a check box or its text to change it.
+- **Highlight items containing:** type part of an item's name or properties and press **Enter**. Items containing it get a gold slot, e.g. `totem of the tribe` or `hit lightning`. Matching ignores case. Up to 10 words; uncheck words to turn them off, and **Remove Unchecked** takes them out of the list.
+
+Items are tagged from their properties. An item whose properties haven't arrived from the server yet is tagged when they arrive. Matching uses the English property text. List view isn't tagged.
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
@@ -282,6 +335,8 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6106 | Consumable Timers | Corks' Addons | `CorksTimers.Toggle()` |
 | 6107 | Combat Timers | Corks' Addons | `CorksCombatTimers.Toggle()` |
 | 6108 | Event Tracker | Corks' Addons | `CorksEventTracker.Toggle()` |
+| 6109 | Alerts | Corks' Addons | `CorksAlerts.Toggle()` |
+| 6110 | Loot Tags | Corks' Addons | `CorksLootTags.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
@@ -300,7 +355,10 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksChatFilterEnabled` | Chat Filter on/off |
 | `CorksChatFilterPreset<cliloc>` | Chat Filter starting rows (checked or not) |
 | `CorksChatFilterCount`, `CorksChatFilterId<n>`, `CorksChatFilterText<n>`, `CorksChatFilterOn<n>` | Chat Filter rows you added |
-| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksEventTrackerWindowOpen`, `CorksChatFilterOpen` | Whether each Corks window was open at logout |
+| `CorksAlert<name>` | Each Corks' Alerts row on or off, e.g. `CorksAlertrevealed` |
+| `CorksLootTagsEnabled`, `CorksLootTagsLabels`, `CorksLootTagsTint`, `CorksLootTagsArtifact`, `CorksLootTagsRarity`, `CorksLootTagsSplinter`, `CorksLootTagsPara`, `CorksLootTagsMagic` | Loot Tags options |
+| `CorksLootTagsWordCount`, `CorksLootTagsWord<n>`, `CorksLootTagsWordOn<n>` | Loot Tags highlight words |
+| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksEventTrackerWindowOpen`, `CorksChatFilterOpen`, `CorksAlertsOpen`, `CorksLootTagsOpen` | Whether each Corks window was open at logout |
 | `CorksEventTrackerItemName` | Event Tracker Event Item Tag |
 | `CorksEventTrackerRewardPoints`, `CorksEventTrackerRewardEvent`, `CorksEventTrackerRewardExpires` | Event Tracker reward points last read from the event vendor |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
@@ -312,9 +370,9 @@ Window positions and scales are saved through the standard `WindowUtils` helpers
 ```text
 CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
-├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows, the drop alerts and the chat filter, and runs the chat log copy each frame
+├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows, the drop alerts, the center screen alerts and the chat filter, installs the alert and loot tag hooks, and runs the chat log copy each frame
 ├── Source/
-│   ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6108) to the Actions menu
+│   ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6110) to the Actions menu
 │   ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
 │   ├── CorksTargeting.xml     Targeting settings window
 │   ├── CorksDurabilityGump.lua  Gear Watcher logic
@@ -330,8 +388,17 @@ CorksUI/
 │   ├── CorksJewelrySearch.lua Jewelry box search: reads the open box's items, matching, remembered pages, covers
 │   ├── CorksJewelrySearch.xml Jewelry box search bar and the cover template
 │   ├── CorksUOAMBridge.lua    Other UOAM players on the Atlas and radar, read from the UOAM Bridge's file
+│   ├── CorksAlerts.lua        Center screen alerts: game messages, switching stock alerts off, window
+│   ├── CorksAlerts.xml        Corks' Alerts window (50 rows defined up front)
+│   ├── CorksLootTags.lua      Loot tags: reads item properties, tags and tints container grid slots, window
+│   ├── CorksLootTags.xml      Corks' Loot Tags window (20 rows defined up front)
+│   ├── CorksTextures.xml      Textures added by CorksUI (Repair popup, alert graphics)
 │   └── MapWindow.lua          Map Window changes
+├── Textures/
+│   └── cst_*.dds              Repair popup and alert graphics
 └── Tools/
+    ├── AlertTextures/
+    │   └── make_alert_textures.py  Makes the Corks' Alerts graphics (not loaded by the client)
     └── UOAMBridge/
         ├── uoam_bridge.py     UOAM Bridge: lets UOAM follow the EC player (not loaded by the client)
         ├── uoam_relay.py      Relays UOAM's hub link and reads the group's positions from it
@@ -354,5 +421,8 @@ A few things about the client's Lua environment that come up when working on thi
   - `lua5.1 tests/test_chatfilter.lua` runs the chat filter tests against stand-ins for the client's chat log, overhead text and settings functions. It runs everything twice, once for a chat log that counts entries from 0 (what the client does) and once from 1 (what the docs say).
   - `lua5.1 tests/test_jewelrysearch.lua` runs the jewelry box search tests.
   - `lua5.1 tests/test_uoambridge.lua` runs the tests for reading the UOAM Bridge's player file.
+  - `lua5.1 tests/test_alerts.lua` runs the Corks' Alerts tests. They also check that each alert graphic is listed in `CorksTextures.xml` and its file is the size `CorksAlerts.TEXTURES` says.
+  - `lua5.1 tests/test_loottags.lua` runs the Loot Tags tests against a stand-in for the stock container code.
+- **Changing the alert graphics:** edit the text, font or colors in `Tools/AlertTextures/make_alert_textures.py` and run it with Python 3 and Pillow (`pip install pillow`). It writes the `.dds` files to `Textures/` and prints their sizes; copy any new sizes into `CorksAlerts.TEXTURES`. It also writes `preview.png` next to the script so you can check them by eye.
 - **Rebuilding the UOAM Bridge `.exe`:** after changing `uoam_bridge.py` or `uoam_relay.py`, run `Tools/UOAMBridge/build_exe.bat`. It installs PyInstaller into `%TEMP%\CorksUOAMBridgeBuild` the first time, not into your own Python, and writes a new `CorksUOAMBridge.exe` next to the script. The `.exe` is left out of git (`.gitignore`); attach it to a GitHub release instead.
 - **The client differs from its docs in places:** `TextLogGetEntry` counts from 0, and `WStringToString` errors on a number. Errors inside the message handlers are swallowed by `pcall`, so mistakes like these show up as features silently doing nothing.

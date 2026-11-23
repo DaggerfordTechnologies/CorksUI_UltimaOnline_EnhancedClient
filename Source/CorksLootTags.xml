@@ -1,0 +1,291 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- One row per option or highlight word (check box plus text), or a group title -->
+    <Window name="CorksLootTagsRowTemplate">
+      <Size>
+        <AbsPoint x="330" y="24" />
+      </Size>
+      <Windows>
+        <Button name="$parentButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="left" relativePoint="left">
+              <AbsPoint x="5" y="0" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksLootTags.OnRowButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentLabel" font="UO_DefaultText" maxchars="128" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="300" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="right" relativePoint="left" relativeTo="$parentButton">
+              <AbsPoint x="8" y="0" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksLootTags.OnRowLabel" />
+          </EventHandlers>
+        </Label>
+      </Windows>
+    </Window>
+
+    <Window name="CorksLootTags" movable="true" layer="popup">
+      <Size>
+        <AbsPoint x="380" y="500" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="0" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksLootTags.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksLootTags.Shutdown" />
+        <EventHandler event="OnUpdate" function="CorksLootTags.OnWindowUpdate" />
+        <EventHandler event="OnRButtonUp" function="CorksLootTags.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <!-- Rows are defined up front (not created at runtime) so they keep the
+             window's scale. Keep in sync with CorksLootTags.MAX_ROWS. -->
+        <ScrollWindow name="$parentList" childscrollwindow="$parentScrollChild" scrollbar="$parentScrollbar" lineheight="24" autoHideScrollBar="true">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="10" y="38" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-10" y="-120" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <VerticalScrollbar name="$parentScrollbar" inherits="StandardVertScroll" />
+            <Window name="$parentScrollChild">
+              <Size>
+                <AbsPoint x="330" y="24" />
+              </Size>
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+              </Anchors>
+              <Windows>
+                <Window name="$parentRow1" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="0" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow2" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="24" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow3" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="48" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow4" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="72" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow5" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="96" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow6" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="120" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow7" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="144" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow8" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="168" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow9" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="192" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow10" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="216" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow11" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="240" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow12" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="264" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow13" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="288" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow14" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="312" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow15" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="336" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow16" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="360" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow17" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="384" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow18" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="408" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow19" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="432" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+                <Window name="$parentRow20" inherits="CorksLootTagsRowTemplate">
+                  <Anchors>
+                    <Anchor point="topleft" relativePoint="topleft">
+                      <AbsPoint x="0" y="456" />
+                    </Anchor>
+                  </Anchors>
+                </Window>
+              </Windows>
+            </Window>
+          </Windows>
+        </ScrollWindow>
+
+        <Button name="$parentRemoveButton" inherits="UO_Default_Medium_Select_Button">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-18" y="-80" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksLootTags.OnRemoveUnchecked" />
+          </EventHandlers>
+        </Button>
+
+        <Label name="$parentTextLabel" font="UO_DefaultText" maxchars="64" textalign="left" handleinput="false">
+          <Size>
+            <AbsPoint x="340" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="topleft">
+              <AbsPoint x="18" y="-72" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <EditBox name="$parentTextBox" font="UO_DefaultText" taborder="1" maxchars="60" scrolling="horz" layer="overlay">
+          <Size>
+            <AbsPoint x="330" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="23" y="-25" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnKeyEnter" function="CorksLootTags.OnTextEnter" />
+            <EventHandler event="OnKeyEscape" function="CorksLootTags.OnTextEscape" />
+          </EventHandlers>
+        </EditBox>
+        <Window name="$parentTextBoxBG" handleinput="false">
+          <Size>
+            <AbsPoint x="340" y="30" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" relativeTo="$parentTextBox">
+              <AbsPoint x="-5" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+            <FullResizeImage name="$parentBG" inherits="UO_Simple_Black_Background">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+            <FullResizeImage name="$parentFrame" inherits="UO_Default_Inner_Window_Frame">
+              <Anchors>
+                <Anchor point="topleft" relativePoint="topleft" />
+                <Anchor point="bottomright" relativePoint="bottomright" />
+              </Anchors>
+            </FullResizeImage>
+          </Windows>
+        </Window>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>

@@ -15,3 +15,6 @@ Source/CorksGumpPreview.xml  export-ignore
 # README and its screenshots; GitHub shows them from the repo
 README.md           export-ignore
 *.png               export-ignore
+
+# Dev-only tool that makes the alert graphics (the .dds files it writes are shipped)
+Tools/AlertTextures  export-ignore
