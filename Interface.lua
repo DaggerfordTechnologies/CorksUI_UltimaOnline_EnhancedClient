@@ -717,6 +717,7 @@ function Interface.CreateWindows()
 	CreateWindow( "CorksChatFilter", Interface.LoadBoolean("CorksChatFilterOpen", false))
 	CreateWindow( "CorksAlerts", Interface.LoadBoolean("CorksAlertsOpen", false))
 	CreateWindow( "CorksLootTags", Interface.LoadBoolean("CorksLootTagsOpen", false))
+	CreateWindow( "CorksCombatMeter", Interface.LoadBoolean("CorksCombatMeterOpen", false))
 	-- Shown above a jewelry box while one is open
 	CreateWindow( "CorksJewelrySearch", false)
 	-- /gumpdump notes the item pictures hovered in server gumps (GenericGump.lua loads after it)
@@ -733,6 +734,9 @@ function Interface.CreateWindows()
 	Interface.ErrorTracker(hooked, hookErr)
 	-- Loot Tags marks items in container grid view as the stock code draws them
 	hooked, hookErr = pcall(CorksLootTags.InstallHook)
+	Interface.ErrorTracker(hooked, hookErr)
+	-- Combat Meter reads every damage number and adjusts how it's drawn
+	hooked, hookErr = pcall(CorksCombatMeter.InstallHook)
 	Interface.ErrorTracker(hooked, hookErr)
 	Interface.CreateTCTools()
 	
@@ -1081,6 +1085,12 @@ function Interface.Update( timePassed )
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksLootTags.OnUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksCombatDump.OnUpdate, timePassed)
+	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksCombatMeter.OnUpdate, timePassed)
 	Interface.ErrorTracker(ok, err)
 
 	ok, err = pcall(CorksCombatTimers.OnUpdate, timePassed)
@@ -1858,6 +1868,9 @@ function Interface.NewChatText()
 	-- After the stock alerts, so a Corks alert for the same message shows last
 	ok, err = pcall(CorksAlerts.OnChatText)
 	Interface.ErrorTracker(ok, err)
+
+	ok, err = pcall(CorksCombatMeter.OnChatText)
+	Interface.ErrorTracker(ok, err)
 	
 	if (SystemData.TextSourceID == WindowData.PlayerStatus.PlayerId) then
 		local spellinf = SpellsInfo.SpellsData[WStringToString(SystemData.Text)]
@@ -1957,6 +1970,7 @@ Interface.ChatAliases = {
 	-- The preview is dev-only and left out of release downloads (.gitattributes)
 	["/gumppreview"] = function() if CorksGumpPreview then CorksGumpPreview.Toggle() end end,
 	["/gumpdump"] = function() CorksGumpDump.Run() end,
+	["/combatdump"] = function() CorksCombatDump.Toggle() end,
 	["/repairpopup"] = function() CorksDurabilityGump.ShowRepairPopup() end,}
 
 -- Every line typed in chat is sent with SendChat, whichever Enter handler the chat

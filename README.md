@@ -1,6 +1,6 @@
 # CorksUI
 
-Custom lightweight user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a scalable notoriety-aware targeting system, an equipment durability tracker, potion timers, a system message chat filter, center screen alerts, loot tags for containers and several Map Window improvements.
+Custom lightweight user interface additions for the **Ultima Online Enhanced Client**. CorksUI is built on top of the default UI and adds a scalable notoriety-aware targeting system, an equipment durability tracker, potion timers, a system message chat filter, center screen alerts, loot tags for containers, a combat meter and several Map Window improvements.
 
 ## Contents
 
@@ -14,6 +14,7 @@ Custom lightweight user interface additions for the **Ultima Online Enhanced Cli
   - [Corks' Chat Filter](#corks-chat-filter)
   - [Corks' Alerts](#corks-alerts)
   - [Corks' Loot Tags](#corks-loot-tags)
+  - [Corks' Combat Meter](#corks-combat-meter)
   - [Jewelry Box Search](#jewelry-box-search)
   - [Map Window Changes](#map-window-changes)
   - [UOAM Bridge](#uoam-bridge)
@@ -267,6 +268,35 @@ Items are tagged from their properties. An item whose properties haven't arrived
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 
+### Corks' Combat Meter
+
+Sums up each fight: damage dealt, damage per second, biggest hit, damage taken by you and your pet, healing and absorbed damage. It also changes the damage numbers over heads.
+
+**Opening the window:** Actions → **Corks' Addons** → **Combat Meter**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Fights are recorded while it is closed.
+
+- **A fight** starts with the first damage number and ends after 10 seconds without one. The window shows the fight in progress, or the last one.
+- **Stats:** damage dealt, damage per second, damage taken, pet damage taken, healed / regenerated, absorbed, and the biggest hit (and on what).
+- **Enemies:** the three enemies that took the most damage in the fight, with their hits.
+- **Recent:** the last four hits and heals. The **Dealt**, **Taken**, **Pet** and **Heals** check boxes pick what's listed.
+- **Fights:** the fight in progress and the last 3 fights. Click one to show it.
+- **Reset** clears the fights and the recent list. Fights are kept until you reset, reload the UI or log out.
+
+**Damage dealt is your group's damage.** The client sends a damage number without saying who dealt it. Hits by you, your pets and other players fighting with you all arrive the same way, so they're all counted. Fight alone for your own damage. Damage taken by you and by your pet is always exact.
+
+**Healing** is worked out from your hit points, so it includes potions, spells, bandages and life leech. A rise at least as big as **Heals from** counts as healing and shows as a green number over your head, like `+52`. Smaller rises count as regeneration. A hit and a heal in the same moment are told apart by matching the drop to the damage number. **Absorbed** damage comes from the game's "point(s) of damage have been absorbed" message, and shows as a blue number in brackets, like `(12)`.
+
+**Setup** (the button at the bottom left) changes the damage numbers over heads:
+
+- **Hide small damage numbers and enlarge big hits** turns the two settings below on or off.
+- **Hide numbers below:** numbers smaller than this aren't drawn (still counted). Off by default.
+- **Big hits from:** numbers at least this big are drawn half as large again. Off by default.
+- **Heals from:** the smallest hit point rise counted as a heal (5 by default).
+- **Show heals over your head** and **Show absorbed damage over your head** turn those numbers on or off.
+
+The colors of the stock damage numbers stay as set in the client's options.
+
+**Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
+
 ### Jewelry Box Search
 
 <p>
@@ -337,6 +367,7 @@ Custom actions use IDs **6100–6149** in `Source/ActionsWindow.lua`.
 | 6108 | Event Tracker | Corks' Addons | `CorksEventTracker.Toggle()` |
 | 6109 | Alerts | Corks' Addons | `CorksAlerts.Toggle()` |
 | 6110 | Loot Tags | Corks' Addons | `CorksLootTags.Toggle()` |
+| 6111 | Combat Meter | Corks' Addons | `CorksCombatMeter.Toggle()` |
 
 You can also run any of these from a macro or the chat line with `/script <function>`.
 
@@ -358,7 +389,9 @@ Settings are stored in the client's normal interface settings, so each character
 | `CorksAlert<name>` | Each Corks' Alerts row on or off, e.g. `CorksAlertrevealed` |
 | `CorksLootTagsEnabled`, `CorksLootTagsLabels`, `CorksLootTagsTint`, `CorksLootTagsArtifact`, `CorksLootTagsRarity`, `CorksLootTagsSplinter`, `CorksLootTagsPara`, `CorksLootTagsMagic` | Loot Tags options |
 | `CorksLootTagsWordCount`, `CorksLootTagsWord<n>`, `CorksLootTagsWordOn<n>` | Loot Tags highlight words |
-| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksEventTrackerWindowOpen`, `CorksChatFilterOpen`, `CorksAlertsOpen`, `CorksLootTagsOpen` | Whether each Corks window was open at logout |
+| `CorksCombatMeterNumbers`, `CorksCombatMeterMinDamage`, `CorksCombatMeterBigHit`, `CorksCombatMeterHealMin`, `CorksCombatMeterHealNumbers`, `CorksCombatMeterAbsorbNumbers` | Combat Meter number settings |
+| `CorksCombatMeterShowDealt`, `CorksCombatMeterShowTaken`, `CorksCombatMeterShowPet`, `CorksCombatMeterShowHeals` | Combat Meter recent list filters |
+| `CorksTargetingWindowOpen`, `CorksDurabilityGumpOpen`, `CorksTimersOpen`, `CorksCombatTimersOpen`, `CorksEventTrackerWindowOpen`, `CorksChatFilterOpen`, `CorksAlertsOpen`, `CorksLootTagsOpen`, `CorksCombatMeterOpen` | Whether each Corks window was open at logout |
 | `CorksEventTrackerItemName` | Event Tracker Event Item Tag |
 | `CorksEventTrackerRewardPoints`, `CorksEventTrackerRewardEvent`, `CorksEventTrackerRewardExpires` | Event Tracker reward points last read from the event vendor |
 | `MapZoom`, `MapWindowLocked`, `ShowMapCombos`, `MapWindowTilt` | Map Window |
@@ -372,7 +405,7 @@ CorksUI/
 ├── Interface.xml              Loads all UI files, including the Corks additions
 ├── Interface.lua              Creates the Corks windows at startup, feeds journal text to both timer windows, the drop alerts, the center screen alerts and the chat filter, installs the alert and loot tag hooks, and runs the chat log copy each frame
 ├── Source/
-│   ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6110) to the Actions menu
+│   ├── ActionsWindow.lua      Adds the custom actions (IDs 6100–6111) to the Actions menu
 │   ├── CorksTargeting.lua     Targeting filters and Next/Nearest/Previous logic
 │   ├── CorksTargeting.xml     Targeting settings window
 │   ├── CorksDurabilityGump.lua  Gear Watcher logic
@@ -392,6 +425,9 @@ CorksUI/
 │   ├── CorksAlerts.xml        Corks' Alerts window (50 rows defined up front)
 │   ├── CorksLootTags.lua      Loot tags: reads item properties, tags and tints container grid slots, window
 │   ├── CorksLootTags.xml      Corks' Loot Tags window (20 rows defined up front)
+│   ├── CorksCombatMeter.lua   Combat meter: damage numbers, heals from hit points, absorbs, fights, window
+│   ├── CorksCombatMeter.xml   Corks' Combat Meter window (meter and setup panels)
+│   ├── CorksCombatDump.lua    /combatdump: records what the client sends for damage (dev tool)
 │   ├── CorksTextures.xml      Textures added by CorksUI (Repair popup, alert graphics)
 │   └── MapWindow.lua          Map Window changes
 ├── Textures/
@@ -423,6 +459,9 @@ A few things about the client's Lua environment that come up when working on thi
   - `lua5.1 tests/test_uoambridge.lua` runs the tests for reading the UOAM Bridge's player file.
   - `lua5.1 tests/test_alerts.lua` runs the Corks' Alerts tests. They also check that each alert graphic is listed in `CorksTextures.xml` and its file is the size `CorksAlerts.TEXTURES` says.
   - `lua5.1 tests/test_loottags.lua` runs the Loot Tags tests against a stand-in for the stock container code.
+  - `lua5.1 tests/test_combatdump.lua` runs the `/combatdump` tests.
+  - `lua5.1 tests/test_combatmeter.lua` runs the Combat Meter tests, including the orders hit points and damage numbers arrived in during real fights.
+- **`/combatdump`** (dev tool) records what the client sends for damage. Type it in chat to start and again to stop. Each damage number (with every field of the client's `Damage` table, the mobile's name and whether it's your target) and each change to your own hit points is written to `logs/CorksCombatDump.log`, and stopping prints a summary in chat.
 - **Changing the alert graphics:** edit the text, font or colors in `Tools/AlertTextures/make_alert_textures.py` and run it with Python 3 and Pillow (`pip install pillow`). It writes the `.dds` files to `Textures/` and prints their sizes; copy any new sizes into `CorksAlerts.TEXTURES`. It also writes `preview.png` next to the script so you can check them by eye.
 - **Rebuilding the UOAM Bridge `.exe`:** after changing `uoam_bridge.py` or `uoam_relay.py`, run `Tools/UOAMBridge/build_exe.bat`. It installs PyInstaller into `%TEMP%\CorksUOAMBridgeBuild` the first time, not into your own Python, and writes a new `CorksUOAMBridge.exe` next to the script. The `.exe` is left out of git (`.gitignore`); attach it to a GitHub release instead.
 - **The client differs from its docs in places:** `TextLogGetEntry` counts from 0, and `WStringToString` errors on a number. Errors inside the message handlers are swallowed by `pcall`, so mistakes like these show up as features silently doing nothing.
