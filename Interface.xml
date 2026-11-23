@@ -100,6 +100,7 @@
 	<Include file="Source/CorksJewelrySearch.xml"/>
 	<Include file="Source/CorksAlerts.xml"/>
 	<Include file="Source/CorksLootTags.xml"/>
+	<Include file="Source/CorksCombatMeter.xml"/>
 	<Include file="Source/QuickStats.xml"/>
 	<Include file="Source/FontSelector.xml"/>
 	<Include file="Source/LegacyRunebook.xml"/>
@@ -170,12 +171,14 @@
 		<Script file="Source/CorksGumpArt.lua"/>
 		<Script file="Source/CorksGumpPreview.lua"/>
 		<Script file="Source/CorksGumpDump.lua"/>
+		<Script file="Source/CorksCombatDump.lua"/>
 		<Script file="Source/CorksBuffRestore.lua"/>
 		<Script file="Source/CorksChatFilter.lua"/>
 		<Script file="Source/CorksJewelrySearch.lua"/>
 		<Script file="Source/CorksUOAMBridge.lua"/>
 		<Script file="Source/CorksAlerts.lua"/>
 		<Script file="Source/CorksLootTags.lua"/>
+		<Script file="Source/CorksCombatMeter.lua"/>
 		<Script file="Source/PaperdollWindow.lua" />
 		<Script file="Source/ItemsInfo.lua"/>
 		<Script file="Source/ContainersInfo.lua"/>

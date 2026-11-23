@@ -1,0 +1,1525 @@
+<Interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
+  <Windows>
+
+    <!-- The stock white bar (mobileBar, 130x10) with 4px ends, so it stretches to any
+         width. Tinted per bar with WindowSetTintColor, as the stock summon timer is. -->
+    <HorizontalResizeImage name="CorksMeterBarImage" texture="mobileBar" texturescale="1">
+      <Size>
+        <AbsPoint x="130" y="10" />
+      </Size>
+      <Sizes left="4" middle="122" right="4" />
+      <TexCoords>
+        <Left x="0" y="0" />
+        <Middle x="4" y="0" />
+        <Right x="126" y="0" />
+      </TexCoords>
+    </HorizontalResizeImage>
+
+    <!-- Corks' Combat Meter. Made by a script. The Meter panel has four tab pages
+         (Fight, Enemies, Recent, Fights); the Setup button swaps the Meter and Setup
+         panels. Every row is defined here (not created at runtime) so the rows keep
+         the window's scale. Controls inside the panels have full names
+         (CorksCombatMeter...), which the Lua uses. Size must match
+         CorksCombatMeter.WIDTH / HEIGHT; row counts match the *_ROWS constants. -->
+    <Window name="CorksCombatMeter" movable="true" layer="popup">
+      <Size>
+        <AbsPoint x="380" y="318" />
+      </Size>
+      <Anchors>
+        <Anchor point="center" relativePoint="center">
+          <AbsPoint x="0" y="0" />
+        </Anchor>
+      </Anchors>
+      <EventHandlers>
+        <EventHandler event="OnInitialize" function="CorksCombatMeter.Initialize" />
+        <EventHandler event="OnShutdown" function="CorksCombatMeter.Shutdown" />
+        <EventHandler event="OnUpdate" function="CorksCombatMeter.OnWindowUpdate" />
+        <EventHandler event="OnRButtonUp" function="CorksCombatMeter.OnClose" />
+        <EventHandler event="OnMouseWheel" function="WindowUtils.Scale" />
+      </EventHandlers>
+      <Windows>
+        <Window name="$parentChrome" inherits="UO_DefaultWindow">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+        <!-- Holder for the classic gump art background (CorksCombatMeter.ClassicBackground) -->
+        <Window name="$parentClassicBG" handleinput="false" layer="background">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft" />
+            <Anchor point="bottomright" relativePoint="bottomright" />
+          </Anchors>
+        </Window>
+
+        <Window name="$parentMeter" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="0" y="0" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="0" y="-44" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+        <Window name="CorksCombatMeterPageTotals" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="0" y="58" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="0" y="0" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+        <Label name="CorksCombatMeterFightLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="220" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="4" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterDpsLabel" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="124" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="238" y="4" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBar1Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="76" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="28" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterBar1Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="32" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterBar1Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="32" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterBar1Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="82" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="280" y="28" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBar2Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="76" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="50" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterBar2Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="54" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterBar2Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="54" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterBar2Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="82" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="280" y="50" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBar3Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="76" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="72" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterBar3Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="76" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterBar3Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="76" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterBar3Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="82" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="280" y="72" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBar4Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="76" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="94" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterBar4Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="98" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterBar4Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="98" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterBar4Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="82" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="280" y="94" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBar5Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="76" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="116" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterBar5Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="120" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterBar5Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="120" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterBar5Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="82" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="280" y="116" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBar6Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="76" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="138" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterBar6Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="142" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterBar6Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="180" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="96" y="142" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterBar6Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="82" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="280" y="138" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBiggestLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="164" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+          </Windows>
+        </Window>
+        <Window name="CorksCombatMeterPageFoes" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="0" y="58" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="0" y="0" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+        <Label name="CorksCombatMeterEnemiesHeading" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="4" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterEnemy1Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="130" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="26" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterEnemy1Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="30" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterEnemy1Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="30" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterEnemy1Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="88" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="274" y="26" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterEnemy2Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="130" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="48" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterEnemy2Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="52" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterEnemy2Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="52" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterEnemy2Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="88" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="274" y="48" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterEnemy3Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="130" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="70" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterEnemy3Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="74" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterEnemy3Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="74" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterEnemy3Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="88" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="274" y="70" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterEnemy4Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="130" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="92" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterEnemy4Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="96" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterEnemy4Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="96" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterEnemy4Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="88" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="274" y="92" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterEnemy5Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="130" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="114" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterEnemy5Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="118" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterEnemy5Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="118" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterEnemy5Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="88" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="274" y="114" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterEnemy6Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="130" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="136" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterEnemy6Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="140" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterEnemy6Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="140" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterEnemy6Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="88" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="274" y="136" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterEnemy7Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="130" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="158" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <StatusBar name="CorksCombatMeterEnemy7Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="162" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterEnemy7Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="120" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="150" y="162" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterEnemy7Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="88" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="274" y="158" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+          </Windows>
+        </Window>
+        <Window name="CorksCombatMeterPageRecent" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="0" y="58" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="0" y="0" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+        <Button name="CorksCombatMeterFilterDealtButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="2" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterFilterDealtLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="56" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="42" y="3" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+        <Button name="CorksCombatMeterFilterTakenButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="104" y="2" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterFilterTakenLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="56" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="128" y="3" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+        <Button name="CorksCombatMeterFilterPetButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="190" y="2" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterFilterPetLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="56" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="214" y="3" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+        <Button name="CorksCombatMeterFilterHealsButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="276" y="2" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterFilterHealsLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="56" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="300" y="3" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+        <Label name="CorksCombatMeterRecent1" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="30" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterRecent2" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="48" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterRecent3" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="66" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterRecent4" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="84" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterRecent5" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="102" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterRecent6" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="120" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterRecent7" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="138" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterRecent8" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="156" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+          </Windows>
+        </Window>
+        <Window name="CorksCombatMeterPageFights" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="0" y="58" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="0" y="0" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+        <Label name="CorksCombatMeterFightsHeading" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="4" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterFight1Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="70" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="26" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+        <StatusBar name="CorksCombatMeterFight1Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="30" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterFight1Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="30" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterFight1Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" >
+          <Size>
+            <AbsPoint x="128" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="234" y="26" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+        <Label name="CorksCombatMeterFight2Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="70" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="48" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+        <StatusBar name="CorksCombatMeterFight2Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="52" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterFight2Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="52" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterFight2Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" >
+          <Size>
+            <AbsPoint x="128" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="234" y="48" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+        <Label name="CorksCombatMeterFight3Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="70" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="70" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+        <StatusBar name="CorksCombatMeterFight3Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="74" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterFight3Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="74" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterFight3Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" >
+          <Size>
+            <AbsPoint x="128" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="234" y="70" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+        <Label name="CorksCombatMeterFight4Name" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="70" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="92" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+        <StatusBar name="CorksCombatMeterFight4Track" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="96" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <StatusBar name="CorksCombatMeterFight4Fill" foreground="CorksMeterBarImage" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="10" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="90" y="96" />
+            </Anchor>
+          </Anchors>
+        </StatusBar>
+        <Label name="CorksCombatMeterFight4Value" font="UO_DefaultText" maxchars="96" textalign="right" wordwrap="false" >
+          <Size>
+            <AbsPoint x="128" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="234" y="92" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnFightClick" />
+          </EventHandlers>
+        </Label>
+          </Windows>
+        </Window>
+        <Button name="CorksCombatMeterTabTotalsButton" inherits="UO_Default_Small_Select_Button" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="67" y="36" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnTabButton" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnButtonOver" />
+            <EventHandler event="OnMouseOverEnd" function="CorksCombatMeter.OnButtonOverEnd" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterTabTotalsLabel" font="Arial_Black_Shadow_12" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="65" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="CorksCombatMeterTabTotalsButton">
+              <AbsPoint x="0" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="CorksCombatMeterTabFoesButton" inherits="UO_Default_Small_Select_Button" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="130" y="36" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnTabButton" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnButtonOver" />
+            <EventHandler event="OnMouseOverEnd" function="CorksCombatMeter.OnButtonOverEnd" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterTabFoesLabel" font="Arial_Black_Shadow_12" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="65" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="CorksCombatMeterTabFoesButton">
+              <AbsPoint x="0" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="CorksCombatMeterTabRecentButton" inherits="UO_Default_Small_Select_Button" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="193" y="36" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnTabButton" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnButtonOver" />
+            <EventHandler event="OnMouseOverEnd" function="CorksCombatMeter.OnButtonOverEnd" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterTabRecentLabel" font="Arial_Black_Shadow_12" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="65" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="CorksCombatMeterTabRecentButton">
+              <AbsPoint x="0" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="CorksCombatMeterTabFightsButton" inherits="UO_Default_Small_Select_Button" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="256" y="36" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnTabButton" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnButtonOver" />
+            <EventHandler event="OnMouseOverEnd" function="CorksCombatMeter.OnButtonOverEnd" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterTabFightsLabel" font="Arial_Black_Shadow_12" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="65" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="CorksCombatMeterTabFightsButton">
+              <AbsPoint x="0" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+          </Windows>
+        </Window>
+
+        <Window name="$parentSetup" popable="false">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="0" y="0" />
+            </Anchor>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="0" y="-44" />
+            </Anchor>
+          </Anchors>
+          <Windows>
+        <Label name="CorksCombatMeterSetupHeading" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="36" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="CorksCombatMeterNumbersButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="60" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterNumbersLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="320" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="42" y="61" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+        <Button name="CorksCombatMeterHealsButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="86" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterHealsLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="320" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="42" y="87" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+        <Button name="CorksCombatMeterAbsorbsButton" inherits="UO_Default_Check_Button">
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="112" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckButton" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterAbsorbsLabel" font="UO_DefaultText" maxchars="96" textalign="left" wordwrap="false" >
+          <Size>
+            <AbsPoint x="320" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="42" y="113" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnCheckLabel" />
+          </EventHandlers>
+        </Label>
+        <Label name="CorksCombatMeterMinDamageName" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="144" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="CorksCombatMeterMinDamageMinus" inherits="UO_Default_Minus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="160" y="146" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnSliderMinus" />
+          </EventHandlers>
+        </Button>
+        <SliderBar name="CorksCombatMeterMinDamageSlider" inherits="UO_Default_Horizontal_SliderBar" numticks="50">
+          <Size>
+            <AbsPoint x="120" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="179" y="146" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnSlide" function="CorksCombatMeter.OnSlide" />
+          </EventHandlers>
+        </SliderBar>
+        <Button name="CorksCombatMeterMinDamagePlus" inherits="UO_Default_Plus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="302" y="146" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnSliderPlus" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterMinDamageValue" font="UO_DefaultText" maxchars="8" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="42" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="320" y="145" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterBigHitName" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="170" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="CorksCombatMeterBigHitMinus" inherits="UO_Default_Minus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="160" y="172" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnSliderMinus" />
+          </EventHandlers>
+        </Button>
+        <SliderBar name="CorksCombatMeterBigHitSlider" inherits="UO_Default_Horizontal_SliderBar" numticks="50">
+          <Size>
+            <AbsPoint x="120" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="179" y="172" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnSlide" function="CorksCombatMeter.OnSlide" />
+          </EventHandlers>
+        </SliderBar>
+        <Button name="CorksCombatMeterBigHitPlus" inherits="UO_Default_Plus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="302" y="172" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnSliderPlus" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterBigHitValue" font="UO_DefaultText" maxchars="8" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="42" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="320" y="171" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterHealMinName" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="140" y="20" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="196" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="CorksCombatMeterHealMinMinus" inherits="UO_Default_Minus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="160" y="198" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnSliderMinus" />
+          </EventHandlers>
+        </Button>
+        <SliderBar name="CorksCombatMeterHealMinSlider" inherits="UO_Default_Horizontal_SliderBar" numticks="50">
+          <Size>
+            <AbsPoint x="120" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="179" y="198" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnSlide" function="CorksCombatMeter.OnSlide" />
+          </EventHandlers>
+        </SliderBar>
+        <Button name="CorksCombatMeterHealMinPlus" inherits="UO_Default_Plus_Button" texturescale="0.7">
+          <Size>
+            <AbsPoint x="16" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="302" y="198" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnSliderPlus" />
+          </EventHandlers>
+        </Button>
+        <Label name="CorksCombatMeterHealMinValue" font="UO_DefaultText" maxchars="8" textalign="right" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="42" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="320" y="197" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Label name="CorksCombatMeterSetupNote" font="UO_DefaultText" maxchars="256" textalign="left" wordwrap="true" handleinput="false">
+          <Size>
+            <AbsPoint x="344" y="40" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="226" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+          </Windows>
+        </Window>
+
+        <Button name="$parentSetupButton" inherits="UO_Default_Small_Select_Button" popable="false">
+          <Anchors>
+            <Anchor point="bottomleft" relativePoint="bottomleft">
+              <AbsPoint x="22" y="-18" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnSetupButton" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnButtonOver" />
+            <EventHandler event="OnMouseOverEnd" function="CorksCombatMeter.OnButtonOverEnd" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentSetupLabel" font="Arial_Black_Shadow_12" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="65" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="$parentSetupButton">
+              <AbsPoint x="0" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <Button name="$parentResetButton" inherits="UO_Default_Small_Select_Button" popable="false">
+          <Anchors>
+            <Anchor point="bottomright" relativePoint="bottomright">
+              <AbsPoint x="-22" y="-18" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnResetButton" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnButtonOver" />
+            <EventHandler event="OnMouseOverEnd" function="CorksCombatMeter.OnButtonOverEnd" />
+          </EventHandlers>
+        </Button>
+        <Label name="$parentResetLabel" font="Arial_Black_Shadow_12" maxchars="16" textalign="center" wordwrap="false" handleinput="false">
+          <Size>
+            <AbsPoint x="65" y="16" />
+          </Size>
+          <Anchors>
+            <Anchor point="center" relativePoint="center" relativeTo="$parentResetButton">
+              <AbsPoint x="0" y="-5" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+        </Label>
+      </Windows>
+    </Window>
+
+  </Windows>
+</Interface>
