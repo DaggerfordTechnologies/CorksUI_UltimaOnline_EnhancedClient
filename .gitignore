@@ -2,5 +2,5 @@ tests/
 __pycache__/
 Tools/UOAMBridge/*
 !Tools/UOAMBridge/CorksUOAMBridge.exe
-Tools/AlertTextures/preview.png
+Tools/AlertTextures/
 TODO.md
