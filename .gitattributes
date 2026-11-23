@@ -14,3 +14,7 @@ README.md           export-ignore
 
 # Dev-only tool that makes the alert graphics (the .dds files it writes are shipped)
 Tools/AlertTextures  export-ignore
+
+# UOAM bridge source and build/launch scripts (only CorksUOAMBridge.exe is shipped)
+Tools/UOAMBridge/*.py   export-ignore
+Tools/UOAMBridge/*.bat  export-ignore
