@@ -275,10 +275,11 @@ Sums up each fight: damage dealt, damage per second, biggest hit, damage taken b
 **Opening the window:** Actions → **Corks' Addons** → **Combat Meter**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Fights are recorded while it is closed.
 
 - **A fight** starts with the first damage number and ends after 10 seconds without one. The window shows the fight in progress, or the last one.
-- **Stats:** damage dealt, damage per second, damage taken, pet damage taken, healed / regenerated, absorbed, and the biggest hit (and on what).
-- **Enemies:** the three enemies that took the most damage in the fight, with their hits.
-- **Recent:** the last four hits and heals. The **Dealt**, **Taken**, **Pet** and **Heals** check boxes pick what's listed.
-- **Fights:** the fight in progress and the last 3 fights. Click one to show it.
+- **Tabs** along the top show one page at a time. The current tab's name is gold, and the window remembers it.
+- **Totals:** the fight's length and damage per second, then a colored bar for each total: Dealt, Taken, Pet (damage your pet took), Healed, Regen and Absorbed. The bars share one scale, so you can compare them at a glance. Below them, the biggest hit and what it hit.
+- **Foes:** up to seven enemies that took the most damage, each with a bar showing its share of the damage dealt, e.g. `1,871 (91%)`.
+- **Recent:** the last eight hits and heals. The **Dealt**, **Taken**, **Pet** and **Heals** check boxes pick what's listed.
+- **Fights:** the fight in progress and the last 3 fights, with their damage and damage per second, and bars comparing them. Click one to show it on the Totals tab.
 - **Reset** clears the fights and the recent list. Fights are kept until you reset, reload the UI or log out.
 
 **Damage dealt is your group's damage.** The client sends a damage number without saying who dealt it. Hits by you, your pets and other players fighting with you all arrive the same way, so they're all counted. Fight alone for your own damage. Damage taken by you and by your pet is always exact.

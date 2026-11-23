@@ -24,7 +24,7 @@ CorksCombatMeter = {}
 CorksCombatMeter.WINDOW = "CorksCombatMeter"
 -- Size, as in the XML
 CorksCombatMeter.WIDTH = 380
-CorksCombatMeter.HEIGHT = 446
+CorksCombatMeter.HEIGHT = 318
 
 -- Same classic background as the Gear Watcher, or nil for the standard EC look
 CorksCombatMeter.ClassicBackground = 2620
@@ -46,10 +46,16 @@ CorksCombatMeter.MATCH_TIME = 2
 CorksCombatMeter.BIG_SCALE = 1.5
 
 -- Rows defined in CorksCombatMeter.xml; keep in sync
-CorksCombatMeter.STAT_ROWS = 7
-CorksCombatMeter.ENEMY_ROWS = 3
-CorksCombatMeter.RECENT_ROWS = 4
-CorksCombatMeter.FIGHT_ROWS = 3
+CorksCombatMeter.BAR_ROWS = 6
+CorksCombatMeter.ENEMY_ROWS = 7
+CorksCombatMeter.RECENT_ROWS = 8
+CorksCombatMeter.FIGHT_ROWS = 4
+
+-- The meter's tab pages, in button order
+CorksCombatMeter.TABS = { "Totals", "Foes", "Recent", "Fights" }
+CorksCombatMeter.Tab = "Totals"
+-- Color of a bar's empty track
+CorksCombatMeter.TRACK_COLOR = { 45, 40, 35 }
 
 CorksCombatMeter.COLOR = {
 	dealt  = { 255, 220, 90 },
@@ -554,27 +560,36 @@ function CorksCombatMeter.SetLabel(name, text, color)
 	LabelSetText(name, StringToWString(text))
 end
 
--- The stat rows: { name, value, color }
-function CorksCombatMeter.StatRows(fight)
+-- The Fight page bars: { name, amount, value text, color }. They share one scale,
+-- so dealt, taken and healed can be compared at a glance.
+function CorksCombatMeter.BarRows(fight)
 	local M = CorksCombatMeter
 	local C = M.COLOR
 	if not fight then
 		fight = M.NewFight(0)
 	end
-	local biggest = "-"
-	if fight.biggest > 0 then
-		biggest = M.Commas(fight.biggest) .. " on " .. (fight.biggestName or "Unknown")
-	end
-	-- 1-6 are shown in two columns (1 and 2 side by side, and so on), 7 across the window
 	return {
-		{ "Dealt",          M.Commas(fight.dealt), C.dealt },
-		{ "Per second",     M.Commas(fight.dealt / M.FightLength(fight)), C.dealt },
-		{ "Taken",          M.Commas(fight.taken), C.you },
-		{ "Pet taken",      M.Commas(fight.petTaken), C.pet },
-		{ "Healed / regen", M.Commas(fight.healed) .. " / " .. M.Commas(fight.regen), C.heal },
-		{ "Absorbed",       M.Commas(fight.absorbed), C.absorb },
-		{ "Biggest hit",    biggest, C.dealt },
+		{ "Dealt",    fight.dealt,    M.Commas(fight.dealt),    C.dealt },
+		{ "Taken",    fight.taken,    M.Commas(fight.taken),    C.you },
+		{ "Pet",      fight.petTaken, M.Commas(fight.petTaken), C.pet },
+		{ "Healed",   fight.healed,   M.Commas(fight.healed),   C.heal },
+		{ "Regen",    fight.regen,    M.Commas(fight.regen),    C.regen },
+		{ "Absorbed", fight.absorbed, M.Commas(fight.absorbed), C.absorb },
 	}
+end
+
+function CorksCombatMeter.BiggestText(fight)
+	if not fight or fight.biggest <= 0 then
+		return "Biggest hit: -"
+	end
+	return "Biggest hit: " .. CorksCombatMeter.Commas(fight.biggest) .. " on " .. (fight.biggestName or "Unknown")
+end
+
+function CorksCombatMeter.DpsText(fight)
+	if not fight then
+		return ""
+	end
+	return CorksCombatMeter.Commas(fight.dealt / CorksCombatMeter.FightLength(fight)) .. " per second"
 end
 
 -- Enemies by damage dealt, most first
@@ -639,9 +654,30 @@ function CorksCombatMeter.FightTitle(fight)
 		return "No fights yet"
 	end
 	if fight == M.Current then
-		return "Fight in progress: " .. M.Duration(M.Now() - fight.start)
+		return "In progress " .. M.Duration(M.Now() - fight.start)
 	end
-	return "Fight lasted " .. M.Duration(M.FightLength(fight)) .. ", ended " .. M.Duration(M.Now() - fight.last) .. " ago"
+	return "Lasted " .. M.Duration(M.FightLength(fight)) .. ", ended " .. M.Duration(M.Now() - fight.last) .. " ago"
+end
+
+-- Fills a bar: amount out of most, in color. A zero amount leaves only the track.
+function CorksCombatMeter.SetBar(name, amount, most, color)
+	StatusBarSetMaximumValue(name .. "Fill", math.max(most, 1))
+	StatusBarSetCurrentValue(name .. "Fill", math.max(amount, 0))
+	WindowSetTintColor(name .. "Fill", color[1], color[2], color[3])
+end
+
+-- A bar row with nothing in it: no text, no track, no fill
+function CorksCombatMeter.ClearBar(name)
+	StatusBarSetCurrentValue(name .. "Fill", 0)
+	WindowSetShowing(name .. "Track", false)
+end
+
+function CorksCombatMeter.ShowTrack(name)
+	local c = CorksCombatMeter.TRACK_COLOR
+	WindowSetShowing(name .. "Track", true)
+	StatusBarSetMaximumValue(name .. "Track", 1)
+	StatusBarSetCurrentValue(name .. "Track", 1)
+	WindowSetTintColor(name .. "Track", c[1], c[2], c[3])
 end
 
 function CorksCombatMeter.Refresh()
@@ -650,27 +686,45 @@ function CorksCombatMeter.Refresh()
 	local W = M.WINDOW
 	local fight = M.ShownFight()
 
+	-- Fight page
 	M.SetLabel(W .. "FightLabel", M.FightTitle(fight), C.gold)
-
-	local stats = M.StatRows(fight)
-	for i = 1, M.STAT_ROWS do
-		local stat = stats[i]
-		M.SetLabel(W .. "Stat" .. i .. "Name", stat[1], stat[3])
-		M.SetLabel(W .. "Stat" .. i .. "Value", stat[2], C.white)
+	M.SetLabel(W .. "DpsLabel", M.DpsText(fight), C.dealt)
+	local bars = M.BarRows(fight)
+	local most = 0
+	for _, row in ipairs(bars) do
+		most = math.max(most, row[2])
 	end
+	for i = 1, M.BAR_ROWS do
+		local row = bars[i]
+		local name = W .. "Bar" .. i
+		M.SetLabel(name .. "Name", row[1], row[4])
+		M.SetLabel(name .. "Value", row[3], C.white)
+		M.ShowTrack(name)
+		M.SetBar(name, row[2], most, row[4])
+	end
+	M.SetLabel(W .. "BiggestLabel", M.BiggestText(fight), C.dealt)
 
+	-- Enemies page: each bar is the enemy's share of the damage dealt
 	local enemies = M.EnemyRows(fight)
+	local dealt = fight and fight.dealt or 0
+	M.SetLabel(W .. "EnemiesHeading", "Damage dealt by you, your pets and friends", C.gold)
 	for i = 1, M.ENEMY_ROWS do
 		local enemy = enemies[i]
+		local name = W .. "Enemy" .. i
 		if enemy then
-			M.SetLabel(W .. "Enemy" .. i .. "Name", enemy.name, C.white)
-			M.SetLabel(W .. "Enemy" .. i .. "Value", M.Commas(enemy.total) .. " (" .. enemy.hits .. " hits)", C.dealt)
+			local share = math.floor(enemy.total * 100 / math.max(dealt, 1) + 0.5)
+			M.SetLabel(name .. "Name", enemy.name, C.white)
+			M.SetLabel(name .. "Value", M.Commas(enemy.total) .. " (" .. share .. "%)", C.white)
+			M.ShowTrack(name)
+			M.SetBar(name, enemy.total, dealt, C.dealt)
 		else
-			M.SetLabel(W .. "Enemy" .. i .. "Name", i == 1 and "None yet" or "", C.grey)
-			M.SetLabel(W .. "Enemy" .. i .. "Value", "", C.white)
+			M.SetLabel(name .. "Name", i == 1 and "None yet" or "", C.grey)
+			M.SetLabel(name .. "Value", "", C.white)
+			M.ClearBar(name)
 		end
 	end
 
+	-- Recent page
 	local recent = M.RecentRows()
 	for i = 1, M.RECENT_ROWS do
 		local entry = recent[i]
@@ -681,18 +735,40 @@ function CorksCombatMeter.Refresh()
 		end
 	end
 
+	-- Fights page: bars compare the fights' damage per second
 	local fights = M.FightList()
+	local bestDps = 0
+	for _, listed in ipairs(fights) do
+		bestDps = math.max(bestDps, listed.dealt / M.FightLength(listed))
+	end
+	M.SetLabel(W .. "FightsHeading", "Click a fight to show it", C.gold)
 	for i = 1, M.FIGHT_ROWS do
 		local listed = fights[i]
 		local name = W .. "Fight" .. i
 		if listed then
-			local when = (listed == M.Current) and "Now " or (M.Duration(M.FightLength(listed)) .. " ")
-			local text = when .. "  " .. M.Commas(listed.dealt) .. " dealt, "
-				.. M.Commas(listed.dealt / M.FightLength(listed)) .. "/s"
-			M.SetLabel(name, text, listed == fight and C.gold or C.white)
+			local when = (listed == M.Current) and "Now" or M.Duration(M.FightLength(listed))
+			local dps = listed.dealt / M.FightLength(listed)
+			local color = (listed == fight) and C.gold or C.white
+			M.SetLabel(name .. "Name", when, color)
+			M.SetLabel(name .. "Value", M.Commas(listed.dealt) .. " (" .. M.Commas(dps) .. "/s)", color)
+			M.ShowTrack(name)
+			M.SetBar(name, dps, bestDps, C.dealt)
 		else
-			M.SetLabel(name, "", C.white)
+			M.SetLabel(name .. "Name", i == 1 and "None yet" or "", C.grey)
+			M.SetLabel(name .. "Value", "", C.white)
+			M.ClearBar(name)
 		end
+	end
+end
+
+-- Shows one tab page and marks its button
+function CorksCombatMeter.ShowTab(tab)
+	local M = CorksCombatMeter
+	local C = M.COLOR
+	M.Tab = tab
+	for _, name in ipairs(M.TABS) do
+		WindowSetShowing(M.WINDOW .. "Page" .. name, name == tab)
+		M.SetLabel(M.WINDOW .. "Tab" .. name .. "Label", name, name == tab and C.gold or C.white)
 	end
 end
 
@@ -778,9 +854,6 @@ function CorksCombatMeter.Initialize()
 	WindowUtils.SetWindowTitle(W, L"Corks' Combat Meter")
 
 	local C = M.COLOR
-	M.SetLabel(W .. "EnemiesHeading", "Enemies (damage dealt by you, your pets and friends)", C.gold)
-	M.SetLabel(W .. "RecentHeading", "Recent", C.gold)
-	M.SetLabel(W .. "FightsHeading", "Fights (click to show)", C.gold)
 	M.SetLabel(W .. "SetupHeading", "Damage numbers over heads", C.gold)
 	M.SetLabel(W .. "SetupNote", "Heals are worked out from your hit points, so they include potions, spells, bandages and leech. Smaller rises count as regeneration.", C.grey)
 	LabelSetText(W .. "SetupLabel", L"Setup")
@@ -799,6 +872,15 @@ function CorksCombatMeter.Initialize()
 	for _, slider in ipairs(M.SLIDERS) do
 		M.SetLabel(W .. slider.row .. "Name", slider.text, C.white)
 	end
+
+	local savedTab = Interface.LoadString("CorksCombatMeterTab", "Totals")
+	M.Tab = "Totals"
+	for _, name in ipairs(M.TABS) do
+		if name == savedTab then
+			M.Tab = name
+		end
+	end
+	M.ShowTab(M.Tab)
 
 	M.Initialized = true
 	M.ShowSetup(false)
@@ -820,9 +902,29 @@ function CorksCombatMeter.OnButtonOver()
 end
 
 function CorksCombatMeter.OnButtonOverEnd()
+	local M = CorksCombatMeter
 	local label = string.gsub(SystemData.ActiveWindow.name, "Button$", "Label")
-	LabelSetTextColor(label, 255, 255, 255)
+	local color = M.COLOR.white
+	if label == M.WINDOW .. "Tab" .. M.Tab .. "Label" then
+		color = M.COLOR.gold
+	end
+	LabelSetTextColor(label, color[1], color[2], color[3])
 	LabelSetText(label, LabelGetText(label))
+end
+
+function CorksCombatMeter.OnTabButton()
+	local M = CorksCombatMeter
+	local tab = string.match(SystemData.ActiveWindow.name, "^" .. M.WINDOW .. "Tab(%a+)Button$")
+	for _, name in ipairs(M.TABS) do
+		if name == tab then
+			M.ShowTab(name)
+			if Interface.SaveString then
+				Interface.SaveString("CorksCombatMeterTab", name)
+			end
+			M.Refresh()
+			return
+		end
+	end
 end
 
 -- A check button changes its own pressed flag after the click handler, so clicks
@@ -864,10 +966,11 @@ end
 
 function CorksCombatMeter.OnFightClick()
 	local M = CorksCombatMeter
-	local index = tonumber(string.match(SystemData.ActiveWindow.name, "Fight(%d+)$"))
+	local index = tonumber(string.match(SystemData.ActiveWindow.name, "Fight(%d+)%a+$"))
 	local fight = index and M.FightList()[index]
 	if fight then
 		M.Selected = fight
+		M.ShowTab("Totals")
 		M.Refresh()
 	end
 end
