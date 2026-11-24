@@ -270,6 +270,10 @@ Items are tagged from their properties. An item whose properties haven't arrived
 
 ### Corks' Combat Meter
 
+<p>
+  <img src="CombatMeter.png" alt="Corks' Chat Filter" height="300">
+</p>
+
 Sums up each fight: damage dealt, damage per second, biggest hit, damage taken by you and your pet, healing and absorbed damage. It also changes the damage numbers over heads.
 
 **Opening the window:** Actions → **Corks' Addons** → **Combat Meter**. The window is closed by default. If it is open when you log out it opens again next time, until you close it. Fights are recorded while it is closed.
