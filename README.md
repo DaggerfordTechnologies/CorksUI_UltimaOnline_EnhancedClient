@@ -288,7 +288,7 @@ Sums up each fight: damage dealt, damage per second, biggest hit, damage taken b
 
 **Damage dealt is your group's damage.** The client sends a damage number without saying who dealt it. Hits by you, your pets and other players fighting with you all arrive the same way, so they're all counted. Fight alone for your own damage. Damage taken by you and by your pet is always exact.
 
-**Healing** is worked out from your hit points, so it includes potions, spells, bandages and life leech. A rise at least as big as **Heals from** counts as healing and shows as a green number over your head, like `+52`. Smaller rises count as regeneration. A hit and a heal in the same moment are told apart by matching the drop to the damage number. **Absorbed** damage comes from the game's "point(s) of damage have been absorbed" message, and shows as a blue number in brackets, like `(12)`.
+**Healing** is worked out from your hit points, so it includes potions, spells, bandages and life leech. A rise at least as big as **Heals from** counts as healing and shows as a number over your head (green by default), like `+52`. Smaller rises count as regeneration. A hit and a heal in the same moment are told apart by matching the drop to the damage number. **Absorbed** damage comes from the game's "point(s) of damage have been absorbed" message, and shows as a number in brackets (blue by default), like `(12)`.
 
 **Setup** (the button at the bottom left) changes the damage numbers over heads:
 
@@ -297,8 +297,7 @@ Sums up each fight: damage dealt, damage per second, biggest hit, damage taken b
 - **Big hits from:** numbers at least this big are drawn half as large again. Off by default.
 - **Heals from:** the smallest hit point rise counted as a heal (5 by default).
 - **Show heals over your head** and **Show absorbed damage over your head** turn those numbers on or off.
-
-The colors of the stock damage numbers stay as set in the client's options.
+- **Number colors:** click a square (or its name) to pick a color for damage numbers over **Foes**, over **You** and over your **Pet**, and for **Heals** and **Absorb**ed damage over your head. The three damage colors are the client's own settings, so they also change under Settings → Overhead Text, and changing them there changes them here. Hover over **Heals from** for how heals are worked out.
 
 **Window controls:** right-click to close; use the mouse wheel to scale it. It remembers its position and scale.
 

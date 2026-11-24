@@ -1383,7 +1383,7 @@
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
         </Label>
-        <Label name="CorksCombatMeterHealMinName" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false" handleinput="false">
+        <Label name="CorksCombatMeterHealMinName" font="UO_DefaultText" maxchars="32" textalign="left" wordwrap="false">
           <Size>
             <AbsPoint x="140" y="20" />
           </Size>
@@ -1393,6 +1393,9 @@
             </Anchor>
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnHealTipOver" />
+          </EventHandlers>
         </Label>
         <Button name="CorksCombatMeterHealMinMinus" inherits="UO_Default_Minus_Button" texturescale="0.7">
           <Size>
@@ -1444,9 +1447,9 @@
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
         </Label>
-        <Label name="CorksCombatMeterSetupNote" font="UO_DefaultText" maxchars="256" textalign="left" wordwrap="true" handleinput="false">
+        <Label name="CorksCombatMeterColorsHeading" font="UO_DefaultText" maxchars="64" textalign="left" wordwrap="false" handleinput="false">
           <Size>
-            <AbsPoint x="344" y="40" />
+            <AbsPoint x="344" y="18" />
           </Size>
           <Anchors>
             <Anchor point="topleft" relativePoint="topleft">
@@ -1454,6 +1457,151 @@
             </Anchor>
           </Anchors>
           <Color r="255" g="255" b="255" a="255" />
+        </Label>
+        <DynamicImage name="CorksCombatMeterColorFoeSwatch" inherits="ColorPickerWindowColorTemplate" alpha="1.0">
+          <Size>
+            <AbsPoint x="18" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="18" y="248" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonDown" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </DynamicImage>
+        <Label name="CorksCombatMeterColorFoeLabel" font="UO_DefaultText" maxchars="16" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="44" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="40" y="248" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </Label>
+        <DynamicImage name="CorksCombatMeterColorYouSwatch" inherits="ColorPickerWindowColorTemplate" alpha="1.0">
+          <Size>
+            <AbsPoint x="18" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="86" y="248" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonDown" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </DynamicImage>
+        <Label name="CorksCombatMeterColorYouLabel" font="UO_DefaultText" maxchars="16" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="44" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="108" y="248" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </Label>
+        <DynamicImage name="CorksCombatMeterColorPetSwatch" inherits="ColorPickerWindowColorTemplate" alpha="1.0">
+          <Size>
+            <AbsPoint x="18" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="154" y="248" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonDown" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </DynamicImage>
+        <Label name="CorksCombatMeterColorPetLabel" font="UO_DefaultText" maxchars="16" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="44" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="176" y="248" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </Label>
+        <DynamicImage name="CorksCombatMeterColorHealSwatch" inherits="ColorPickerWindowColorTemplate" alpha="1.0">
+          <Size>
+            <AbsPoint x="18" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="222" y="248" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonDown" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </DynamicImage>
+        <Label name="CorksCombatMeterColorHealLabel" font="UO_DefaultText" maxchars="16" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="44" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="244" y="248" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </Label>
+        <DynamicImage name="CorksCombatMeterColorAbsorbSwatch" inherits="ColorPickerWindowColorTemplate" alpha="1.0">
+          <Size>
+            <AbsPoint x="18" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="290" y="248" />
+            </Anchor>
+          </Anchors>
+          <EventHandlers>
+            <EventHandler event="OnLButtonDown" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
+        </DynamicImage>
+        <Label name="CorksCombatMeterColorAbsorbLabel" font="UO_DefaultText" maxchars="16" textalign="left" wordwrap="false">
+          <Size>
+            <AbsPoint x="44" y="18" />
+          </Size>
+          <Anchors>
+            <Anchor point="topleft" relativePoint="topleft">
+              <AbsPoint x="312" y="248" />
+            </Anchor>
+          </Anchors>
+          <Color r="255" g="255" b="255" a="255" />
+          <EventHandlers>
+            <EventHandler event="OnLButtonUp" function="CorksCombatMeter.OnColorClick" />
+            <EventHandler event="OnMouseOver" function="CorksCombatMeter.OnColorOver" />
+          </EventHandlers>
         </Label>
           </Windows>
         </Window>

@@ -85,6 +85,23 @@ CorksCombatMeter.SLIDERS = {
 	{ row = "BigHit",    key = "BigHit",    text = "Big hits from",      min = 0, max = 300, default = 0, step = 10 },
 	{ row = "HealMin",   key = "HealMin",   text = "Heals from",         min = 1, max = 50, default = 5, step = 1 },
 }
+-- Colors of the numbers over heads, picked on the Setup page. The three damage
+-- colors are the stock client's own (DamageWindow, saved under its names), so the
+-- client's Settings > Overhead Text pickers and these always agree. Heals and
+-- absorbed damage are the meter's own numbers, saved under key.
+CorksCombatMeter.NUMBER_COLORS = {
+	{ row = "Foe",    text = "Foes",   stock = "OTHERGETDAMAGE_COLOR", tip = "Damage numbers over anyone but you and your pet" },
+	{ row = "You",    text = "You",    stock = "YOUGETAMAGE_COLOR",    tip = "Damage numbers over you" },
+	{ row = "Pet",    text = "Pet",    stock = "PETGETDAMAGE_COLOR",   tip = "Damage numbers over your pet" },
+	{ row = "Heal",   text = "Heals",  key = "HealColor",   default = { r = 90, g = 255, b = 120, a = 255 }, tip = "Heals over your head, like +52" },
+	{ row = "Absorb", text = "Absorb", key = "AbsorbColor", default = { r = 100, g = 180, b = 255, a = 255 }, tip = "Absorbed damage over your head, like (12)" },
+}
+CorksCombatMeter.PICKER = "CorksCombatMeterColorPicker"
+CorksCombatMeter.PickingRow = nil
+-- The stock hue picker's choices: nine shades of each of these hues
+CorksCombatMeter.PICKER_HUES = { 0, 34, 53, 63, 89, 119, 144, 368, 946 }
+CorksCombatMeter.HEAL_TIP = "Heals are worked out from your hit points, so they include potions, spells, bandages and leech. Smaller rises count as regeneration."
+
 CorksCombatMeter.FILTERS = {
 	{ row = "Dealt", key = "ShowDealt", text = "Dealt", color = "dealt" },
 	{ row = "Taken", key = "ShowTaken", text = "Received", color = "you" },
@@ -132,6 +149,16 @@ function CorksCombatMeter.Load()
 	for _, slider in ipairs(CorksCombatMeter.SLIDERS) do
 		S[slider.key] = CorksCombatMeter.Clamp(slider, Interface.LoadNumber("CorksCombatMeter" .. slider.key, slider.default))
 	end
+	for _, entry in ipairs(CorksCombatMeter.NUMBER_COLORS) do
+		if entry.key then
+			local d = entry.default
+			local c = Interface.LoadColor("CorksCombatMeter" .. entry.key, nil)
+			if type(c) ~= "table" or not Interface.CheckColor(c) then
+				c = { r = d.r, g = d.g, b = d.b, a = d.a }
+			end
+			S[entry.key] = c
+		end
+	end
 	CorksCombatMeter.Loaded = true
 end
 
@@ -145,6 +172,8 @@ function CorksCombatMeter.Set(key, value)
 	CorksCombatMeter.Settings[key] = value
 	if type(value) == "boolean" then
 		Interface.SaveBoolean("CorksCombatMeter" .. key, value)
+	elseif type(value) == "table" then
+		Interface.SaveColor("CorksCombatMeter" .. key, value)
 	else
 		Interface.SaveNumber("CorksCombatMeter" .. key, value)
 	end
@@ -350,7 +379,7 @@ function CorksCombatMeter.RecordHeal(amount)
 	if isHeal then
 		M.AddRecent("heal", amount, nil)
 		if M.Get("HealNumbers") then
-			pcall(M.ShowOverPlayer, L"+" .. StringToWString(tostring(amount)), M.COLOR.heal)
+			pcall(M.ShowOverPlayer, L"+" .. StringToWString(tostring(amount)), M.Get("HealColor"))
 		end
 	end
 end
@@ -364,7 +393,7 @@ function CorksCombatMeter.RecordAbsorb(amount)
 	end
 	M.AddRecent("absorb", amount, nil)
 	if M.Get("AbsorbNumbers") then
-		pcall(M.ShowOverPlayer, L"(" .. StringToWString(tostring(amount)) .. L")", M.COLOR.absorb)
+		pcall(M.ShowOverPlayer, L"(" .. StringToWString(tostring(amount)) .. L")", M.Get("AbsorbColor"))
 	end
 end
 
@@ -456,7 +485,8 @@ function CorksCombatMeter.AfterDamage(mobileId, amount)
 	end
 end
 
--- Draws text over your head the way the stock code draws damage numbers
+-- Draws text over your head the way the stock code draws damage numbers, in
+-- color ({ r, g, b })
 function CorksCombatMeter.ShowOverPlayer(text, color)
 	local playerId = CorksCombatMeter.PlayerId()
 	if not playerId then
@@ -465,7 +495,7 @@ function CorksCombatMeter.ShowOverPlayer(text, color)
 	DamageWindow.AddText(playerId, text)
 	local index = CorksCombatMeter.FindNumberWindow(playerId, text)
 	if index then
-		LabelSetTextColor("DamageWindow" .. index .. "Text", color[1], color[2], color[3])
+		LabelSetTextColor("DamageWindow" .. index .. "Text", color.r, color.g, color.b)
 	end
 end
 
@@ -822,6 +852,7 @@ function CorksCombatMeter.RefreshSetup()
 	for _, slider in ipairs(M.SLIDERS) do
 		M.ShowSlider(slider)
 	end
+	M.ShowColorSwatches()
 end
 
 function CorksCombatMeter.ShowSetup(show)
@@ -833,9 +864,140 @@ function CorksCombatMeter.ShowSetup(show)
 		LabelSetText(M.WINDOW .. "SetupLabel", L"Meter")
 		M.RefreshSetup()
 	else
+		M.ClosePicker()
 		LabelSetText(M.WINDOW .. "SetupLabel", L"Setup")
 		M.Refresh()
 	end
+end
+
+----------------------------------------------------------------
+-- Window: number colors
+----------------------------------------------------------------
+
+-- The color in use for a NUMBER_COLORS entry: { r, g, b }, or nil
+function CorksCombatMeter.ColorOf(entry)
+	if entry.stock then
+		return DamageWindow and DamageWindow[entry.stock]
+	end
+	return CorksCombatMeter.Get(entry.key)
+end
+
+-- The NUMBER_COLORS entry for a swatch or its label, or nil
+function CorksCombatMeter.ColorEntryOf(windowName)
+	local row = string.match(windowName or "", "^" .. CorksCombatMeter.WINDOW .. "Color(%a+)Swatch$")
+		or string.match(windowName or "", "^" .. CorksCombatMeter.WINDOW .. "Color(%a+)Label$")
+	for _, entry in ipairs(CorksCombatMeter.NUMBER_COLORS) do
+		if entry.row == row then
+			return entry
+		end
+	end
+	return nil
+end
+
+function CorksCombatMeter.ShowColorSwatches()
+	local M = CorksCombatMeter
+	for _, entry in ipairs(M.NUMBER_COLORS) do
+		local c = M.ColorOf(entry)
+		if c then
+			WindowSetTintColor(M.WINDOW .. "Color" .. entry.row .. "Swatch", c.r, c.g, c.b)
+		end
+	end
+end
+
+function CorksCombatMeter.ClosePicker()
+	CorksCombatMeter.PickingRow = nil
+	if DoesWindowNameExist(CorksCombatMeter.PICKER) then
+		DestroyWindow(CorksCombatMeter.PICKER)
+	end
+end
+
+-- Opens the stock hue picker above a swatch. The picker is made fresh each time,
+-- because its code keeps state per window name.
+function CorksCombatMeter.OpenPicker(entry)
+	local M = CorksCombatMeter
+	local P = M.PICKER
+	M.ClosePicker()
+	local hues = {}
+	for _, hue in ipairs(M.PICKER_HUES) do
+		for shade = 0, 8 do
+			table.insert(hues, hue + shade)
+		end
+	end
+	ColorPickerWindow.colorSelected[P] = nil
+	CreateWindowFromTemplate(P, "ColorPickerWindowTemplate", "Root")
+	-- Above the meter, which is on the popup layer
+	WindowSetLayer(P, Window.Layers.OVERLAY)
+	ColorPickerWindow.SetNumColorsPerRow(9)
+	ColorPickerWindow.SetSwatchSize(30)
+	ColorPickerWindow.SetWindowPadding(4, 4)
+	-- No frame round the chosen color: the stock code mixes up hue and index for it
+	ColorPickerWindow.SetFrameEnabled(false)
+	ColorPickerWindow.SetCloseButtonEnabled(true)
+	ColorPickerWindow.SetColorTable(hues, P)
+	ColorPickerWindow.DrawColorTable(P)
+	ColorPickerWindow.SetAfterColorSelectionFunction(M.OnColorPicked)
+	local _, height = WindowGetDimensions(P)
+	WindowClearAnchors(P)
+	WindowAddAnchor(P, "topleft", M.WINDOW .. "Color" .. entry.row .. "Swatch", "topleft", 0, -height - 6)
+	WindowSetShowing(P, true)
+	M.PickingRow = entry.row
+end
+
+-- Called by the stock picker after a color is clicked
+function CorksCombatMeter.OnColorPicked(parent)
+	local M = CorksCombatMeter
+	-- Another window's picker (the stock settings set this function back on open)
+	if parent ~= M.PICKER or not M.PickingRow then
+		return
+	end
+	local entry
+	for _, candidate in ipairs(M.NUMBER_COLORS) do
+		if candidate.row == M.PickingRow then
+			entry = candidate
+		end
+	end
+	M.PickingRow = nil
+	local hue = ColorPickerWindow.colorSelected[parent]
+	if not entry or not hue then
+		return
+	end
+	local r, g, b, a = HueRGBAValue(hue)
+	if entry.stock then
+		local c = DamageWindow and DamageWindow[entry.stock]
+		if not c then
+			return
+		end
+		-- Changed in place, like the stock settings do, so DamageWindow uses it at once
+		c.r, c.g, c.b, c.a = r, g, b, a
+		Interface.SaveColor("DamageWindow" .. entry.stock, c)
+	else
+		M.Set(entry.key, { r = r, g = g, b = b, a = a })
+	end
+	M.ShowColorSwatches()
+end
+
+function CorksCombatMeter.OnColorClick()
+	local entry = CorksCombatMeter.ColorEntryOf(SystemData.ActiveWindow.name)
+	if entry then
+		CorksCombatMeter.OpenPicker(entry)
+	end
+end
+
+function CorksCombatMeter.ShowTip(text)
+	Tooltips.CreateTextOnlyTooltip(SystemData.ActiveWindow.name, StringToWString(text))
+	Tooltips.Finalize()
+	Tooltips.AnchorTooltip(Tooltips.ANCHOR_WINDOW_TOP)
+end
+
+function CorksCombatMeter.OnColorOver()
+	local entry = CorksCombatMeter.ColorEntryOf(SystemData.ActiveWindow.name)
+	if entry then
+		CorksCombatMeter.ShowTip(entry.tip .. ". Click to change the color.")
+	end
+end
+
+function CorksCombatMeter.OnHealTipOver()
+	CorksCombatMeter.ShowTip(CorksCombatMeter.HEAL_TIP)
 end
 
 -- Draws the classic background (protected, so a problem with the art can never
@@ -874,7 +1036,10 @@ function CorksCombatMeter.Initialize()
 
 	local C = M.COLOR
 	M.SetLabel(W .. "SetupHeading", "Damage numbers over heads", C.gold)
-	M.SetLabel(W .. "SetupNote", "Heals are worked out from your hit points, so they include potions, spells, bandages and leech. Smaller rises count as regeneration.", C.grey)
+	M.SetLabel(W .. "ColorsHeading", "Number colors (click one to change it)", C.grey)
+	for _, entry in ipairs(M.NUMBER_COLORS) do
+		M.SetLabel(W .. "Color" .. entry.row .. "Label", entry.text, C.white)
+	end
 	LabelSetText(W .. "SetupLabel", L"Setup")
 	LabelSetText(W .. "ResetLabel", L"Reset")
 
@@ -907,6 +1072,7 @@ function CorksCombatMeter.Initialize()
 end
 
 function CorksCombatMeter.Shutdown()
+	CorksCombatMeter.ClosePicker()
 	WindowUtils.SaveWindowPosition(CorksCombatMeter.WINDOW)
 	CorksGumpArt.ReleaseAll(CorksCombatMeter.GumpArt)
 	CorksCombatMeter.Initialized = false
@@ -1068,6 +1234,9 @@ function CorksCombatMeter.SetOpen(open)
 		return
 	end
 	WindowSetShowing(W, open)
+	if not open then
+		CorksCombatMeter.ClosePicker()
+	end
 	if open and not CorksCombatMeter.ShowingSetup then
 		CorksCombatMeter.Refresh()
 	end
